@@ -1,0 +1,29 @@
+Contexto: Estou iniciando um projeto Python com FastAPI usando VS Code. Preciso preparar a estrutura de diretório e iniciar um git no main.
+Objetivo: Crie a estrutura de diretórios a partir de /laboratorio-projeto, para a aplicação, com diretórios por tarefa, diretório para prompts e docs auxiliares.
+Estilo: Organize por secoes usando a tecnologia como criterio, com comentarios.
+Resposta: Crie a estrutura de diretórios, sem arquivos. Crie o git e o main no diretorio /laboratorio-projeto e faça o primeiro commit . Crie no diretório de prompts o arquivo Prompt00 - Inicio com o conteúdo desse prompt.
+
+---
+
+Modelo: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 03/10/2026
+
+Resumo da resposta:
+
+- Diretórios criados conforme a estrutura do CLAUDE.md, por camada (tarefa):
+  app/api (controller), app/models (estruturas de dados), app/repositories
+  (acesso ao banco), app/services (regras de negócio), docs, prompts e tests.
+  Nenhum arquivo foi criado dentro deles.
+- .gitignore criado (passo 1 da inicialização no CLAUDE.md), organizado em
+  seções comentadas por tecnologia: Python, ambiente virtual, pytest/mypy,
+  .env, SQLite, VS Code e sistema operacional.
+- Repositório git iniciado com a branch main e primeiro commit contendo
+  .gitignore, CLAUDE.md e este arquivo.
+- Observação: o git não versiona diretórios vazios. Os diretórios app/, docs/
+  e tests/ existem localmente e entram no repositório quando receberem seus
+  primeiros arquivos. Não foram usados arquivos .gitkeep porque a estrutura de
+  diretórios do CLAUDE.md é fechada e proíbe arquivos criados por antecipação.
+- Divergência de nome: o CLAUDE.md cita "Prompt00 - Cria estrutura e main" como
+  exemplo; prevaleceu o nome pedido, "Prompt00 - Inicio".
+
+Interações seguintes: nenhuma.
