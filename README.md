@@ -167,4 +167,4 @@ Fora do escopo do MVP. São possibilidades futuras, não compromissos:
 
 Desenvolvido por Luis Z Siqueira, com apoio do Claude Code, como miniprojeto do curso 1 da pós-graduação SWE-GENAI.
 
-Distribuído sob a licença MIT.
+Distribuído sob a licença MIT. Veja o arquivo [`LICENSE`](LICENSE).

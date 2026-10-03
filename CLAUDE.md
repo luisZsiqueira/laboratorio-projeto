@@ -255,6 +255,7 @@ laboratorio-projeto/
 │   ├── test_task_routes.py    # integração dos endpoints (inclui /health)
 │   └── test_task_service.py   # unitários do service de tarefas
 ├── .gitignore
+├── LICENSE                    # licença MIT
 ├── README.md
 ├── requirements.txt           # dependências com versões fixadas
 └── CLAUDE.md                  # este arquivo

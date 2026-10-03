@@ -1,0 +1,21 @@
+Contexto: MVP de micro-API para gestao de tarefas. Existentes no projeto o arquivo CLAUDE.md com configurações de como vamos trabalhar, diretorios /prompts para armazenar os prompts, /docs para os documentos, contendo o arquivo /docs/requerimentos.md com requerimentos do projeto. Iremos usar a licença MIT. 
+Objetivo: Escrever no diretório um arquivo LICENSE com a licenca mit.  
+Estilo: Markdown simples, direto e profissional.  
+Resposta: Forneca o LICENSE completo e grave o arquivo no diretório. Atualize os faltantes no git. Não comite.
+---
+
+Modelo: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 03/10/2026
+
+Resumo da execução:
+
+- LICENSE criado na raiz com o texto padrão da licença MIT (em inglês,
+  Copyright (c) 2026 Luis Z Siqueira).
+- Divergência do estilo pedido: o arquivo é texto puro, não Markdown, e
+  mantém o texto oficial sem alterações, para o GitHub reconhecer a licença.
+- README: seção "Créditos e licença" passa a apontar para o LICENSE.
+- CLAUDE.md: LICENSE incluído na estrutura de diretórios (fechada).
+- Git: arquivos adicionados ao stage na branch docs/arquitetura, junto com
+  as mudanças do prompt 04 ainda sem commit. Sem commit.
+
+Interações seguintes: nenhuma.
