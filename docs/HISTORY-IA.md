@@ -29,6 +29,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 04 | 03/10/2026 | Arquitetura | `docs/arquitetura.md` (Mermaid e ADRs), roadmap | ~2,5 h |
 | 05 | 03/10/2026 | Documentação / licenciamento | `LICENSE` (MIT) | ~0,2 h |
 | 06 | 03/10/2026 | Documentação do processo | este arquivo | ~1 h |
+| 07 | 03/10/2026 | Publicação / verificação | *push* para o GitHub, conferência do clone e dos diagramas Mermaid | ~0,5 h |
 
 ## Entradas
 
@@ -127,6 +128,20 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Ganho percebido:** ~1 h
 - **Desafios:**
   - As estimativas de ganho foram feitas pela IA e dependem de validação do autor.
+
+### Prompt 07: publicação no GitHub
+
+- **Data:** 03/10/2026
+- **Fase:** publicação e verificação
+- **Modelo:** Claude Opus 5.5, via Claude Code, com a extensão Claude in Chrome para inspecionar a página
+- **Uso da IA:** varredura de segredos antes da publicação, *push* de `main`, comparação de um clone limpo com o repositório local, verificação da licença pela API do GitHub e conferência visual da renderização dos 5 diagramas Mermaid no navegador
+- **Prompt:** [`prompts/Prompt 07 - push GitHub visualizacao mermaid`](../prompts/Prompt%2007%20-%20push%20GitHub%20visualizacao%20mermaid)
+- **Refinamentos:** nenhum
+- **Ganho percebido:** ~0,5 h
+- **Desafios:**
+  - A renderização Mermaid do GitHub acontece no navegador, então não basta conferir o arquivo publicado; foi preciso abrir a página e inspecionar cada diagrama. Isso fechou a pendência do Prompt 04, que não pôde renderizar localmente.
+  - A captura de tela da página travou algumas vezes; capturas isoladas resolveram.
+  - Diretórios vazios (`app/`, `tests/`) não aparecem no GitHub, como já previsto no Prompt 00.
 
 ## Observações transversais
 
