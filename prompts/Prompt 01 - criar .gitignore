@@ -1,0 +1,39 @@
+Contexto: Estou iniciando um projeto Python com FastAPI usando VS Code. Também pretendo usar Node.js para o frontend no futuro. Preciso de um arquivo .gitignore abrangente.
+Objetivo: Verificar e corrigir o arquivo .gitignore para que ignore arquivos e pastas comuns de Python, Node.js, Vs Code, bancos de dados SQLite3 e ambientes virtuais.
+Estilo: Organização por secoes usando a tecnologia como criterio, com comentarios.
+Resposta: Atualize o arquivo gitignore do projeto com a versão verificada e corrigida. Quanto ao Git, abra o brach, adicione os faltantes. Não comite.
+
+---
+
+Modelo: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 03/10/2026
+
+Resumo da resposta:
+
+- Branch fix/gitignore-abrangente criada a partir de main.
+- .gitignore revisado e ampliado, em seções comentadas por tecnologia:
+  - Python: acrescentados *$py.class, *.so, .Python, wheels/, *.egg, logs do pip.
+  - Ambientes virtuais: acrescentados env/ e ENV/.
+  - Testes e linters: acrescentados dmypy, .ruff_cache/, .coverage.*,
+    coverage.xml, .tox/, .nox/, .cache/.
+  - Configuração: corrigido o padrão .env.*, que também ignorava o
+    .env.example; incluída a exceção !.env.example.
+  - SQLite3: acrescentados os arquivos de WAL e shared memory
+    (*.db-wal, *.db-shm) e os equivalentes de *.sqlite3.
+  - Node.js (seção nova): node_modules/, caches de npm/pnpm/yarn, eslint,
+    Parcel, Vite, Next, Nuxt, Turbo, coverage/ e logs de depuração.
+  - Logs gerais: *.log e logs/.
+  - VS Code: acrescentados *.code-workspace e .history/.
+  - Sistema operacional: separado em Windows, macOS e Linux, com padrões
+    acrescentados ($RECYCLE.BIN/, ._*, *~ etc.).
+- Verificação com git check-ignore sobre caminhos de exemplo: artefatos
+  ignorados; app/, tests/, prompts/, README.md, requirements.txt e
+  .env.example continuam versionáveis.
+- .gitignore e este arquivo adicionados ao stage. Sem commit, como pedido.
+- Divergências do CLAUDE.md: o frontend em Node.js está fora do MVP e o
+  CLAUDE.md pede para não antecipar configuração para ele; a seção Node.js
+  foi incluída por pedido explícito e só afeta o que o git ignora. O nome
+  deste arquivo ("Prompt 01", com espaço) difere do padrão "PromptNN" e foi
+  mantido como criado pelo usuário.
+
+Interações seguintes: nenhuma.

@@ -1,0 +1,41 @@
+Contexto: MVP de micro-API para gestao de tarefas com priorizacao assistida porIA. Criação do arquivo requirements.txt com a lista de dependências.
+Objetivo: Criar o arquivo requirements.txt no diretório, com assertividade quanto as versões utilizadas, inclusive do Python, verificando se estão todas em uso atualmente.
+Estilo: Criar o requirements.txt em formato UTF-8 sem BOM.
+Resposta: Grave o arquivo requirements.txt no diretório. Adicione ao branch do git. Comite. Realize o merge com o main.
+
+
+---
+
+Modelo: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 03/10/2026
+
+Resumo da resposta:
+
+- Versões consultadas no PyPI em 03/10/2026 (pip index versions), última
+  estável de cada pacote direto: fastapi 0.142.2, uvicorn 0.54.0,
+  SQLAlchemy 2.1.3, pydantic 2.13.5, pydantic-settings 2.15.0, pytest 9.1.1,
+  httpx2 2.13.1, mypy 2.4.0.
+- Achado: o Starlette 1.7.0 (trazido pelo FastAPI) exige httpx2 para o
+  TestClient; com httpx, emite aviso de deprecação, que falharia com
+  -W error. Registrado na tabela de APIs deprecadas do CLAUDE.md.
+- requirements.txt criado em UTF-8 sem BOM (verificado pelos primeiros
+  bytes), com dependências diretas e transitivas fixadas, marcadores de
+  plataforma (colorama só no Windows, librt só fora do PyPy) e comentário
+  com a versão do Python: mínimo 3.11 (exigido pelo SQLAlchemy 2.1.3),
+  testado em 3.14.6. Todos os pacotes listados estão em uso (diretos ou
+  exigidos por eles).
+- Validação: instalação em ambiente virtual limpo a partir do arquivo,
+  pip check sem conflitos, pip freeze idêntico ao do .venv, smoke test do
+  TestClient com -W error.
+- README atualizado: Stack com versões, nova seção Configuração
+  (DATABASE_URL, ENVIRONMENT, padrões), nota em Como rodar e tabela de uso
+  de IA.
+- .gitignore: acrescentado o padrão .~lock.*# (lock do LibreOffice, que
+  apareceu ao abrir o README).
+- Git: três commits na branch (gitignore, README e requisitos,
+  requirements), branch renomeada para docs/inicializacao, merge em main
+  com --no-ff. Sem push.
+- Divergência: o contexto do prompt repete "priorização assistida por IA";
+  mantido fora do MVP, conforme CLAUDE.md e README, até decisão do usuário.
+
+Interações seguintes: nenhuma.

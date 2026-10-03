@@ -191,7 +191,7 @@ Padrões suspeitos a checar primeiro, por serem os que assistentes de IA costuma
 | `class Config:` em `BaseSettings` | `model_config = SettingsConfigDict(env_file=".env")` | a verificar |
 | `datetime.utcnow()` | `datetime.now(datetime.UTC)` | a verificar |
 | `declarative_base()` | `class Base(DeclarativeBase)` | a verificar |
-| cliente HTTP usado pelo `TestClient` (`httpx` vs. sucessor) | o que a versão do Starlette instalada exigir | a verificar |
+| cliente HTTP usado pelo `TestClient` (`httpx` vs. sucessor) | `httpx2` (2.13.1): sem ele, o Starlette recorre ao `httpx` e emite aviso de deprecação | proibido `httpx` (Starlette 1.7.0, 03/10/2026) |
 | fixture de banco em memória sem `engine.dispose()` | chamar `engine.dispose()` ao final da fixture | a verificar |
 | `mypy app` sobre `app/` sem `__init__.py` na raiz | se houver erro de módulo duplicado ou não encontrado, usar `python -m mypy --explicit-package-bases app` e registrar como ADR | a verificar |
 

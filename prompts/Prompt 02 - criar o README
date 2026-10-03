@@ -1,0 +1,41 @@
+Contexto: MVP de micro-API para gestao de tarefas com priorizacao assistida porIA. Existentes no projeto o arquivo CLAUDE.md com configurações de como vamos trabalhar, diretorios /prompts para armazenar os prompts, /docs para os documentos, contendo o arquivo /docs/requerimentos.md com requerimentos do projeto. Iremos usar a licença MIT. Objetivo: Escrever no diretório um README inicial com objetivo, stack, como rodar localmente e roadmap de releases.  Estilo: Markdown simples, direto e profissional.  Resposta: Forneca o README completo e grave o arquivo no diretório. Atualize os faltantes no git. Não comite.
+
+
+---
+
+Modelo: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 03/10/2026
+
+Resumo da resposta:
+
+- README.md criado na raiz, marcado como "em desenvolvimento", com as seções:
+  Objetivo (escopo do MVP e tabela de prioridades), Stack, Como rodar
+  localmente (PowerShell e Bash, comandos da definição de pronto), Roadmap de
+  releases, Uso de IA generativa, Limitações e próximos passos, e Licença (MIT).
+- Conteúdo baseado no Ponto de partida do CLAUDE.md, porque o
+  docs/requerimentos.md citado no prompt não existe no repositório (docs/
+  está vazio).
+- README.md e este arquivo adicionados ao stage, na branch
+  fix/gitignore-abrangente (sem resposta sobre a branch separada). Sem commit.
+- Divergências e pendências:
+  - O prompt fala em "priorização assistida por IA" no MVP; o CLAUDE.md a
+    coloca fora do MVP. O README seguiu o CLAUDE.md: priority_advisor
+    determinístico no MVP e a versão com IA em Limitações e próximos passos.
+    Aguarda confirmação do usuário.
+  - Licença MIT citada no README, sem arquivo LICENSE, porque a estrutura de
+    diretórios do CLAUDE.md é fechada. Aguarda decisão do usuário.
+  - Stack sem versões: serão fixadas e verificadas no PyPI na criação do
+    requirements.txt (passo 4 da inicialização).
+  - Roadmap (v0.1.0 = MVP; v1.0.0 = entrega) é uma proposta do assistente,
+    sem fonte anterior; aguarda confirmação.
+  - Python instalado na máquina: 3.14.6. A versão em que o projeto foi testado
+    será registrada quando houver testes.
+
+Interações seguintes:
+
+- 03/10/2026: usuário adicionou docs/requerimentos.md e aceitou renomear a
+  branch para docs/inicializacao no momento do commit. README revisado contra
+  os requisitos: seção Licença virou "Créditos e licença" (autor e apoio do
+  Claude Code) e o roadmap passou a citar a tag/release v1.0.0 no GitHub.
+  Exemplos de uso ficam para quando os endpoints existirem (v0.1.0).
+  docs/requerimentos.md adicionado ao stage. Sem commit.
