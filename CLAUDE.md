@@ -32,11 +32,9 @@ Decisões já acordadas entre o usuário e o assistente antes de existir código
 
 - **Escopo do MVP:** criar, listar (com filtro por *status*), consultar, atualizar (total e parcial), marcar como concluída e excluir tarefas; *health check* real da aplicação e do banco. Cada tarefa tem prioridade e pode ser **aberta** (sem data/hora) ou **específica** (com data/hora estipulada).
 - **Prioridade:** 1 = mandatória (fazer imediatamente); 2 = importante (fazer hoje se possível); 3 = regular (fazer quando houver tempo); 4 = fazer na data/hora estipulada. Decisões em aberto para o *blueprint*: se prioridade 4 exige data/hora e vice-versa; prioridade padrão (recomendação: 3); filtro por prioridade.
-- **Assessor de prioridade (`priority_advisor`):** a estrutura de diretórios prevê `tests/test_priority_advisor.py`, portanto há um componente `app/services/priority_advisor.py` no MVP. Decisão em aberto para o *blueprint* da `v0.1.0`: o que ele faz. Recomendação: regras determinísticas, sem IA (por exemplo, validar a coerência entre prioridade e data/hora e sugerir prioridade pela proximidade do prazo), chamadas pelo *service*. A versão assistida por IA continua fora do MVP.
+- **Assessor de prioridade (`priority_advisor`):** a estrutura de diretórios prevê `tests/test_priority_advisor.py`, portanto há um componente `app/services/priority_advisor.py` no MVP. Decisão em aberto para o *blueprint* da `v0.4.0`: o que ele faz. Recomendação: regras determinísticas, sem IA (por exemplo, validar a coerência entre prioridade e data/hora e sugerir prioridade pela proximidade do prazo), chamadas pelo *service*. A versão assistida por IA continua fora do MVP.
 - **Fora do MVP (registrar no README em Limitações e Próximos Passos):** autenticação e usuários, paginação, *frontend*, migrações com Alembic, priorização assistida por IA (agente via API Claude). São previsão futura, não meta; não antecipar código, dependência nem configuração para eles.
 - **Stack pretendida:** Python 3.11+, FastAPI, SQLAlchemy 2.x (`Mapped` / `mapped_column`), Pydantic v2, pydantic-settings, SQLite3, Uvicorn, pytest com `TestClient` (cliente HTTP compatível com a versão do Starlette em uso), mypy, Mermaid.js para diagramas. Versões a verificar no PyPI na data da criação do `requirements.txt`, com fonte e data registradas no `docs/HISTORY-IA.md`.
-- **Arquitetura:** camadas Controller (`app/api/`) → Service (`app/services/`) → Repository (`app/repositories/`) → SQLite3, com modelos ORM, esquemas Pydantic e configurações em `app/models/`. Documentada em `docs/arquitetura.md` com diagramas Mermaid.js e ADRs curtos (decisão e motivo).
-- **Decisões técnicas a registrar como ADRs:** SQLite com `check_same_thread=False`; nos testes, `sqlite://` com `StaticPool`; tabelas criadas com `Base.metadata.create_all` no `lifespan` de `app/main.py`; `/health` executa `SELECT 1` via `text()` e responde `503` quando o banco falha; documentação interativa desabilitada com `ENVIRONMENT=production`; `Base` declarativo em `app/models/base.py`, importado pelos modelos e por `app/repositories/database.py`, para evitar ciclo de importação; `app/` sem `__init__.py` na raiz (pacote de *namespace*), com os comandos executados a partir da raiz do repositório via `python -m`.
 - **Configuração mínima:** `DATABASE_URL` (padrão SQLite local) e `ENVIRONMENT` (`development`, `test`, `production`), com valores padrão documentados no README.
 
 ## Inicialização do projeto
@@ -228,7 +226,7 @@ laboratorio-projeto/
 │   ├── api/                   # controller
 │   │   ├── __init__.py
 │   │   ├── task_routes.py     # endpoints de tarefas
-│   │   └── health_routes.py   # endpoint /health (SELECT 1)
+│   │   └── health_routes.py   # endpoint /health
 │   ├── models/                # estruturas de dados, sem lógica
 │   │   ├── __init__.py
 │   │   ├── base.py            # Base declarativo do SQLAlchemy
@@ -237,11 +235,12 @@ laboratorio-projeto/
 │   │   └── settings.py        # configurações lidas do ambiente/.env (pydantic-settings)
 │   ├── repositories/          # acesso ao banco
 │   │   ├── __init__.py
-│   │   ├── database.py        # engine SQLite, sessão e dependência get_db
+│   │   ├── database.py        # engine SQLite, sessão, dependência get_db e ping (SELECT 1)
 │   │   └── task_repository.py # consultas e persistência de tarefas
 │   ├── services/              # regras de negócio
 │   │   ├── __init__.py
 │   │   ├── task_service.py    # casos de uso de tarefas
+│   │   ├── health_service.py  # verificação de saúde (chama database.ping)
 │   │   └── priority_advisor.py # regras de prioridade (determinísticas, sem IA)
 │   └── main.py                # criação da aplicação FastAPI, lifespan e registro das rotas
 ├── docs/
@@ -256,6 +255,7 @@ laboratorio-projeto/
 │   ├── test_task_routes.py    # integração dos endpoints (inclui /health)
 │   └── test_task_service.py   # unitários do service de tarefas
 ├── .gitignore
+├── LICENSE                    # licença MIT
 ├── README.md
 ├── requirements.txt           # dependências com versões fixadas
 └── CLAUDE.md                  # este arquivo

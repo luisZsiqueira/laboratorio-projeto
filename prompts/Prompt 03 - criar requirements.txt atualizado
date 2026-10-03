@@ -3,39 +3,37 @@ Objetivo: Criar o arquivo requirements.txt no diretório, com assertividade quan
 Estilo: Criar o requirements.txt em formato UTF-8 sem BOM.
 Resposta: Grave o arquivo requirements.txt no diretório. Adicione ao branch do git. Comite. Realize o merge com o main.
 
-
 ---
 
 Modelo: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
 Data de execução: 03/10/2026
 
-Resumo da resposta:
+Resumo da execução:
 
-- Versões consultadas no PyPI em 03/10/2026 (pip index versions), última
-  estável de cada pacote direto: fastapi 0.142.2, uvicorn 0.54.0,
-  SQLAlchemy 2.1.3, pydantic 2.13.5, pydantic-settings 2.15.0, pytest 9.1.1,
-  httpx2 2.13.1, mypy 2.4.0.
-- Achado: o Starlette 1.7.0 (trazido pelo FastAPI) exige httpx2 para o
-  TestClient; com httpx, emite aviso de deprecação, que falharia com
-  -W error. Registrado na tabela de APIs deprecadas do CLAUDE.md.
-- requirements.txt criado em UTF-8 sem BOM (verificado pelos primeiros
-  bytes), com dependências diretas e transitivas fixadas, marcadores de
-  plataforma (colorama só no Windows, librt só fora do PyPy) e comentário
-  com a versão do Python: mínimo 3.11 (exigido pelo SQLAlchemy 2.1.3),
-  testado em 3.14.6. Todos os pacotes listados estão em uso (diretos ou
-  exigidos por eles).
-- Validação: instalação em ambiente virtual limpo a partir do arquivo,
-  pip check sem conflitos, pip freeze idêntico ao do .venv, smoke test do
+- Versões consultadas no PyPI em 03/10/2026 e fixadas (última estável de
+  cada pacote direto): fastapi 0.142.2, uvicorn 0.54.0, SQLAlchemy 2.1.3,
+  pydantic 2.13.5, pydantic-settings 2.15.0, pytest 9.1.1, httpx2 2.13.1,
+  mypy 2.4.0. Dependências transitivas também fixadas.
+- Python: mínimo 3.11 (exigido pelo SQLAlchemy 2.1.3), testado em 3.14.6;
+  registrado em comentário, pois o pip não fixa a versão do Python.
+- Achado: o Starlette 1.7.0 exige httpx2 para o TestClient; com httpx emite
+  aviso de deprecação. Registrado no roteiro de APIs deprecadas do CLAUDE.md.
+- Verificação: arquivo em UTF-8 sem BOM; instalação em ambiente limpo,
+  pip check sem conflitos, freeze idêntico ao .venv, smoke test do
   TestClient com -W error.
-- README atualizado: Stack com versões, nova seção Configuração
-  (DATABASE_URL, ENVIRONMENT, padrões), nota em Como rodar e tabela de uso
-  de IA.
-- .gitignore: acrescentado o padrão .~lock.*# (lock do LibreOffice, que
-  apareceu ao abrir o README).
-- Git: três commits na branch (gitignore, README e requisitos,
-  requirements), branch renomeada para docs/inicializacao, merge em main
-  com --no-ff. Sem push.
-- Divergência: o contexto do prompt repete "priorização assistida por IA";
-  mantido fora do MVP, conforme CLAUDE.md e README, até decisão do usuário.
+- README: Stack com versões, seção Configuração (DATABASE_URL, padrão
+  sqlite:///./tasks.db; ENVIRONMENT, padrão development) e uso de IA.
+- .gitignore: acrescentado .~lock.*# (lock do LibreOffice).
+- Git: três commits em vez de um (gitignore; README e requisitos;
+  requirements), branch renomeada para docs/inicializacao. O merge em main
+  foi abortado porque o README.md estava aberto no LibreOffice e o Windows
+  impediu o git de removê-lo; nada se perdeu (conteúdo conferido por hash).
 
-Interações seguintes: nenhuma.
+Interações seguintes:
+
+- "Fechei o README no libreoffice, conclua o merge.": cópia não rastreada do
+  README.md removida após conferência por hash e merge --no-ff concluído
+  (commit 5a4eac1). Sem push.
+- Decisão do usuário: apesar do termo no prompt, a priorização assistida por
+  IA fica fora do MVP.
+- Registro desta execução resumido a pedido do usuário.

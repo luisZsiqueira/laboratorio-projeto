@@ -43,7 +43,22 @@ Entregar um MVP pequeno, claro, funcional, bem testado e bem documentado, que um
 
 As versões estão fixadas no [`requirements.txt`](requirements.txt), incluindo as dependências transitivas. Elas foram consultadas no PyPI em 03/10/2026. O Python 3.11 é o mínimo porque o SQLAlchemy 2.1 o exige.
 
-Arquitetura em camadas: Controller (`app/api/`) → Service (`app/services/`) → Repository (`app/repositories/`) → SQLite3. Os detalhes e as decisões de projeto estarão em [`docs/arquitetura.md`](docs/arquitetura.md).
+## Arquitetura
+
+API síncrona em camadas, uma por pacote em `app/`:
+
+```mermaid
+flowchart LR
+    C(["Cliente HTTP"]) --> API["app/api<br/>rotas"]
+    API --> SVC["app/services<br/>regras de negócio"]
+    SVC --> REPO["app/repositories<br/>acesso ao banco"]
+    REPO --> DB[("SQLite3")]
+    MOD["app/models<br/>ORM, esquemas, settings"] -.-> API
+    MOD -.-> SVC
+    MOD -.-> REPO
+```
+
+Os módulos e suas dependências, o fluxo de dados de `POST /tasks` e `GET /health`, o modelo de dados e as decisões de arquitetura (ADRs) estão em [`docs/arquitetura.md`](docs/arquitetura.md).
 
 ## Configuração
 
@@ -63,7 +78,7 @@ ENVIRONMENT=development
 
 ## Como rodar localmente
 
-> A instalação das dependências já funciona. Os comandos de execução da API e dos testes passam a valer quando o código da aplicação existir, na *release* `v0.1.0`.
+> A instalação das dependências já funciona. Os comandos de execução da API e dos testes passam a valer quando o código da aplicação existir, a partir da *release* `v0.2.0`.
 
 Pré-requisitos: Python 3.11 ou superior e Git.
 
@@ -117,8 +132,12 @@ Todos os comandos são executados a partir da raiz do repositório, com o `.venv
 
 | Release | Conteúdo | Situação |
 | --- | --- | --- |
-| `v0.1.0` | MVP: estrutura e documentação base, dependências verificadas, arquitetura e ADRs, configuração por ambiente, CRUD de tarefas com filtro por *status*, prioridades, `priority_advisor`, `/health` e testes | em andamento |
-| `v1.0.0` | Entrega do curso: revisão de segurança e de documentação, validação em máquina limpa, histórico de uso de IA consolidado; marcada com *tag* e *release* `v1.0.0` no GitHub | planejada |
+| `v0.1.0` | Fundação: estrutura, `.gitignore`, README, requisitos do curso, dependências verificadas, arquitetura e ADRs | em andamento |
+| `v0.2.0` | Base técnica: configuração por ambiente, banco SQLite, aplicação FastAPI com `lifespan` e `/health` | planejada |
+| `v0.3.0` | CRUD de tarefas: criar, listar com filtro por *status*, consultar, atualizar (total e parcial), concluir e excluir | planejada |
+| `v0.4.0` | Prioridades e `priority_advisor` (regras determinísticas) | planejada |
+| `v0.5.0` | Revisão da arquitetura, de segurança e da documentação | planejada |
+| `v1.0.0` | Entrega do curso: validação em máquina limpa, histórico de uso de IA consolidado; marcada com *tag* e *release* `v1.0.0` no GitHub | planejada |
 
 ## Uso de IA generativa
 
@@ -126,11 +145,11 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 
 | Assistente | Modelo | Etapas |
 | --- | --- | --- |
-| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt` |
+| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*.
-- O histórico de uso da IA (etapas, ganhos, desafios) estará em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md).
+- O histórico de uso da IA (etapas, ganhos, desafios) está em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md).
 
 Todo código gerado por IA é revisado e testado antes de ser incorporado.
 
@@ -148,4 +167,4 @@ Fora do escopo do MVP. São possibilidades futuras, não compromissos:
 
 Desenvolvido por Luis Z Siqueira, com apoio do Claude Code, como miniprojeto do curso 1 da pós-graduação SWE-GENAI.
 
-Distribuído sob a licença MIT.
+Distribuído sob a licença MIT. Veja o arquivo [`LICENSE`](LICENSE).
