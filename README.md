@@ -149,7 +149,7 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*.
-- O histórico de uso da IA (etapas, ganhos, desafios) estará em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md).
+- O histórico de uso da IA (etapas, ganhos, desafios) está em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md).
 
 Todo código gerado por IA é revisado e testado antes de ser incorporado.
 
