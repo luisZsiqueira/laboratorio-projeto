@@ -1,0 +1,64 @@
+Contexto: Micro-API de tarefas descrita no CLAUDE.md. O código ainda não existe (app/ e tests/ vazios).
+O curso exige "uma arquitetura mínima com módulos, dependências e fluxo de dados"
+(docs/requerimentos.md). O README aponta para docs/arquitetura.md, que ainda não existe. O arquivo será criado agora.
+
+Objetivos: Criar docs/arquitetura.md em Mermaid.js, como blueprint da v0.2.0/v0.3.0, com três vistas:
+1. Módulos e dependências (flowchart: quem importa quem, incluindo main, config, database,
+   models, schemas, repository, service e routes).
+2. Fluxo de dados (sequenceDiagram) de POST /tasks e de GET /health, mostrando as
+   transformações JSON → Pydantic → ORM → SQLite e os códigos 201/422/404/503.
+3. Modelo de dados (erDiagram da entidade Task).
+Incluir uma seção curta "Decisões de arquitetura" (estilo ADR: decisão + motivo).
+
+Estilo: Documentação técnica objetiva, no padrão do CLAUDE.md. Diagramas pequenos e legíveis,
+compatíveis com a renderização Mermaid do GitHub (sem sintaxe experimental como C4).
+
+Resposta: Antes de escrever, apresente um blueprint curto (arquivos afetados, riscos, fora
+de escopo) e aguarde aprovação. Depois de aprovado, crie os arquivos e resuma o que mudou,
+apontando qualquer divergência do blueprint.
+
+Observacoes:
+- /health segue routes → service → repository.ping(), com SELECT 1 via sqlalchemy.text().
+- routes depende de database apenas por Depends(get_db); representar com seta pontilhada
+  e explicar que a rota não faz consultas.
+- No README, manter o diagrama resumido, remover "(a ser criado)" do link e ajustar o
+  roadmap (arquitetura na v0.1.0; v0.5.0 passa a "revisão da arquitetura").
+- Fechar as branch anteriores. Abrir e trabalhar na branch docs/arquitetura. Não commitar.
+- Este prompt foi criado com auxílio do Claude Opus 5.5
+
+---
+
+Modelo: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 03/10/2026
+
+Resumo da execução:
+
+- Blueprint apresentado e aprovado com as decisões: (1) roadmap em seis
+  releases (v0.1.0 fundação; v0.2.0 base técnica e /health; v0.3.0 CRUD;
+  v0.4.0 prioridades e priority_advisor; v0.5.0 revisão da arquitetura;
+  v1.0.0 entrega); (2) /health com app/services/health_service.py e ping()
+  em app/repositories/database.py; (3) 404 registrado em nota no fluxo de
+  dados, não em diagrama; (4) branch docs/arquitetura criada a partir de
+  main levando o registro do prompt 03 no stage, e branches
+  docs/inicializacao e docs/registro-prompt03 apagadas.
+- docs/arquitetura.md criado: visão geral das camadas; flowchart de módulos
+  e dependências (Depends(get_db) em seta pontilhada); sequenceDiagram de
+  POST /tasks (JSON → Pydantic → ORM → SQLite, 201/422) e de GET /health
+  (SELECT 1 via text(), 200/503); nota sobre 404 e 500; erDiagram da Task;
+  dez ADRs (decisão + motivo).
+- README: nova seção Arquitetura com diagrama resumido, link sem
+  "estarão em", roadmap atualizado e tabela de uso de IA.
+- CLAUDE.md: health_service.py na estrutura de diretórios, ping no
+  comentário de database.py; itens "Arquitetura" e "Decisões técnicas"
+  removidos do Ponto de partida (migrados para docs/arquitetura.md);
+  decisão do priority_advisor passa ao blueprint da v0.4.0.
+- Divergências do blueprint: ADR-10 (datas em UTC; o SQLite não guarda fuso)
+  acrescentado; o README não tinha o texto "(a ser criado)", e sim
+  "estarão em", que foi ajustado. Diagramas não renderizados localmente
+  (sem Node.js); sintaxe revisada manualmente, a confirmar no GitHub.
+- Arquivos no stage, sem commit.
+
+Interações seguintes:
+
+- Aprovação do blueprint com as decisões 1 a 4 (o "444" da mensagem foi
+  interpretado como 404).
