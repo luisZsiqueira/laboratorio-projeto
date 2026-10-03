@@ -26,25 +26,44 @@ Entregar um MVP pequeno, claro, funcional, bem testado e bem documentado, que um
 
 ## Stack
 
-| Componente | Uso |
-| --- | --- |
-| Python 3.11+ | linguagem |
-| FastAPI | framework web e documentação OpenAPI |
-| Uvicorn | servidor ASGI |
-| SQLAlchemy 2.x | ORM (`Mapped` / `mapped_column`) |
-| Pydantic v2 e pydantic-settings | validação de dados e configuração por variáveis de ambiente |
-| SQLite3 | banco de dados |
-| pytest e `TestClient` | testes unitários e de integração |
-| mypy | checagem estática de tipos |
-| Mermaid.js | diagramas de arquitetura (renderizados pelo GitHub) |
+| Componente | Versão | Uso |
+| --- | --- | --- |
+| Python | 3.11+ (testado em 3.14.6) | linguagem |
+| FastAPI | 0.142.2 | framework web e documentação OpenAPI |
+| Starlette | 1.7.0 | base do FastAPI (dependência transitiva) |
+| Uvicorn | 0.54.0 | servidor ASGI |
+| SQLAlchemy | 2.1.3 | ORM (`Mapped` / `mapped_column`) |
+| Pydantic | 2.13.5 | validação de dados |
+| pydantic-settings | 2.15.0 | configuração por variáveis de ambiente |
+| SQLite3 | embutido no Python | banco de dados |
+| pytest | 9.1.1 | testes unitários e de integração |
+| httpx2 | 2.13.1 | cliente HTTP do `TestClient` |
+| mypy | 2.4.0 | checagem estática de tipos |
+| Mermaid.js | renderizado pelo GitHub | diagramas de arquitetura |
 
-As versões serão fixadas no `requirements.txt`, depois de verificadas no PyPI.
+As versões estão fixadas no [`requirements.txt`](requirements.txt), incluindo as dependências transitivas. Elas foram consultadas no PyPI em 03/10/2026. O Python 3.11 é o mínimo porque o SQLAlchemy 2.1 o exige.
 
 Arquitetura em camadas: Controller (`app/api/`) → Service (`app/services/`) → Repository (`app/repositories/`) → SQLite3. Os detalhes e as decisões de projeto estarão em [`docs/arquitetura.md`](docs/arquitetura.md).
 
+## Configuração
+
+Toda configuração vem de variáveis de ambiente, opcionalmente lidas de um arquivo `.env` na raiz do repositório. O `.env` não é versionado.
+
+| Variável | Valores | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `DATABASE_URL` | URL do SQLAlchemy | `sqlite:///./tasks.db` | banco de dados; cria o arquivo `tasks.db` na raiz |
+| `ENVIRONMENT` | `development`, `test`, `production` | `development` | em `production`, a documentação interativa (`/docs`, `/redoc`) fica desabilitada |
+
+Exemplo de `.env`:
+
+```dotenv
+DATABASE_URL=sqlite:///./tasks.db
+ENVIRONMENT=development
+```
+
 ## Como rodar localmente
 
-> Os comandos abaixo valem a partir da criação do `requirements.txt` e do código da aplicação, previstos na *release* `v0.1.0`.
+> A instalação das dependências já funciona. Os comandos de execução da API e dos testes passam a valer quando o código da aplicação existir, na *release* `v0.1.0`.
 
 Pré-requisitos: Python 3.11 ou superior e Git.
 
@@ -107,7 +126,7 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 
 | Assistente | Modelo | Etapas |
 | --- | --- | --- |
-| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README |
+| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt` |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*.
