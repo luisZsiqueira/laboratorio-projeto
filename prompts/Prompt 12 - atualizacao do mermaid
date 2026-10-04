@@ -1,0 +1,48 @@
+CONTEXTO: O projeto iniciou com gráficos mermaid iniciais e precisa ser revisado.
+OBJETIVO: Ler e analisar os gráficos e fluxos em mermaid, avaliar a necessidade de atualização, sugerir atualizações possíveis e atualizar os gráficos mermaid do projeto quando autorizado.
+ESTILO: Técnico e objetivo, estilo desenvolvedor sênior realizado revisão dos gráficos e fluxos mermaid.
+TOM: Neutro e criterioso.
+RESPOSTA: Forneça um relatorio resumido e enumerado das alterações necessárias para aprovação. Aprovado, atualize os arquivos do projeto com os mermaid atualizados e grave um arquivo /docs/mermaid.md com os gráficos e fluxos atualizados. Quanto ao git, adicione a branch os faltantes. Comite. Faça merge com main. Realize o push para o GitHub.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 04/10/2026
+
+Resumo da execução:
+
+1. Revisão (sem alterar arquivos): 5 diagramas analisados (README: visão
+   em camadas; docs/arquitetura.md: módulos, POST /tasks, GET /health,
+   modelo de dados). Relatório com 13 itens: A) necessários (1 aresta
+   task_service -> task; 2 commit/refresh no POST; 3 esquema de /health),
+   B) recomendados (4 diagrama de erros; 5 padrões no modelo de dados;
+   6 diagrama de testes), C) não recomendados (7 estados do TaskStatus;
+   8 roadmap em gantt; 9 README sem mudança), D) docs/mermaid.md e
+   verificação no GitHub, E) git.
+2. Decisões do autor: item 3 adiado para o blueprint da v0.2.0
+   (registrado como D-08 no escopo e no backlog); item 10 com o antes e
+   o depois de cada diagrama, de forma didática. Demais itens aprovados.
+3. Executado:
+   - docs/arquitetura.md: aresta task_service -> task; INSERT + COMMIT e
+     refresh no POST /tasks; nova ADR-12 (commit e refresh no
+     repository); novo diagrama "Erros em /tasks/{id}" (200/204, 404,
+     500); padrões em aberto (D-01, D-04) no modelo de dados; nova seção
+     5 (Testes) com diagrama; ADRs passam para a seção 6.
+   - docs/mermaid.md (novo): antes (commit 885d036) e depois de cada
+     diagrama, com as mudanças destacadas em laranja (linkStyle e rect).
+   - docs/escopo-mvp.md (D-08), docs/backlog.md (D-08 no RF-12, ADR-12
+     no RT-07), CLAUDE.md (fonte de verdade, estrutura, regra de
+     atualização dos diagramas), README.md, CHANGELOG.md,
+     docs/HISTORY-IA.md e este arquivo.
+4. Git: branch renomeada para docs/escopo-backlog-mermaid; commit
+   885d036 com o escopo e o backlog (Prompts 10 e 11); commit com a
+   revisão dos diagramas (Prompt 12); branch publicada para conferir a
+   renderização no GitHub antes do merge; merge --no-ff em main e push.
+5. Testes: definição de pronto não aplicável (sem código em app/).
+6. Verificação no GitHub (Claude in Chrome, branch publicada antes do
+   merge): docs/mermaid.md com 10 diagramas renderizados e
+   docs/arquitetura.md com 6; destaques em laranja visíveis (aresta
+   task_service -> task e faixa do commit/refresh); diagramas novos de
+   erros e de testes conferidos visualmente. A captura de tela travou
+   duas vezes; a navegação direta por âncora resolveu.

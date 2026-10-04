@@ -1,0 +1,38 @@
+CONTEXTO: Documentação do MVP de micro-API de tarefas. 
+OBJETIVO: Gerar documento de escopo com objetivo, requisitos funcionais, não funcionais e fora de escopo.
+ESTILO: Técnico e objetivo, estilo desenvolvedor sênior realizado documentação de requisitos e escopo do projeto, em markdown.
+TOM: Neutro e criterioso.
+RESPOSTA: Forneça o conteúdo completo gravando em docs/escopo-mvp.md . Atualize os arquivos do projeto (README.md, HISTORY-A.md e outros que se façam necessários). Quanto ao git, use mensagens semanticamente significativas, crie uma branch, adicione e atualize, não comite.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 04/10/2026
+
+Resumo da execução:
+
+1. Criado docs/escopo-mvp.md: objetivo, critérios de sucesso e restrições;
+   conceitos e atributos da tarefa; requisitos funcionais RF-01 a RF-13
+   (critério de aceitação e release prevista); requisitos não funcionais
+   RNF-01 a RNF-15 (forma de verificação); fora de escopo dividido em
+   previsões futuras (com motivo) e excluídos sem previsão; decisões em
+   aberto D-01 a D-07 com recomendação; rastreabilidade com
+   docs/requerimentos.md.
+2. Fonte de verdade: docs/escopo-mvp.md passa a ser o dono dos requisitos
+   no CLAUDE.md; o README mantém o resumo, o roadmap e as limitações, com
+   links para o documento.
+3. Decisões em aberto migradas do Ponto de partida do CLAUDE.md e da
+   seção 4 de docs/arquitetura.md para docs/escopo-mvp.md (seção 6).
+   Acrescentadas duas decisões não explicitadas antes: rota da marcação
+   como concluída (D-02) e momento de criar a coluna priority (D-03).
+4. Estrutura de diretórios do CLAUDE.md atualizada com o novo arquivo.
+5. Atualizados: README.md (escopo, uso de IA, limitações), CHANGELOG.md
+   ([Não publicado]), docs/HISTORY-IA.md (entrada do Prompt 10) e este
+   arquivo.
+6. Git: branch docs/escopo-mvp criada a partir de main; arquivos
+   adicionados ao stage; sem commit, como pedido. Mensagem sugerida:
+   "docs: adiciona o documento de escopo e requisitos do MVP".
+7. Testes: definição de pronto não aplicável (sem código em app/).
+
+Observação: não existe Prompt 09 em prompts/.
