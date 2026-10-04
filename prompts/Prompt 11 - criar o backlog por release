@@ -1,0 +1,39 @@
+CONTEXTO: O produto será engtregue por releases, exige-se a criação do backlog.
+OBJETIVO: Gerar o backlog mínimo com IDs RF/RT e critérios de aceite.
+ESTILO: Técnico e objetivo, estilo desenvolvedor sênior realizado documentação em backlog, em markdown.
+TOM: Neutro e criterioso.
+RESPOSTA: Forneça o conteúdo completo gravando em docs/backlog.md . Atualize os arquivos do projeto (README.md, HISTORY-A.md e outros que se façam necessários). Quanto ao git, use mensagens semanticamente significativas, crie uma branch, adicione e atualize, não comite.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 04/10/2026
+
+Resumo da execução:
+
+1. Criado docs/backlog.md: convenções (RF = requisito funcional, mesmo ID
+   de docs/escopo-mvp.md; RT = requisito técnico, criado no backlog);
+   critérios comuns a todos os itens e ao fechamento de release; resumo
+   por release com estimativas; backlog das releases v0.2.0 a v1.0.0;
+   rastreabilidade RNF -> itens.
+2. Conteúdo: 13 itens RF e 17 itens RT, cada um com critérios de aceite
+   numerados e marcados por forma de verificação ([T] teste, [I]
+   inspeção, [C] comando), RNF atendidos, estimativa e situação.
+   Estimativa total: 18,5 h (v0.2.0 4 h; v0.3.0 6,5 h; v0.4.0 3,5 h;
+   v0.5.0 2,5 h; v1.0.0 2 h).
+3. Filtro por prioridade (D-06) ficou como item condicionado (RF-14 só se
+   aprovado no blueprint da v0.4.0).
+4. Atualizados: CLAUDE.md (fonte de verdade, estrutura de diretórios,
+   fechamento de release, arquivos a manter atualizados), README.md
+   (roadmap e uso de IA), docs/escopo-mvp.md (referência ao backlog),
+   CHANGELOG.md ([Não publicado]), docs/HISTORY-IA.md (entrada do
+   Prompt 11) e este arquivo.
+5. Git: branch docs/backlog criada a partir do estado atual, com as
+   mudanças do Prompt 10 ainda no stage (sem commit). Arquivos
+   adicionados ao stage; sem commit, como pedido. Mensagem sugerida:
+   "docs: adiciona o backlog do MVP por release".
+6. Testes: definição de pronto não aplicável (sem código em app/).
+
+Interpretação: "RT" não é definido no prompt; foi lido como requisito
+técnico.

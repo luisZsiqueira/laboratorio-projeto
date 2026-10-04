@@ -171,7 +171,7 @@ erDiagram
 
 - Tarefa **aberta**: `due_at` vazio. Tarefa **específica**: `due_at` preenchido.
 - Prioridades: 1 = mandatória, 2 = importante, 3 = regular, 4 = agendada (na data/hora estipulada).
-- Decisões em aberto para o *blueprint* da `v0.3.0`/`v0.4.0`: valores de `TaskStatus` (recomendação: `pending`, `done`); prioridade padrão (recomendação: 3); se prioridade 4 exige `due_at` e vice-versa; filtro por prioridade; regras do `priority_advisor`.
+- Decisões em aberto para o *blueprint* da `v0.3.0`/`v0.4.0` (valores de `TaskStatus`, prioridade padrão, coerência entre prioridade 4 e `due_at`, filtro por prioridade, regras do `priority_advisor`): ver [`docs/escopo-mvp.md`](escopo-mvp.md), seção 6.
 
 ## 5. Decisões de arquitetura
 

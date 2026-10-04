@@ -16,7 +16,9 @@ Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a
 
 | Assunto | Arquivo dono | O que este arquivo diz a respeito |
 | --- | --- | --- |
-| Escopo do MVP, previsões futuras (fora do MVP), roadmap de *releases* | `README.md` (Objetivo, Roadmap, Limitações e Próximos Passos) | não ampliar o escopo sem pedido explícito |
+| Requisitos funcionais e não funcionais, fora de escopo, decisões de escopo em aberto | `docs/escopo-mvp.md` | não ampliar o escopo sem pedido explícito |
+| Itens de trabalho por *release* (RF/RT), critérios de aceite, estimativas e situação | `docs/backlog.md` | o *blueprint* de cada *release* parte dos itens dela; item novo só com decisão do autor |
+| Resumo do escopo, previsões futuras (fora do MVP), roadmap de *releases* | `README.md` (Objetivo, Roadmap, Limitações e Próximos Passos) | o resumo segue o `docs/escopo-mvp.md` |
 | Stack e versões | `README.md` (Stack) e `requirements.txt` | versões fixadas e verificadas; mudar só com justificativa e fonte |
 | Arquitetura, pacotes, fluxo de dados, modelo de dados, decisões (ADRs) | `docs/arquitetura.md` | regra de separação de camadas |
 | Endpoints, códigos de resposta, exemplos de uso | `README.md` (Endpoints) | — |
@@ -31,10 +33,7 @@ Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a
 
 Decisões já acordadas entre o usuário e o assistente antes de existir código. Cada item deve ser migrado para seu arquivo dono na *release* que o criar; depois da migração, esta seção é reduzida até desaparecer, e o CLAUDE.md passa a conter apenas regras de trabalho.
 
-Na `v0.1.0`, o escopo do MVP, as prioridades, os itens fora do MVP, a *stack* e a configuração mínima foram migrados para o `README.md` (Objetivo, Stack, Configuração, Limitações e Próximos Passos). Restam as decisões em aberto:
-
-- **Prioridade:** decisões em aberto para o *blueprint*: se prioridade 4 exige data/hora e vice-versa; prioridade padrão (recomendação: 3); filtro por prioridade.
-- **Assessor de prioridade (`priority_advisor`):** decisão em aberto para o *blueprint* da `v0.4.0`: o que ele faz. Recomendação: regras determinísticas, sem IA (por exemplo, validar a coerência entre prioridade e data/hora e sugerir prioridade pela proximidade do prazo), chamadas pelo *service*. A versão assistida por IA continua fora do MVP.
+Na `v0.1.0`, o escopo do MVP, as prioridades, os itens fora do MVP, a *stack* e a configuração mínima foram migrados para o `README.md` (Objetivo, Stack, Configuração, Limitações e Próximos Passos). Em 04/10/2026, as decisões em aberto sobre prioridade e `priority_advisor` foram migradas para `docs/escopo-mvp.md` (Decisões em aberto), que passa a ser a referência dos *blueprints*. Nada mais resta nesta seção; ela pode ser removida no fechamento da `v0.2.0`.
 
 ## Inicialização do projeto
 
@@ -84,6 +83,7 @@ Ao concluir cada *release* do roadmap, além do fluxo acima:
 - Revisar o `README.md` por inteiro, como arquivo vivo: status do projeto, Roadmap (marcar a *release* como concluída), Endpoints e exemplos de uso, Configuração, Como rodar, Uso de IA generativa, Limitações e Próximos Passos. O README deve descrever o projeto **como ele está**, não como foi planejado.
 - Ajustar `docs/arquitetura.md` no que a implementação divergiu do desenho.
 - Consolidar em `docs/HISTORY-IA.md` a entrada da *release*.
+- Marcar no `docs/backlog.md` a situação dos itens da *release* (concluídos ou movidos, com justificativa).
 - Acrescentar ao `CHANGELOG.md` a seção da *release*, com as mudanças agrupadas por tipo de *commit*.
 - Após o *merge* em `main`, criar a *tag* anotada `vX.Y.Z` e publicá-la (com autorização de *push*).
 - Migrar para os arquivos donos os itens do [Ponto de partida](#ponto-de-partida) que a *release* materializou e removê-los desta seção.
@@ -113,7 +113,7 @@ O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem co
 
 | Quando | Atualizar |
 | --- | --- |
-| *Release* concluída | `README.md` por inteiro (ver [Fechamento de release](#fechamento-de-release)), `CHANGELOG.md`, `docs/arquitetura.md`, `docs/HISTORY-IA.md`, seção [Ponto de partida](#ponto-de-partida) deste arquivo |
+| *Release* concluída | `README.md` por inteiro (ver [Fechamento de release](#fechamento-de-release)), `CHANGELOG.md`, `docs/arquitetura.md`, `docs/HISTORY-IA.md`, `docs/backlog.md`, seção [Ponto de partida](#ponto-de-partida) deste arquivo |
 | Muda como configurar, executar ou testar; novo endpoint | `README.md` (seção correspondente) |
 | Nova dependência ou mudança de versão | `requirements.txt` (versão fixada), `README.md` (Stack) e nova rodada do [roteiro de checagem](#apis-deprecadas-roteiro-de-checagem) |
 | Nova variável de ambiente | `README.md` (Configuração, com valor padrão e sem valores sensíveis) |
@@ -248,6 +248,8 @@ laboratorio-projeto/
 │   └── main.py                # criação da aplicação FastAPI, lifespan e registro das rotas
 ├── docs/
 │   ├── arquitetura.md         # arquitetura, diagramas Mermaid.js e ADRs
+│   ├── escopo-mvp.md          # objetivo, requisitos, fora de escopo e decisões em aberto
+│   ├── backlog.md             # itens RF/RT por release, critérios de aceite e estimativas
 │   ├── requerimentos.md       # requisitos de entrega do curso
 │   ├── HISTORY-IA.md          # histórico do uso de IA no projeto
 │   └── release-review-010.md  # revisão de publicação da release v0.1.0

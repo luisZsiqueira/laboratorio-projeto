@@ -31,6 +31,8 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 06 | 03/10/2026 | Documentação do processo | este arquivo | ~1 h |
 | 07 | 03/10/2026 | Publicação / verificação | *push* para o GitHub, conferência do clone e dos diagramas Mermaid | ~0,5 h |
 | 08 | 04/10/2026 | Revisão / publicação de *release* | revisão da `v0.1.0`, checagem de APIs deprecadas, correção do `.venv`, `CHANGELOG.md`, *tag* `v0.1.0` | ~3 h |
+| 10 | 04/10/2026 | Requisitos / escopo | `docs/escopo-mvp.md` (requisitos funcionais e não funcionais, fora de escopo, decisões em aberto) | ~1,5 h |
+| 11 | 04/10/2026 | Planejamento / backlog | `docs/backlog.md` (itens RF/RT por *release*, critérios de aceite, estimativas) | ~1,5 h |
 
 ## Entradas
 
@@ -166,6 +168,47 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Histórico publicado.** Reescrever o histórico exigiria *force push*. A decisão humana foi corrigir a descrição do `94f30f2` só no CHANGELOG e registrar regras para os *merges* futuros.
   - **Release no GitHub.** O `gh` não está instalado, então a Release ficou como passo manual. A *tag* foi publicada.
   - **Definição de pronto.** Numa *release* sem código, ela não se aplica. Foi registrada como "não aplicável", e não como aprovada, para não mascarar o estado do projeto.
+
+### Prompt 10: escopo e não escopo do MVP
+
+- **Data:** 04/10/2026
+- **Fase:** engenharia de requisitos (entre a `v0.1.0` e a `v0.2.0`)
+- **Modelo:** Claude Opus 5.5, via Claude Code
+- **Uso da IA:**
+  - consolidação, em [`docs/escopo-mvp.md`](escopo-mvp.md), do escopo espalhado pelo README, pelo `CLAUDE.md` e por `docs/arquitetura.md`;
+  - redação de 13 requisitos funcionais com critério de aceitação e *release* prevista, e de 15 não funcionais com forma de verificação;
+  - separação do fora de escopo em previsões futuras (com motivo) e itens excluídos sem previsão;
+  - tabela de decisões em aberto com recomendação, e rastreabilidade com `docs/requerimentos.md`;
+  - atualização do README, do `CLAUDE.md` (fonte de verdade, Ponto de partida, estrutura), de `docs/arquitetura.md` e do `CHANGELOG.md`; *branch* `docs/escopo-mvp`, sem *commit*, como pedido.
+- **Prompt:** [`prompts/Prompt 10 - criacao do escopo e nao escopo`](../prompts/Prompt%2010%20-%20criacao%20do%20escopo%20e%20nao%20escopo)
+- **Refinamentos:** nenhum
+- **Ganho percebido:** ~1,5 h
+- **Desafios:**
+  - **Fonte de verdade duplicada.** O `CLAUDE.md` definia o README como dono do escopo. Um segundo documento de escopo criaria duas fontes. A IA tornou `docs/escopo-mvp.md` o dono dos requisitos e deixou no README o resumo e os links.
+  - **Estrutura fechada.** O arquivo novo não constava da estrutura do `CLAUDE.md`. Como a estrutura permite ajustar arquivos dentro de `docs/`, ele foi acrescentado a ela.
+  - **Não decidir pelo autor.** Prioridade padrão, valores de *status*, coerência entre prioridade 4 e data/hora e regras do `priority_advisor` continuam em aberto, com recomendação. A IA acrescentou duas decisões que o desenho anterior não explicitava: a rota da marcação como concluída e o momento de criar a coluna `priority` (sem migrações, criá-la só na `v0.4.0` alteraria o esquema).
+  - **Fora de escopo sem ampliar escopo.** A lista de itens excluídos sem previsão (por exemplo, *deploy*, notificações, busca textual) só delimita o MVP; nenhum deles virou meta.
+  - **Numeração.** Não existe Prompt 09 em `prompts/`; a numeração segue o nome dado pelo autor.
+
+### Prompt 11: backlog por release
+
+- **Data:** 04/10/2026
+- **Fase:** planejamento
+- **Modelo:** Claude Opus 5.5, via Claude Code
+- **Uso da IA:**
+  - desdobramento dos requisitos de `docs/escopo-mvp.md` em [`docs/backlog.md`](backlog.md), organizado pelas *releases* `v0.2.0` a `v1.0.0`;
+  - 13 itens RF (mesmos IDs do escopo) e 17 itens RT, cada um com critérios de aceite marcados por forma de verificação (teste, inspeção ou comando), RNF atendidos, estimativa e situação;
+  - critérios comuns a todos os itens e ao fechamento de *release*, para não repetir a definição de pronto em cada linha;
+  - tabela de rastreabilidade RNF → itens;
+  - atualização do `CLAUDE.md` (fonte de verdade, estrutura, fechamento de *release*), do README, do escopo e do `CHANGELOG.md`.
+- **Prompt:** [`prompts/Prompt 11 - criar o backlog por release`](../prompts/Prompt%2011%20-%20criar%20o%20backlog%20por%20release)
+- **Refinamentos:** nenhum
+- **Ganho percebido:** ~1,5 h
+- **Desafios:**
+  - **Significado de "RT".** O *prompt* não define a sigla, e o escopo usa RNF. A IA interpretou RT como requisito técnico (infraestrutura, código interno, testes, documentação, publicação), ligado aos RNF que atende, e manteve os IDs RF do escopo para haver uma única numeração.
+  - **Itens que dependem de decisões em aberto.** RF-07, RF-10 e RF-11 têm critérios condicionados às decisões D-02, D-05 e D-07; o filtro por prioridade (D-06) ficou como item condicionado, sem ID ativo, para não ampliar o escopo.
+  - **Orçamento.** A soma das estimativas (18,5 h) foi conferida e corrigida durante a execução; o tempo real gasto na `v0.1.0` não foi medido, então a folga frente às 30 h é uma estimativa.
+  - **Mudanças do Prompt 10 sem *commit*.** A *branch* `docs/backlog` foi criada com as mudanças do Prompt 10 ainda no *stage*, porque o backlog depende do escopo; os dois conjuntos ficaram no mesmo *stage*.
 
 ## Release v0.1.0: consolidação
 

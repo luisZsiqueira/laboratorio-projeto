@@ -15,6 +15,8 @@ Entregar um MVP pequeno, claro, funcional, bem testado e bem documentado, que um
 - *Health check* real da aplicação e do banco de dados (`/health`).
 - Assessor de prioridade (`priority_advisor`) com regras determinísticas, sem IA. Por exemplo: verificar se a prioridade é coerente com a data/hora e sugerir uma prioridade pela proximidade do prazo.
 
+Os requisitos funcionais e não funcionais, com critérios de aceitação, os itens fora de escopo e as decisões em aberto estão em [`docs/escopo-mvp.md`](docs/escopo-mvp.md).
+
 ### Prioridades
 
 | Valor | Significado |
@@ -142,6 +144,8 @@ A versão e o comportamento são os mesmos; só as otimizações em Cython ficam
 
 ## Roadmap de releases
 
+Os itens de cada *release* (requisitos funcionais RF e técnicos RT), com critérios de aceite e estimativas, estão em [`docs/backlog.md`](docs/backlog.md).
+
 | Release | Conteúdo | Situação |
 | --- | --- | --- |
 | `v0.1.0` | Fundação: estrutura, `.gitignore`, README, requisitos do curso, dependências verificadas, arquitetura e ADRs | concluída (04/10/2026, *tag* `v0.1.0`) |
@@ -157,7 +161,7 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 
 | Assistente | Modelo | Etapas |
 | --- | --- | --- |
-| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`) |
+| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`), documento de escopo e requisitos do MVP, backlog por *release* |
 | Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
@@ -175,6 +179,8 @@ Fora do escopo do MVP. São possibilidades futuras, não compromissos:
 - *frontend*;
 - migrações de banco com Alembic;
 - priorização assistida por IA (agente via API Claude).
+
+O motivo de cada item ficar fora do MVP e os itens excluídos sem previsão estão em [`docs/escopo-mvp.md`](docs/escopo-mvp.md) (Fora de escopo).
 
 ## Créditos e licença
 
