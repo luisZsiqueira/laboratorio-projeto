@@ -30,6 +30,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 05 | 03/10/2026 | Documentação / licenciamento | `LICENSE` (MIT) | ~0,2 h |
 | 06 | 03/10/2026 | Documentação do processo | este arquivo | ~1 h |
 | 07 | 03/10/2026 | Publicação / verificação | *push* para o GitHub, conferência do clone e dos diagramas Mermaid | ~0,5 h |
+| 08 | 04/10/2026 | Revisão / publicação de *release* | revisão da `v0.1.0`, checagem de APIs deprecadas, correção do `.venv`, `CHANGELOG.md`, *tag* `v0.1.0` | ~3 h |
 
 ## Entradas
 
@@ -142,6 +143,46 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - A renderização Mermaid do GitHub acontece no navegador, então não basta conferir o arquivo publicado; foi preciso abrir a página e inspecionar cada diagrama. Isso fechou a pendência do Prompt 04, que não pôde renderizar localmente.
   - A captura de tela da página travou algumas vezes; capturas isoladas resolveram.
   - Diretórios vazios (`app/`, `tests/`) não aparecem no GitHub, como já previsto no Prompt 00.
+
+### Prompt 08: revisão de publicação da release v0.1.0
+
+- **Data:** 04/10/2026
+- **Fase:** revisão e publicação de *release*
+- **Modelo:** Claude Opus 5.5, via Claude Code
+- **Uso da IA:**
+  - revisão crítica em formato de checklist, com severidade "bloqueia" e "recomenda": *commits*, APIs deprecadas, ambiente virtual, `.gitignore` e requisitos do curso;
+  - testes mínimos dos 8 padrões do roteiro de checagem, num diretório temporário;
+  - diagnóstico e correção do `.venv`;
+  - criação do `CHANGELOG.md`;
+  - fechamento da *release*: README, `CLAUDE.md`, ADR-11, *merge*, *tag* `v0.1.0` e *push*;
+  - relatório em [`docs/release-review-010.md`](release-review-010.md).
+- **Prompt:** [`prompts/Prompt 08 - revisao critica release 010`](../prompts/Prompt%2008%20-%20revisao%20critica%20release%20010)
+- **Refinamentos:** nenhum. O autor aprovou todos os itens propostos de uma vez e autorizou o *push* e a *tag*.
+- **Ganho percebido:** ~3 h
+- **Desafios:**
+  - **Smart App Control.** O Windows bloqueava as extensões compiladas do SQLAlchemy, e `import sqlalchemy` falhava. O defeito passou despercebido no Prompt 03 porque o `pip check` valida metadados, não importações. Ele só apareceu ao executar código real. A correção (reinstalar a mesma versão em Python puro) foi testada num ambiente virtual descartável antes de tocar o `.venv`.
+  - **Comando do mypy.** O comando da definição de pronto (`mypy app`) falharia na estrutura decidida na ADR-03. A simulação da estrutura revelou isso antes de existir código e gerou a ADR-11.
+  - **`declarative_base()`.** Não emite aviso no SQLAlchemy 2.1.3, então o critério "emite aviso" não o pega. Foi classificado como estilo legado.
+  - **Histórico publicado.** Reescrever o histórico exigiria *force push*. A decisão humana foi corrigir a descrição do `94f30f2` só no CHANGELOG e registrar regras para os *merges* futuros.
+  - **Release no GitHub.** O `gh` não está instalado, então a Release ficou como passo manual. A *tag* foi publicada.
+  - **Definição de pronto.** Numa *release* sem código, ela não se aplica. Foi registrada como "não aplicável", e não como aprovada, para não mascarar o estado do projeto.
+
+## Release v0.1.0: consolidação
+
+- **Período:** 03/10/2026 a 04/10/2026 (Prompts 00 a 08)
+- **Entregas:**
+  - `.gitignore`, `CLAUDE.md`, README e `docs/requerimentos.md`;
+  - `requirements.txt` verificado;
+  - `docs/arquitetura.md` (4 diagramas Mermaid, mais 1 no README, e 11 ADRs);
+  - `LICENSE`, este histórico, `CHANGELOG.md` e `docs/release-review-010.md`;
+  - publicação no GitHub com *tag* `v0.1.0`.
+- **Uso da IA:** geração de documentação, verificação de versões no PyPI, desenho da arquitetura, revisão contra requisitos, testes de APIs deprecadas e diagnóstico de ambiente. Nenhum código da aplicação foi gerado nesta *release*.
+- **Ganho percebido acumulado:** ~10,7 h (soma das estimativas dos Prompts 00 a 08).
+- **Lição principal:** a verificação por execução encontrou dois defeitos que a leitura de documentação não revelaria:
+  - o `httpx2` (Prompt 03);
+  - o bloqueio do SQLAlchemy pelo Smart App Control e o comando do mypy (Prompt 08).
+
+  Na `v0.2.0`, o primeiro código já nasce sob o roteiro de checagem preenchido.
 
 ## Observações transversais
 
