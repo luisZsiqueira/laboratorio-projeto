@@ -1,6 +1,6 @@
 # Arquitetura
 
-> **Status:** desenho aprovado na *release* `v0.1.0`, antes do código. Serve de *blueprint* para as *releases* `v0.2.0` a `v0.4.0` e será revisado na `v0.5.0`. Divergências da implementação são ajustadas pontualmente no fechamento de cada *release*.
+> **Status:** desenho aprovado na *release* `v0.1.0`, antes do código, e diagramas revisados em 04/10/2026 (Prompt 12). Serve de *blueprint* para as *releases* `v0.2.0` a `v0.4.0` e será revisado na `v0.5.0`. Divergências da implementação são ajustadas pontualmente no fechamento de cada *release*. O histórico visual dos diagramas (antes e depois de cada revisão) está em [`docs/mermaid.md`](mermaid.md).
 
 ## 1. Visão geral
 
@@ -63,6 +63,7 @@ flowchart TD
     task_service --> priority_advisor
     task_service --> task_repository
     task_service --> task_schemas
+    task_service --> task
     health_service --> database
 
     task_repository --> task
@@ -80,12 +81,13 @@ Observações:
 - `main.py` importa `database.py` só para criar as tabelas (`Base.metadata.create_all`) no `lifespan`, e `settings.py` para desabilitar a documentação em produção.
 - `priority_advisor.py` contém funções puras: não importa repositório, banco nem HTTP.
 - `task_schemas.py` define os tipos `TaskStatus` e `TaskPriority` (`typing.Literal`) usados também pelo *service*.
+- `task_service.py` importa `task.py` porque converte o esquema de entrada no objeto ORM `Task` que entrega ao *repository*.
 
 ## 3. Fluxo de dados
 
 ### POST /tasks
 
-O corpo JSON é validado pelo FastAPI no esquema Pydantic antes de chegar à rota. O *service* recebe o esquema, aplica as regras de prioridade e entrega ao *repository* um objeto ORM, que o grava no SQLite. A resposta volta como objeto ORM e é convertida para o esquema de saída (`from_attributes`) e serializada em JSON.
+O corpo JSON é validado pelo FastAPI no esquema Pydantic antes de chegar à rota. O *service* recebe o esquema, aplica as regras de prioridade e entrega ao *repository* um objeto ORM, que o grava no SQLite, confirma a transação e recarrega a linha para obter os valores gerados pelo banco (ADR-12). A resposta volta como objeto ORM e é convertida para o esquema de saída (`from_attributes`) e serializada em JSON.
 
 ```mermaid
 sequenceDiagram
@@ -109,8 +111,9 @@ sequenceDiagram
             R-->>C: 422 Unprocessable Entity
         else coerente
             S->>Rep: add(session, Task ORM)
-            Rep->>DB: INSERT (parametrizado pelo ORM)
-            DB-->>Rep: linha gravada (id, created_at)
+            Rep->>DB: INSERT (parametrizado pelo ORM) + COMMIT
+            Rep->>DB: refresh (SELECT da linha gravada)
+            DB-->>Rep: id, created_at, updated_at
             Rep-->>S: Task (ORM)
             S-->>R: Task (ORM)
             Note over R: response_model converte ORM → TaskRead (Pydantic)
@@ -146,7 +149,42 @@ sequenceDiagram
     end
 ```
 
-### Outros códigos de resposta
+### Erros em /tasks/{id}
+
+Vale para `GET`, `PUT`, `PATCH` e `DELETE /tasks/{id}` e para a marcação como concluída. O corpo inválido (422) segue o fluxo de `POST /tasks`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant R as task_routes
+    participant S as task_service
+    participant Rep as task_repository
+    participant DB as SQLite3
+
+    C->>R: GET, PUT, PATCH ou DELETE /tasks/{id}
+    R->>S: operação(session, id, ...)
+    S->>Rep: get(session, id)
+    Rep->>DB: SELECT por id (parametrizado pelo ORM)
+    alt tarefa existe
+        DB-->>Rep: linha
+        Rep-->>S: Task (ORM)
+        Note over S,Rep: segue a operação pedida
+        S-->>R: resultado
+        R-->>C: 200 OK ou 204 No Content
+    else tarefa inexistente
+        DB-->>Rep: nenhuma linha
+        Rep-->>S: None
+        S-->>R: exceção de domínio (tarefa não encontrada)
+        R-->>C: 404 Not Found (JSON)
+    else falha inesperada do banco
+        DB-->>Rep: SQLAlchemyError
+        Rep-->>S: exceção propagada
+        S-->>R: exceção propagada
+        Note over R: detalhe registrado no log
+        R-->>C: 500 Internal Server Error (mensagem genérica)
+    end
+```
 
 - **404 Not Found:** `GET`, `PUT`, `PATCH` e `DELETE /tasks/{id}` (e a marcação como concluída) respondem 404 quando o *repository* não encontra a tarefa. O *service* sinaliza com uma exceção de domínio, e a rota a traduz para 404; o *service* não conhece códigos HTTP.
 - **500 Internal Server Error:** falha inesperada do banco em operações de tarefa responde com mensagem genérica; o detalhe vai para o log, nunca para o cliente.
@@ -161,19 +199,50 @@ erDiagram
         int id PK "autoincremento"
         string title "obrigatório, 1 a 200 caracteres"
         string description "opcional, até 1000 caracteres"
-        string status "TaskStatus (Literal)"
-        int priority "TaskPriority (Literal 1 a 4)"
+        string status "TaskStatus (Literal), padrão em aberto (D-01)"
+        int priority "TaskPriority (Literal 1 a 4), padrão em aberto (D-04)"
         datetime due_at "opcional, UTC, vazio = tarefa aberta"
         datetime created_at "UTC, definido na criação"
         datetime updated_at "UTC, atualizado a cada alteração"
     }
 ```
 
+- Atributos e regras conforme [`docs/escopo-mvp.md`](escopo-mvp.md), seção 2.1.
 - Tarefa **aberta**: `due_at` vazio. Tarefa **específica**: `due_at` preenchido.
 - Prioridades: 1 = mandatória, 2 = importante, 3 = regular, 4 = agendada (na data/hora estipulada).
 - Decisões em aberto para o *blueprint* da `v0.3.0`/`v0.4.0` (valores de `TaskStatus`, prioridade padrão, coerência entre prioridade 4 e `due_at`, filtro por prioridade, regras do `priority_advisor`): ver [`docs/escopo-mvp.md`](escopo-mvp.md), seção 6.
 
-## 5. Decisões de arquitetura
+## 5. Testes
+
+Cada arquivo de teste exercita uma parte da aplicação, com o mínimo de infraestrutura. Não há `conftest.py`: cada fixture fica no arquivo que a usa.
+
+```mermaid
+flowchart LR
+    subgraph tests["tests/"]
+        t_service["test_task_service.py<br/>unitários"]
+        t_advisor["test_priority_advisor.py<br/>unitários"]
+        t_routes["test_task_routes.py<br/>integração"]
+    end
+
+    task_service["task_service.py"]
+    double["dublê simples do<br/>task_repository"]
+    priority_advisor["priority_advisor.py<br/>funções puras"]
+    client["TestClient<br/>(httpx2)"]
+    app["aplicação completa<br/>main.py, rotas, services, repositories"]
+    mem[("SQLite em memória<br/>sqlite:// + StaticPool")]
+
+    t_service --> task_service
+    task_service -->|"repository substituído"| double
+    t_advisor --> priority_advisor
+    t_routes --> client
+    client --> app
+    app -->|"get_db substituído<br/>(dependency_overrides)"| mem
+```
+
+- Os unitários não abrem banco nem HTTP. O `priority_advisor` recebe a data/hora de referência como parâmetro, para resultados determinísticos.
+- A integração cobre todos os endpoints, incluindo `/health` com banco indisponível e a documentação com `ENVIRONMENT=production`. A fixture chama `engine.dispose()` ao final (ADR-06).
+
+## 6. Decisões de arquitetura
 
 | # | Decisão | Motivo |
 | --- | --- | --- |
@@ -188,3 +257,4 @@ erDiagram
 | ADR-09 | `httpx2` como cliente HTTP do `TestClient` | o Starlette 1.7.0 o exige; o uso de `httpx` emite aviso de deprecação, que falha com `-W error` |
 | ADR-10 | Datas *timezone-aware* em UTC nos esquemas e na persistência | o SQLite não guarda fuso horário; a conversão para UTC na leitura e na escrita fica na camada de modelos/*repository* e é coberta por testes |
 | ADR-11 | Checagem de tipos com `python -m mypy --explicit-package-bases app` | com `app/` sem `__init__.py` (ADR-03), `mypy app` acusa o mesmo arquivo sob dois nomes de módulo (`models.x` e `app.models.x`); a opção faz o mypy derivar o nome do módulo a partir da raiz. Verificado no mypy 2.4.0 em 04/10/2026 |
+| ADR-12 | Operações de escrita confirmadas no *repository* (`commit` seguido de `refresh`); `get_db` só abre e fecha a sessão | mantém a persistência num único ponto; o `refresh` devolve os valores gerados pelo banco (`id`, datas); uma sessão fechada sem `commit` descarta alterações pendentes de uma requisição que falhou. Decidido na revisão dos diagramas (Prompt 12), em 04/10/2026 |

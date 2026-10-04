@@ -33,6 +33,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 08 | 04/10/2026 | Revisão / publicação de *release* | revisão da `v0.1.0`, checagem de APIs deprecadas, correção do `.venv`, `CHANGELOG.md`, *tag* `v0.1.0` | ~3 h |
 | 10 | 04/10/2026 | Requisitos / escopo | `docs/escopo-mvp.md` (requisitos funcionais e não funcionais, fora de escopo, decisões em aberto) | ~1,5 h |
 | 11 | 04/10/2026 | Planejamento / backlog | `docs/backlog.md` (itens RF/RT por *release*, critérios de aceite, estimativas) | ~1,5 h |
+| 12 | 04/10/2026 | Arquitetura / revisão | revisão dos diagramas Mermaid, ADR-12, `docs/mermaid.md` (antes e depois), *merge* e *push* | ~2 h |
 
 ## Entradas
 
@@ -209,6 +210,27 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Itens que dependem de decisões em aberto.** RF-07, RF-10 e RF-11 têm critérios condicionados às decisões D-02, D-05 e D-07; o filtro por prioridade (D-06) ficou como item condicionado, sem ID ativo, para não ampliar o escopo.
   - **Orçamento.** A soma das estimativas (18,5 h) foi conferida e corrigida durante a execução; o tempo real gasto na `v0.1.0` não foi medido, então a folga frente às 30 h é uma estimativa.
   - **Mudanças do Prompt 10 sem *commit*.** A *branch* `docs/backlog` foi criada com as mudanças do Prompt 10 ainda no *stage*, porque o backlog depende do escopo; os dois conjuntos ficaram no mesmo *stage*.
+
+### Prompt 12: revisão dos diagramas Mermaid
+
+- **Data:** 04/10/2026
+- **Fase:** arquitetura (revisão do desenho antes do código)
+- **Modelo:** Claude Opus 5.5, via Claude Code; Claude in Chrome para conferir a renderização no GitHub
+- **Uso da IA:**
+  - análise dos 5 diagramas (1 no README e 4 em `docs/arquitetura.md`) contra o `CLAUDE.md`, os ADRs, o escopo e o backlog;
+  - relatório enumerado para aprovação, separando alterações necessárias, recomendadas e não recomendadas;
+  - execução do aprovado: aresta `task_service → task`, `commit` e `refresh` no fluxo de `POST /tasks` (nova ADR-12), padrões em aberto no modelo de dados, diagramas novos de erros em `/tasks/{id}` e de testes;
+  - criação de [`docs/mermaid.md`](mermaid.md) com o antes e o depois de cada diagrama, com destaque visual das mudanças (`linkStyle` e `rect`), gerado a partir do *commit* anterior para garantir cópias fiéis;
+  - *commits*, *merge* em `main` e *push*.
+- **Prompt:** [`prompts/Prompt 12 - atualizacao do mermaid`](../prompts/Prompt%2012%20-%20atualizacao%20do%20mermaid)
+- **Refinamentos:** o autor aprovou os itens com duas ressalvas. O esquema da resposta de `/health` ficou para o *blueprint* da `v0.2.0` (registrado como D-08). O `docs/mermaid.md` passou a ter o antes e o depois, de forma didática, em vez de só os diagramas atualizados.
+- **Ganho percebido:** ~2 h
+- **Desafios:**
+  - **Revisar diagrama é revisar desenho.** As duas inconsistências reais eram lacunas de projeto, não erros de sintaxe: uma dependência escondida entre camadas e a ausência de responsável pelo `commit`. A segunda virou ADR antes de existir código.
+  - **Não decidir pelo autor.** A IA propôs `health_schemas.py`, mas ofereceu deixar a escolha para o *blueprint*; o autor escolheu adiar.
+  - **Cópias de diagramas.** Um catálogo separado pode divergir da versão oficial. Mitigação: `docs/arquitetura.md` continua dono, e o `CLAUDE.md` passou a exigir a atualização dos dois lugares.
+  - **Limites do Mermaid.** O `erDiagram` não permite destacar um atributo com cor; a mudança foi explicada em texto.
+  - **Renderização.** Sem Node.js na máquina, a validação da sintaxe depende do GitHub: a *branch* foi publicada antes do *merge* e conferida no navegador.
 
 ## Release v0.1.0: consolidação
 

@@ -21,6 +21,7 @@ Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a
 | Resumo do escopo, previsões futuras (fora do MVP), roadmap de *releases* | `README.md` (Objetivo, Roadmap, Limitações e Próximos Passos) | o resumo segue o `docs/escopo-mvp.md` |
 | Stack e versões | `README.md` (Stack) e `requirements.txt` | versões fixadas e verificadas; mudar só com justificativa e fonte |
 | Arquitetura, pacotes, fluxo de dados, modelo de dados, decisões (ADRs) | `docs/arquitetura.md` | regra de separação de camadas |
+| Histórico visual dos diagramas (antes e depois de cada revisão) | `docs/mermaid.md` | catálogo; a versão oficial de cada diagrama fica em `docs/arquitetura.md` ou no README |
 | Endpoints, códigos de resposta, exemplos de uso | `README.md` (Endpoints) | — |
 | Configuração (variáveis de ambiente e valores padrão) | `README.md` (Configuração) | toda configuração vem do ambiente |
 | Comandos de instalação, execução e teste | `README.md` (Como rodar) | só os comandos da definição de pronto |
@@ -118,6 +119,7 @@ O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem co
 | Nova dependência ou mudança de versão | `requirements.txt` (versão fixada), `README.md` (Stack) e nova rodada do [roteiro de checagem](#apis-deprecadas-roteiro-de-checagem) |
 | Nova variável de ambiente | `README.md` (Configuração, com valor padrão e sem valores sensíveis) |
 | Implementação diverge do desenho | `docs/arquitetura.md` (ajuste pontual; não refazer diagramas) |
+| Diagrama Mermaid alterado ou criado | versão oficial (`docs/arquitetura.md` ou README) e `docs/mermaid.md` (nova seção com o antes e o depois, mudança destacada) |
 | Nova tecnologia ou novo tipo de artefato gerado | `.gitignore` |
 | Novo modelo ou assistente de IA, ou nova etapa apoiada por IA | `README.md` (Uso de IA generativa), exigência R3.4 do curso |
 | Cada interação relevante com IA | arquivo do *prompt* em `prompts/` e `docs/HISTORY-IA.md` |
@@ -250,6 +252,7 @@ laboratorio-projeto/
 │   ├── arquitetura.md         # arquitetura, diagramas Mermaid.js e ADRs
 │   ├── escopo-mvp.md          # objetivo, requisitos, fora de escopo e decisões em aberto
 │   ├── backlog.md             # itens RF/RT por release, critérios de aceite e estimativas
+│   ├── mermaid.md             # catálogo dos diagramas, com antes e depois de cada revisão
 │   ├── requerimentos.md       # requisitos de entrega do curso
 │   ├── HISTORY-IA.md          # histórico do uso de IA no projeto
 │   └── release-review-010.md  # revisão de publicação da release v0.1.0

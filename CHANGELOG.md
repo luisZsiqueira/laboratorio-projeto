@@ -13,6 +13,8 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 - Registra o Prompt 10 no histórico de uso de IA.
 - Adiciona `docs/backlog.md` com os itens das *releases* `v0.2.0` a `v1.0.0`: 13 requisitos funcionais (RF) e 17 técnicos (RT), critérios de aceite verificáveis, estimativas e rastreabilidade com os requisitos não funcionais.
 - Inclui o backlog nas fontes de verdade, na estrutura e nas regras de fechamento de *release* do `CLAUDE.md`, e o referencia no README e no escopo; registra o Prompt 11.
+- Revisa os diagramas Mermaid de `docs/arquitetura.md`: acrescenta a dependência `task_service → task`, o `commit` e o `refresh` no fluxo de `POST /tasks` (ADR-12), os padrões em aberto no modelo de dados e dois diagramas novos (erros em `/tasks/{id}` e testes).
+- Adiciona `docs/mermaid.md`, catálogo dos diagramas com o antes e o depois da revisão; registra a decisão D-08 (esquema de `/health`) no escopo e no backlog; registra o Prompt 12.
 
 ## [0.1.0] - 2026-10-04
 

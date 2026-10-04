@@ -60,7 +60,7 @@ flowchart LR
     MOD -.-> REPO
 ```
 
-Os módulos e suas dependências, o fluxo de dados de `POST /tasks` e `GET /health`, o modelo de dados e as decisões de arquitetura (ADRs) estão em [`docs/arquitetura.md`](docs/arquitetura.md).
+Os módulos e suas dependências, o fluxo de dados de `POST /tasks`, `GET /health` e dos erros em `/tasks/{id}`, o modelo de dados, a estratégia de testes e as decisões de arquitetura (ADRs) estão em [`docs/arquitetura.md`](docs/arquitetura.md). O histórico visual dos diagramas, com o antes e o depois de cada revisão, está em [`docs/mermaid.md`](docs/mermaid.md).
 
 ## Configuração
 
@@ -161,8 +161,8 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 
 | Assistente | Modelo | Etapas |
 | --- | --- | --- |
-| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`), documento de escopo e requisitos do MVP, backlog por *release* |
-| Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub |
+| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`), documento de escopo e requisitos do MVP, backlog por *release*, revisão dos diagramas Mermaid |
+| Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub (Prompts 07 e 12) |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*.
