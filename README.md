@@ -1,6 +1,6 @@
 # laboratorio-projeto: micro-API de gestão de tarefas
 
-> **Status:** em desenvolvimento. Este README descreve o projeto planejado; as seções são atualizadas a cada *release*.
+> **Status:** em desenvolvimento. A *release* `v0.1.0` (fundação: documentação, dependências e arquitetura) está publicada; o código da aplicação começa na `v0.2.0`. As mudanças de cada *release* estão no [`CHANGELOG.md`](CHANGELOG.md).
 
 Micro-API REST de gestão de tarefas (*To-Do List*) com prioridades, em Python, FastAPI e SQLite3. É o miniprojeto acadêmico do curso 1 da pós-graduação SWE-GENAI, que exige o uso de IA generativa em todo o ciclo de vida do software.
 
@@ -123,16 +123,28 @@ A API fica disponível em `http://127.0.0.1:8000`, e a documentação interativa
 
 ```bash
 python -m pytest -W error
-python -m mypy app
+python -m mypy --explicit-package-bases app
 ```
 
-Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo.
+Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` na raiz (ADR-03 e ADR-11 em [`docs/arquitetura.md`](docs/arquitetura.md)).
+
+### Solução de problemas (Windows)
+
+Se `import sqlalchemy` falhar com `DLL load failed while importing _immutabledict_cy` e a mensagem "Uma política de Controle de Aplicativo bloqueou este arquivo", o Smart App Control do Windows está bloqueando as extensões compiladas do SQLAlchemy, que não são assinadas. Reinstale a mesma versão em Python puro, com o `.venv` ativo:
+
+```powershell
+$env:DISABLE_SQLALCHEMY_CEXT="1"
+python -m pip install --force-reinstall --no-deps --no-binary SQLAlchemy SQLAlchemy==2.1.3
+Remove-Item Env:DISABLE_SQLALCHEMY_CEXT
+```
+
+A versão e o comportamento são os mesmos; só as otimizações em Cython ficam de fora.
 
 ## Roadmap de releases
 
 | Release | Conteúdo | Situação |
 | --- | --- | --- |
-| `v0.1.0` | Fundação: estrutura, `.gitignore`, README, requisitos do curso, dependências verificadas, arquitetura e ADRs | em andamento |
+| `v0.1.0` | Fundação: estrutura, `.gitignore`, README, requisitos do curso, dependências verificadas, arquitetura e ADRs | concluída (04/10/2026, *tag* `v0.1.0`) |
 | `v0.2.0` | Base técnica: configuração por ambiente, banco SQLite, aplicação FastAPI com `lifespan` e `/health` | planejada |
 | `v0.3.0` | CRUD de tarefas: criar, listar com filtro por *status*, consultar, atualizar (total e parcial), concluir e excluir | planejada |
 | `v0.4.0` | Prioridades e `priority_advisor` (regras determinísticas) | planejada |
@@ -145,7 +157,8 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 
 | Assistente | Modelo | Etapas |
 | --- | --- | --- |
-| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura |
+| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`) |
+| Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*.

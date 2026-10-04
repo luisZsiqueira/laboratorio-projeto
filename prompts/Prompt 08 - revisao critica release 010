@@ -1,0 +1,56 @@
+CONTEXTO: Revisão do projeto para a publicação da release 0.1.0, quanto a APIs deprecadas, commits realizados, conformidade com os requerimentos, correção do ambiente virtual.
+OBJETIVO: Fazer a revisão, sugerir correções por objetivo de forma enumerada, aplicar correções autorizadas por mim, atualizar os arquivos do projeto quanto as correções aplicadas, em especial sobre: 1) Conventional Commits: todos os commits realizados precisam ser semanticamente significativos e suficientemente explicativos, no padrão conventional commits,crie e use um arquivo CHANGELOG.md com uma seção (0.1.0), agrupando sa mudanças; 2) Verifique e teste se há APIs deprecadas, sugira solução de substituição caso encontre, com a menor alteração possível, sem mudar o comportamento dos endpoints nem o banco de dados; 3) O ambiente virtual criado para o projeto; 4) A cobertura do .gitignore em relação ao stack; 5) Outras tarefas relacionadas a publicação da release 0.1.0 , em especial as informadas no arquivo /doc/requerimentos.md .
+STILO: Técnico e objetivo, estilo revisor sênior preparando um checklist de release.
+TOM: Neutro e criterioso, diferencie o que bloqueia a publicação da release do que recomendação.
+RESPOSTA: Apresente um resumo curto e enumerado de cada alteração ou implementação sugerida, para a minha aprovação ou revisão. Após aprovação, execute como aprovado e grave em /docs/release-review-010.md com as alterações, implementações, resultados de testes realizados e lista de bloqueadores e sugestões.
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 04/10/2026
+
+Resumo da execução:
+
+1. Revisão (sem alterar arquivos): checklist enumerado com severidade
+   [B] bloqueia a v0.1.0, [B-0.2] bloqueia o início da v0.2.0 e
+   [R] recomendação. O autor aprovou todos os itens e autorizou push e tag.
+2. Commits: 8 commits conformes ao Conventional Commits, com corpo; 3
+   merges com a mensagem padrão do git. Histórico publicado não foi
+   reescrito (exigiria force push). Criado o CHANGELOG.md (Keep a
+   Changelog) com a seção [0.1.0] agrupada por tipo (docs, build, chore).
+   Regras de merge --no-ff, tag anotada e CHANGELOG registradas no
+   CLAUDE.md.
+3. APIs deprecadas: não há código em app/, então nada foi substituído;
+   endpoints e banco intactos. Os 8 padrões do roteiro foram testados com
+   pytest -W error fora do repositório: on_event, class Config (Pydantic e
+   BaseSettings), datetime.utcnow() e fixture sem engine.dispose() são
+   proibidos; declarative_base() é estilo legado (sem aviso); lifespan,
+   ConfigDict, SettingsConfigDict, now(UTC), DeclarativeBase e httpx2 são
+   permitidos. "mypy app" falha com app/ sem __init__.py (ADR-03); o
+   comando da definição de pronto passou a ser
+   "python -m mypy --explicit-package-bases app" (ADR-11).
+4. Ambiente virtual: Python 3.14.6, pip 26.2.1, pip check sem conflitos,
+   pip freeze idêntico ao requirements.txt. Defeito encontrado: o Smart
+   App Control do Windows bloqueava as extensões .pyd do SQLAlchemy
+   (import sqlalchemy falhava). Correção testada em venv temporário e
+   aplicada: SQLAlchemy 2.1.3 reinstalado em Python puro
+   (DISABLE_SQLALCHEMY_CEXT=1, --no-binary). Documentado no README
+   (Solução de problemas). requirements.txt inalterado.
+5. .gitignore: cobertura conforme à stack, verificada com git check-ignore.
+   Seção Node.js mantida (pedido do Prompt 01).
+6. Requisitos do curso: repositório público e sem segredos; README
+   fechado para a v0.1.0 (status, roadmap concluído, uso de IA, link do
+   CHANGELOG); Ponto de partida do CLAUDE.md reduzido às decisões em
+   aberto; regra de nomes dos prompts ajustada para "Prompt NN - <título>".
+   Pendentes para a v1.0.0: testes automatizados e exemplos de uso.
+7. Testes: definição de pronto não aplicável (pytest: no tests ran;
+   mypy: nenhum arquivo em app/); checagem de deprecação com 11 testes
+   passando e 5 falhando como esperado (padrões legados).
+8. Publicação: branch docs/release-0.1.0 com 3 commits, merge --no-ff em
+   main, tag anotada v0.1.0 e push de main e da tag. Release no GitHub
+   não criada (gh não instalado): fica para a interface web, com o texto
+   da seção [0.1.0] do CHANGELOG.
+
+Arquivos alterados: CHANGELOG.md (novo), docs/release-review-010.md
+(novo, relatório completo), CLAUDE.md, README.md, docs/arquitetura.md,
+docs/HISTORY-IA.md e este prompt.
