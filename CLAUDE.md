@@ -24,22 +24,21 @@ Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a
 | Comandos de instalação, execução e teste | `README.md` (Como rodar) | só os comandos da definição de pronto |
 | Requisitos de entrega do curso | `docs/requerimentos.md` | — |
 | Histórico do uso de IA no projeto | `docs/HISTORY-IA.md`, `prompts/PromptNN - <título>` (um arquivo por *prompt*) e `README.md` (Uso de IA generativa) | formato e momento do registro |
+| Mudanças por *release* | `CHANGELOG.md` | atualizado no [fechamento de cada release](#fechamento-de-release) |
 | O que o git ignora | `.gitignore` | o que nunca versionar |
 
 ## Ponto de partida
 
 Decisões já acordadas entre o usuário e o assistente antes de existir código. Cada item deve ser migrado para seu arquivo dono na *release* que o criar; depois da migração, esta seção é reduzida até desaparecer, e o CLAUDE.md passa a conter apenas regras de trabalho.
 
-- **Escopo do MVP:** criar, listar (com filtro por *status*), consultar, atualizar (total e parcial), marcar como concluída e excluir tarefas; *health check* real da aplicação e do banco. Cada tarefa tem prioridade e pode ser **aberta** (sem data/hora) ou **específica** (com data/hora estipulada).
-- **Prioridade:** 1 = mandatória (fazer imediatamente); 2 = importante (fazer hoje se possível); 3 = regular (fazer quando houver tempo); 4 = fazer na data/hora estipulada. Decisões em aberto para o *blueprint*: se prioridade 4 exige data/hora e vice-versa; prioridade padrão (recomendação: 3); filtro por prioridade.
-- **Assessor de prioridade (`priority_advisor`):** a estrutura de diretórios prevê `tests/test_priority_advisor.py`, portanto há um componente `app/services/priority_advisor.py` no MVP. Decisão em aberto para o *blueprint* da `v0.4.0`: o que ele faz. Recomendação: regras determinísticas, sem IA (por exemplo, validar a coerência entre prioridade e data/hora e sugerir prioridade pela proximidade do prazo), chamadas pelo *service*. A versão assistida por IA continua fora do MVP.
-- **Fora do MVP (registrar no README em Limitações e Próximos Passos):** autenticação e usuários, paginação, *frontend*, migrações com Alembic, priorização assistida por IA (agente via API Claude). São previsão futura, não meta; não antecipar código, dependência nem configuração para eles.
-- **Stack pretendida:** Python 3.11+, FastAPI, SQLAlchemy 2.x (`Mapped` / `mapped_column`), Pydantic v2, pydantic-settings, SQLite3, Uvicorn, pytest com `TestClient` (cliente HTTP compatível com a versão do Starlette em uso), mypy, Mermaid.js para diagramas. Versões a verificar no PyPI na data da criação do `requirements.txt`, com fonte e data registradas no `docs/HISTORY-IA.md`.
-- **Configuração mínima:** `DATABASE_URL` (padrão SQLite local) e `ENVIRONMENT` (`development`, `test`, `production`), com valores padrão documentados no README.
+Na `v0.1.0`, o escopo do MVP, as prioridades, os itens fora do MVP, a *stack* e a configuração mínima foram migrados para o `README.md` (Objetivo, Stack, Configuração, Limitações e Próximos Passos). Restam as decisões em aberto:
+
+- **Prioridade:** decisões em aberto para o *blueprint*: se prioridade 4 exige data/hora e vice-versa; prioridade padrão (recomendação: 3); filtro por prioridade.
+- **Assessor de prioridade (`priority_advisor`):** decisão em aberto para o *blueprint* da `v0.4.0`: o que ele faz. Recomendação: regras determinísticas, sem IA (por exemplo, validar a coerência entre prioridade e data/hora e sugerir prioridade pela proximidade do prazo), chamadas pelo *service*. A versão assistida por IA continua fora do MVP.
 
 ## Inicialização do projeto
 
-Ordem de criação na primeira *release* (`v0.1.0`), cada passo com seu arquivo de *prompt* em `prompts/` e seu registro em `docs/HISTORY-IA.md`:
+Ordem de criação na primeira *release* (`v0.1.0`), cada passo com seu arquivo de *prompt* em `prompts/` e seu registro em `docs/HISTORY-IA.md`. Concluída em 04/10/2026; o detalhamento está em `docs/release-review-010.md`.
 
 1. `git init` em `main`, `.gitignore` coerente com a *stack* (Python, `.venv`, `.pytest_cache`, `.mypy_cache`, `.env`, SQLite, VS Code, sistema operacional) e este `CLAUDE.md`.
 2. `README.md` inicial com título, descrição, escopo, roadmap de *releases* e seção de uso de IA, marcado como "em desenvolvimento".
@@ -85,6 +84,8 @@ Ao concluir cada *release* do roadmap, além do fluxo acima:
 - Revisar o `README.md` por inteiro, como arquivo vivo: status do projeto, Roadmap (marcar a *release* como concluída), Endpoints e exemplos de uso, Configuração, Como rodar, Uso de IA generativa, Limitações e Próximos Passos. O README deve descrever o projeto **como ele está**, não como foi planejado.
 - Ajustar `docs/arquitetura.md` no que a implementação divergiu do desenho.
 - Consolidar em `docs/HISTORY-IA.md` a entrada da *release*.
+- Acrescentar ao `CHANGELOG.md` a seção da *release*, com as mudanças agrupadas por tipo de *commit*.
+- Após o *merge* em `main`, criar a *tag* anotada `vX.Y.Z` e publicá-la (com autorização de *push*).
 - Migrar para os arquivos donos os itens do [Ponto de partida](#ponto-de-partida) que a *release* materializou e removê-los desta seção.
 - Confirmar que a definição de pronto passa em ambiente limpo (ver [Reprodutibilidade](#reprodutibilidade)).
 
@@ -94,10 +95,10 @@ Executar a partir da raiz do repositório, com o ambiente virtual `.venv` ativo:
 
 ```bash
 python -m pytest -W error
-python -m mypy app
+python -m mypy --explicit-package-bases app
 ```
 
-Ambos devem passar, sem avisos. O `-W error` faz avisos de deprecação aparecerem como falha antes de virarem quebra. O `python -m` coloca a raiz do repositório no `sys.path`, o que permite aos testes importar `app` sem `conftest.py` nem arquivo de configuração. Nenhuma tarefa é dada como concluída sem a definição de pronto passando.
+Ambos devem passar, sem avisos. O `-W error` faz avisos de deprecação aparecerem como falha antes de virarem quebra. O `python -m` coloca a raiz do repositório no `sys.path`, o que permite aos testes importar `app` sem `conftest.py` nem arquivo de configuração. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` (ADR-03 e ADR-11 de `docs/arquitetura.md`). Nenhuma tarefa é dada como concluída sem a definição de pronto passando.
 
 ### Reprodutibilidade
 
@@ -112,7 +113,7 @@ O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem co
 
 | Quando | Atualizar |
 | --- | --- |
-| *Release* concluída | `README.md` por inteiro (ver [Fechamento de release](#fechamento-de-release)), `docs/arquitetura.md`, `docs/HISTORY-IA.md`, seção [Ponto de partida](#ponto-de-partida) deste arquivo |
+| *Release* concluída | `README.md` por inteiro (ver [Fechamento de release](#fechamento-de-release)), `CHANGELOG.md`, `docs/arquitetura.md`, `docs/HISTORY-IA.md`, seção [Ponto de partida](#ponto-de-partida) deste arquivo |
 | Muda como configurar, executar ou testar; novo endpoint | `README.md` (seção correspondente) |
 | Nova dependência ou mudança de versão | `requirements.txt` (versão fixada), `README.md` (Stack) e nova rodada do [roteiro de checagem](#apis-deprecadas-roteiro-de-checagem) |
 | Nova variável de ambiente | `README.md` (Configuração, com valor padrão e sem valores sensíveis) |
@@ -126,7 +127,7 @@ O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem co
 
 Dois registros complementares, ambos obrigatórios:
 
-**`prompts/`: o que foi pedido.** Um arquivo por *prompt*, nomeado `PromptNN - <título>`, com `NN` sequencial de dois dígitos a partir de `00` (por exemplo, `Prompt00 - Cria estrutura e main`, `Prompt01 - ...`); a numeração dá a ordem cronológica. O usuário cria o arquivo com o *prompt* (contexto, objetivo, estilo, resposta esperada); após a execução, o assistente acrescenta ao final: separador; modelo e data de execução; resposta ou resumo; interações seguintes.
+**`prompts/`: o que foi pedido.** Um arquivo por *prompt*, nomeado `Prompt NN - <título>`, com `NN` sequencial de dois dígitos a partir de `00` (por exemplo, `Prompt 01 - criar .gitignore`); o primeiro arquivo, `Prompt00 - Inicio`, mantém o nome original para não quebrar referências. A numeração dá a ordem cronológica. O usuário cria o arquivo com o *prompt* (contexto, objetivo, estilo, resposta esperada); após a execução, o assistente acrescenta ao final: separador; modelo e data de execução; resposta ou resumo; interações seguintes.
 
 **`docs/HISTORY-IA.md`: como a IA foi usada.** Arquivo vivo, em ordem cronológica, uma entrada por interação relevante (etapa, *release* ou revisão). Cada entrada registra:
 
@@ -152,6 +153,8 @@ Ao final do projeto, o `HISTORY-IA.md` é a base do histórico de uso de IA exig
   - adiciona testes de integração para filtro válido e inválido
   ```
 
+- *Merge* em `main` com `--no-ff` e a mensagem padrão do git (`Merge branch '...'`), que as ferramentas de *Conventional Commits* ignoram. Não reescrever histórico já publicado.
+- *Releases* marcadas com *tag* anotada `vX.Y.Z` em `main`, com as mudanças registradas no `CHANGELOG.md`.
 - *Commit* e *push* só quando pedido. Antes de *commitar*: definição de pronto passando e só os arquivos esperados no *stage*.
 - Nunca versionar `.venv`, `.pytest_cache`, `.mypy_cache`, `__pycache__`, arquivos `.env` nem o banco SQLite. O `.gitignore` é a lista completa.
 
@@ -184,16 +187,16 @@ Padrões suspeitos a checar primeiro, por serem os que assistentes de IA costuma
 
 | Padrão suspeito | Substituto provável | Situação |
 | --- | --- | --- |
-| `@app.on_event("startup")` / `on_startup` | `FastAPI(lifespan=...)` com `@asynccontextmanager` | a verificar |
-| `class Config:` em modelos Pydantic | `model_config = ConfigDict(...)` | a verificar |
-| `class Config:` em `BaseSettings` | `model_config = SettingsConfigDict(env_file=".env")` | a verificar |
-| `datetime.utcnow()` | `datetime.now(datetime.UTC)` | a verificar |
-| `declarative_base()` | `class Base(DeclarativeBase)` | a verificar |
-| cliente HTTP usado pelo `TestClient` (`httpx` vs. sucessor) | `httpx2` (2.13.1): sem ele, o Starlette recorre ao `httpx` e emite aviso de deprecação | proibido `httpx` (Starlette 1.7.0, 03/10/2026) |
-| fixture de banco em memória sem `engine.dispose()` | chamar `engine.dispose()` ao final da fixture | a verificar |
-| `mypy app` sobre `app/` sem `__init__.py` na raiz | se houver erro de módulo duplicado ou não encontrado, usar `python -m mypy --explicit-package-bases app` e registrar como ADR | a verificar |
+| `@app.on_event("startup")` / `on_startup` | `FastAPI(lifespan=...)` com `@asynccontextmanager` | proibido (FastAPI 0.142.2, 04/10/2026): `DeprecationWarning`; `lifespan` permitido |
+| `class Config:` em modelos Pydantic | `model_config = ConfigDict(...)` | proibido (Pydantic 2.13.5, 04/10/2026): `PydanticDeprecatedSince20`; `ConfigDict` permitido |
+| `class Config:` em `BaseSettings` | `model_config = SettingsConfigDict(env_file=".env")` | proibido (pydantic-settings 2.15.0, 04/10/2026): `PydanticDeprecatedSince20`; `SettingsConfigDict` permitido |
+| `datetime.utcnow()` | `datetime.now(datetime.UTC)` | proibido (Python 3.14.6, 04/10/2026): `DeprecationWarning`; `now(UTC)` permitido |
+| `declarative_base()` | `class Base(DeclarativeBase)` | estilo legado, evitar (SQLAlchemy 2.1.3, 04/10/2026): sem aviso; `DeclarativeBase` permitido |
+| cliente HTTP usado pelo `TestClient` (`httpx` vs. sucessor) | `httpx2` (2.13.1): sem ele, o Starlette recorre ao `httpx` e emite aviso de deprecação | proibido `httpx` (Starlette 1.7.0, 03/10/2026); `httpx2` permitido (04/10/2026) |
+| fixture de banco em memória sem `engine.dispose()` | chamar `engine.dispose()` ao final da fixture | proibido (SQLAlchemy 2.1.3, Python 3.14.6, 04/10/2026): `ResourceWarning` (`unclosed database`) vira `PytestUnraisableExceptionWarning`; com `dispose()` permitido |
+| `mypy app` sobre `app/` sem `__init__.py` na raiz | `python -m mypy --explicit-package-bases app` (ADR-11) | proibido `mypy app` (mypy 2.4.0, 04/10/2026): "Source file found twice under different module names"; com `--explicit-package-bases` permitido |
 
-Depois da checagem, a coluna "Situação" passa a dizer "proibido (vX.Y, dd/mm/aaaa)", "permitido (vX.Y, dd/mm/aaaa)" ou "estilo legado, evitar".
+Situação possível: "proibido (vX.Y, dd/mm/aaaa)", "permitido (vX.Y, dd/mm/aaaa)" ou "estilo legado, evitar". Os testes mínimos da rodada de 04/10/2026 estão em `docs/release-review-010.md`.
 
 ## Testes
 
@@ -246,15 +249,17 @@ laboratorio-projeto/
 ├── docs/
 │   ├── arquitetura.md         # arquitetura, diagramas Mermaid.js e ADRs
 │   ├── requerimentos.md       # requisitos de entrega do curso
-│   └── HISTORY-IA.md          # histórico do uso de IA no projeto
+│   ├── HISTORY-IA.md          # histórico do uso de IA no projeto
+│   └── release-review-010.md  # revisão de publicação da release v0.1.0
 ├── prompts/
-│   ├── Prompt00 - Cria estrutura e main # um arquivo por prompt usado com IA
-│   └── PromptNN - <título>    # numeração sequencial (00, 01, 02...)
+│   ├── Prompt00 - Inicio      # primeiro prompt (nome original mantido)
+│   └── Prompt NN - <título>   # um arquivo por prompt, numeração sequencial (01, 02...)
 ├── tests/
 │   ├── test_priority_advisor.py # unitários do priority_advisor
 │   ├── test_task_routes.py    # integração dos endpoints (inclui /health)
 │   └── test_task_service.py   # unitários do service de tarefas
 ├── .gitignore
+├── CHANGELOG.md               # mudanças por release (Keep a Changelog)
 ├── LICENSE                    # licença MIT
 ├── README.md
 ├── requirements.txt           # dependências com versões fixadas
@@ -264,3 +269,5 @@ laboratorio-projeto/
 ## Ambiente de desenvolvimento
 
 Windows 11 com PowerShell; o README traz os comandos em PowerShell e em Bash. Python 3.11 é o mínimo; registrar no README a versão em que o projeto foi testado. Diagramas em Mermaid.js, renderizados pelo próprio GitHub (sem dependência de Node.js).
+
+Nesta máquina, o Smart App Control do Windows está ativo e bloqueia as extensões compiladas (`.pyd`, sem assinatura) do SQLAlchemy. O SQLAlchemy 2.1.3 do `.venv` foi reinstalado em Python puro, na mesma versão; o procedimento está no README (Solução de problemas).
