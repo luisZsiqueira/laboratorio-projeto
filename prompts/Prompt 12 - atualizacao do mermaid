@@ -40,3 +40,9 @@ Resumo da execução:
    revisão dos diagramas (Prompt 12); branch publicada para conferir a
    renderização no GitHub antes do merge; merge --no-ff em main e push.
 5. Testes: definição de pronto não aplicável (sem código em app/).
+6. Verificação no GitHub (Claude in Chrome, branch publicada antes do
+   merge): docs/mermaid.md com 10 diagramas renderizados e
+   docs/arquitetura.md com 6; destaques em laranja visíveis (aresta
+   task_service -> task e faixa do commit/refresh); diagramas novos de
+   erros e de testes conferidos visualmente. A captura de tela travou
+   duas vezes; a navegação direta por âncora resolveu.

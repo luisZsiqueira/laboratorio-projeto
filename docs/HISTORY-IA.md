@@ -230,7 +230,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Não decidir pelo autor.** A IA propôs `health_schemas.py`, mas ofereceu deixar a escolha para o *blueprint*; o autor escolheu adiar.
   - **Cópias de diagramas.** Um catálogo separado pode divergir da versão oficial. Mitigação: `docs/arquitetura.md` continua dono, e o `CLAUDE.md` passou a exigir a atualização dos dois lugares.
   - **Limites do Mermaid.** O `erDiagram` não permite destacar um atributo com cor; a mudança foi explicada em texto.
-  - **Renderização.** Sem Node.js na máquina, a validação da sintaxe depende do GitHub: a *branch* foi publicada antes do *merge* e conferida no navegador.
+  - **Renderização.** Sem Node.js na máquina, a validação da sintaxe depende do GitHub: a *branch* foi publicada antes do *merge* e conferida no navegador. Os 10 diagramas do catálogo e os 6 de `docs/arquitetura.md` renderizaram, com os destaques visíveis. A captura de tela travou duas vezes, como no Prompt 07; a navegação direta por âncora resolveu.
 
 ## Release v0.1.0: consolidação
 
