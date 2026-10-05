@@ -1,0 +1,19 @@
+Contexto: docs/blueprint-v020.md aprovado. Itens RT-01 e RT-02; ADR-02, ADR-04 e ADR-07.
+Objetivo: Executar os passos do blueprint que criam app/models/settings.py (Settings com DATABASE_URL e ENVIRONMENT tipada com Literal["development", "test", "production"], SettingsConfigDict com env_file), app/models/base.py (class Base(DeclarativeBase)) e app/repositories/database.py (engine a partir de DATABASE_URL com check_same_thread=False; fábrica de sessões; get_db abre uma sessão por requisição e a fecha ao final, inclusive em erro; ping(session) executa SELECT 1 via text() e devolve False em SQLAlchemyError, registrando o detalhe no log), com os __init__.py dos pacotes e os testes previstos no blueprint para esses passos.
+Estilo: Python tipado, docstrings em português, nenhum literal de configuração fora de settings.py; sem class Config nem on_event.
+Resposta: Código dos arquivos e dos testes; saída da definição de pronto. Parar e reportar se um passo falhar de forma não prevista no blueprint.
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Passos 1 e 2 do docs/blueprint-v020.md executados na ordem, com a definição de pronto rodada ao fim de cada um.
+2. Passo 1 (RT-01, RT-04): __init__.py dos quatro pacotes (app/models, app/repositories, app/services, app/api), app/models/settings.py (Environment, Settings, get_settings com lru_cache), docs/decisoes.md com a DT-02 e 4 testes de Settings em tests/test_task_routes.py. Resultado: 4 testes passando, mypy sem erros.
+3. Passo 2 (RT-02, RT-04): app/models/base.py, app/repositories/database.py (create_db_engine, engine, SessionLocal, get_db, create_tables, ping), DT-03 em docs/decisoes.md, dublês FailingSession e SessionSpy, fixture test_engine com engine.dispose() e 4 testes de get_db e ping. Resultado: 8 testes passando com python -m pytest -W error; python -m mypy --explicit-package-bases app sem erros em 7 arquivos; nenhum tasks.db criado na raiz.
+4. Divergências: nenhuma em relação ao blueprint. Em tests/test_task_routes.py entraram só as importações que os testes dos passos 1 e 2 usam; as demais da seção 4.1 chegam com o passo 4.
+5. Incidente: um comando de shell travou por um `python -` sem arquivo, que o assistente incluiu por engano ao gravar os arquivos; foi encerrado, e os arquivos já estavam gravados e foram conferidos. Sem impacto no resultado.
+6. Fora desta execução (Prompts 23 e 24): health_schemas.py, health_service.py, health_routes.py, main.py, testes de /health e de documentação, execução manual e fechamento. docs/HISTORY-IA.md e demais arquivos do passo 6 não foram alterados, por serem do fechamento.
+7. Git: arquivos novos sem stage além do blueprint já adicionado; sem commit.
