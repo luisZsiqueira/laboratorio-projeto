@@ -18,6 +18,7 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 - Adiciona `docs/PRE-HISTORY-IA.md`, com o uso de IA anterior ao repositório: concepção do `CLAUDE.md` no Claude em modo *chat*, em 01 e 02/10/2026.
 - Acrescenta ao `CLAUDE.md` as regras de nomenclatura semântica, funções coesas e tipagem, o registro de decisões técnicas em `docs/decisoes.md` (DT) e a regra de *blueprint* executável por outro modelo, gravado em `docs/blueprint-vXYZ.md`.
 - Atualiza o README (Uso de IA generativa) e o `HISTORY-IA.md`; registra o Prompt 13.
+- Adiciona `prompts/prompts-desenvolvimento.md`, com os 24 *prompts* (21 a 44) da fase de desenvolvimento, das *releases* `v0.2.0` a `v1.0.0`, adaptados do exemplo do tutor em `docs/release-prompts-solon-020.md`; adiciona `docs/EXTRA-HISTORY-IA.md` (uso de IA em modo *chat* fora do repositório) e registra os três arquivos no `CLAUDE.md` e no README; registra o Prompt 20.
 
 ### chore
 
