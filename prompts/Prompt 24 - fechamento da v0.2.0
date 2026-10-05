@@ -20,3 +20,14 @@ Resumo da execução:
 8. CLAUDE.md: seção Ponto de partida removida com as referências a ela; health_schemas.py na Estrutura de diretórios. docs/blueprint-v020.md: status "aprovado e executado".
 9. Divergências do blueprint: nenhuma no código. Documentais: o modelo do Prompt 21 não estava registrado; as horas reais não foram medidas; a execução manual usou a porta 8765.
 10. Git: aguardando aprovação do autor para commits, merge --no-ff, tag v0.2.0, push e definição de pronto em clone limpo.
+
+Interações seguintes (05/10/2026, Claude Opus 5.5):
+
+1. Fechamento aprovado pelo autor. Commits na branch feat/base-tecnica: ce736f9 (docs: blueprint), d2b66e9 (feat: configuração, banco e GET /health) e 9300575 (docs: fechamento). Merge --no-ff em main (e967174), tag anotada v0.2.0 e push de main e da tag.
+2. Definição de pronto em clone limpo da tag v0.2.0, em diretório temporário, com .venv novo e só os comandos do README: instalação sem erro (o SQLAlchemy importou sem o procedimento do Smart App Control), 13 testes passando com -W error, mypy sem erros em 11 arquivos, git status limpo após os testes.
+3. Pendências resolvidas a pedido do autor:
+   - modelo do Prompt 21 identificado como Claude Opus 5.5, pelo transcrito local da sessão que gravou docs/blueprint-v020.md; registros corrigidos;
+   - diagramas alterados (módulos e /health, em docs/arquitetura.md e docs/mermaid.md) validados com o Mermaid oficial pelo serviço mermaid.ink: os quatro renderizam sem erro de sintaxe, e um diagrama de controle quebrado foi rejeitado com erro de parse. A conferência visual no GitHub pelo Claude in Chrome não foi feita porque a extensão não estava conectada;
+   - push da branch feat/base-tecnica;
+   - este registro, na branch docs/registro-fechamento-v020, com merge em main.
+4. Horas reais da v0.2.0: deixadas para preenchimento manual do autor no docs/backlog.md.

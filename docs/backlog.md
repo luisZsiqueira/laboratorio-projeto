@@ -57,7 +57,7 @@ O tempo gasto na `v0.1.0` e na `v0.2.0` não foi medido (seção 4.1). A estimat
 
 Decisão do *blueprint*: D-08 (esquema da resposta de `/health`), tomada em [`docs/blueprint-v020.md`](blueprint-v020.md) e registrada no ADR-13.
 
-**Situação da *release*:** concluída em 05/10/2026. Os seis itens foram entregues como planejados, sem item movido. As horas reais não foram medidas por item: a execução foi feita pelo assistente nos Prompts 22 e 23, em uma sessão interrompida duas vezes por erro de API, e o tempo do autor em revisão não foi cronometrado. Os 4 h estimados ficam como referência.
+**Situação da *release*:** concluída em 05/10/2026. Os seis itens foram entregues como planejados, sem item movido. As horas reais por item não foram medidas pelo assistente e serão preenchidas manualmente pelo autor; até lá, os 4 h estimados ficam como referência.
 
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |

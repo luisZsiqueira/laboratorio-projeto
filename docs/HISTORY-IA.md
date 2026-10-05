@@ -15,7 +15,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | Item | Valor |
 | --- | --- |
 | Assistente | Claude Code (CLI), no VS Code, em Windows 11 com PowerShell |
-| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) por padrão; outros modelos indicados na entrada (Fable 5.1 no Prompt 20, Sonnet 5.5 nos Prompts 22 e 23) |
+| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) por padrão, inclusive nos Prompts 21 e 24; outros modelos indicados na entrada (Fable 5.1 no Prompt 20, Sonnet 5.5 nos Prompts 22 e 23) |
 | Regras de trabalho com a IA | [`CLAUDE.md`](../CLAUDE.md) |
 | Formato dos *prompts* | Contexto, Objetivo, Estilo, Resposta (e Observações, a partir do Prompt 04) |
 
@@ -303,7 +303,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 
 - **Data:** 05/10/2026
 - **Fase:** planejamento da *release* `v0.2.0`
-- **Modelo:** Claude Code; o modelo não foi registrado no arquivo do *prompt* (não verificado)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code. O arquivo do *prompt* não tinha o registro; o modelo foi identificado no Prompt 24 pelo transcrito local da sessão que gravou o *blueprint*
 - **Uso da IA:**
   - leitura do backlog (RT-01 a RT-04, RF-12, RF-13), do escopo (D-08), dos ADRs e do roteiro de checagem de APIs;
   - geração de [`docs/blueprint-v020.md`](blueprint-v020.md) no formato de *blueprint* executável do `CLAUDE.md`: decisões tomadas (D-08, DT-01 a DT-03), importações permitidas por arquivo, padrões proibidos, seis passos com assinaturas, testes nomeados e IDs, riscos, lista do que não fazer e estimativa;
@@ -356,7 +356,10 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Refinamentos:** duas interrupções por erro de API durante a execução; retomada a partir do estado em disco, sem perda.
 - **Ganho percebido:** ~1,5 h
 - **Desafios:**
-  - **Horas reais.** O *prompt* pede as horas reais no backlog, mas elas não foram medidas; a IA registrou isso em vez de inventar números.
+  - **Horas reais.** O *prompt* pede as horas reais no backlog, mas elas não foram medidas; a IA não inventou números e o autor decidiu preenchê-las manualmente.
+  - **Modelo do Prompt 21 sem registro.** Identificado pelo transcrito local da sessão (Claude Opus 5.5), em vez de suposto.
+  - **Conferência dos diagramas.** Sem o Claude in Chrome conectado e sem Node.js na máquina, a sintaxe dos diagramas alterados foi validada pelo serviço mermaid.ink, com um diagrama quebrado como controle negativo.
+- **Resultado do git:** *commits* `ce736f9`, `d2b66e9` e `9300575`; *merge* `e967174` em `main`; *tag* `v0.2.0` e *push* de `main`, da *tag* e da *branch*. Definição de pronto verde em clone limpo da *tag* (13 testes, mypy sem erros, `git status` limpo).
   - **Seção `[Não publicado]` do `CHANGELOG.md`.** As mudanças de documentação feitas em `main` depois da `v0.1.0` entram na `0.2.0`, porque a *tag* as inclui.
 
 ## Release v0.2.0: consolidação
@@ -364,7 +367,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Período:** 05/10/2026 (Prompts 21 a 24)
 - **Entregas:** primeiro código da aplicação. São 11 arquivos em `app/`: configuração, banco, `/health` em camadas e composição com `create_app`. Somam-se 13 testes de integração em `tests/test_task_routes.py`, o *blueprint* executável, três DTs, o ADR-13, o README com a seção Endpoints e a *tag* `v0.2.0`.
 - **Uso da IA:**
-  - divisão de papéis entre modelos: o Opus 5.5 fechou a *release*, e o Sonnet 5.5 executou o *blueprint* sem participar do desenho;
+  - divisão de papéis entre modelos: o Opus 5.5 desenhou (Prompt 21) e fechou (Prompt 24) a *release*, e o Sonnet 5.5 executou o *blueprint* (Prompts 22 e 23) sem participar do desenho;
   - a execução seguiu o *blueprint* sem divergência de código, o que valida a regra de *blueprint* executável do `CLAUDE.md`.
 - **Ganho percebido acumulado:** ~6 h (soma das estimativas dos Prompts 21 a 24).
 - **Lição principal:** o protótipo executado antes do *blueprint* evitou os erros típicos de primeira execução: `ResourceWarning`, `tasks.db` criado pelos testes e configuração lida na importação. Com isso, o modelo de execução chegou ao verde em cada passo sem improvisar. As interrupções de API mostraram outro valor do *blueprint* persistido: ele permite retomar o trabalho a partir do disco.
