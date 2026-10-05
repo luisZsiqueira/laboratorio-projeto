@@ -28,7 +28,8 @@ Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a
 | Configuração (variáveis de ambiente e valores padrão) | `README.md` (Configuração) | toda configuração vem do ambiente |
 | Comandos de instalação, execução e teste | `README.md` (Como rodar) | só os comandos da definição de pronto |
 | Requisitos de entrega do curso | `docs/requerimentos.md` | — |
-| Histórico do uso de IA no projeto | `docs/PRE-HISTORY-IA.md` (antes do repositório), `docs/HISTORY-IA.md`, `prompts/Prompt NN - <título>` (um arquivo por *prompt*) e `README.md` (Uso de IA generativa) | formato e momento do registro |
+| Histórico do uso de IA no projeto | `docs/PRE-HISTORY-IA.md` (antes do repositório), `docs/EXTRA-HISTORY-IA.md` (modo *chat*, fora do repositório), `docs/HISTORY-IA.md`, `prompts/Prompt NN - <título>` (um arquivo por *prompt*) e `README.md` (Uso de IA generativa) | formato e momento do registro |
+| *Prompts* planejados para a fase de desenvolvimento (`v0.2.0` a `v1.0.0`) | `prompts/prompts-desenvolvimento.md` | índice; cada *prompt* vira um arquivo `Prompt NN - <título>` ao ser usado |
 | Mudanças por *release* | `CHANGELOG.md` | atualizado no [fechamento de cada release](#fechamento-de-release) |
 | O que o git ignora | `.gitignore` | o que nunca versionar |
 
@@ -289,12 +290,15 @@ laboratorio-projeto/
 │   ├── mermaid.md             # catálogo dos diagramas, com antes e depois de cada revisão
 │   ├── requerimentos.md       # requisitos de entrega do curso
 │   ├── PRE-HISTORY-IA.md      # uso de IA antes do repositório (concepção do CLAUDE.md)
+│   ├── EXTRA-HISTORY-IA.md    # uso de IA em modo chat fora do repositório (registro do autor)
 │   ├── HISTORY-IA.md          # histórico do uso de IA no projeto
 │   ├── decisoes.md            # decisões técnicas de implementação (DT), criado na primeira decisão
 │   ├── blueprint-vXYZ.md      # blueprint aprovado de cada release (ex.: blueprint-v020.md)
-│   └── release-review-010.md  # revisão de publicação da release v0.1.0
+│   ├── release-review-010.md  # revisão de publicação da release v0.1.0
+│   └── release-prompts-solon-020.md # prompts de exemplo do tutor do curso (referência)
 ├── prompts/
-│   └── Prompt NN - <título>   # um arquivo por prompt, numeração sequencial (00, 01, 02...)
+│   ├── Prompt NN - <título>   # um arquivo por prompt, numeração sequencial (00, 01, 02...)
+│   └── prompts-desenvolvimento.md # índice dos prompts planejados para v0.2.0 a v1.0.0
 ├── tests/
 │   ├── test_priority_advisor.py # unitários do priority_advisor
 │   ├── test_task_routes.py    # integração dos endpoints (inclui /health)

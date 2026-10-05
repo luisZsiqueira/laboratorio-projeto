@@ -1,0 +1,52 @@
+CONTEXTO: Construção dos prompts para a fase de desenvolvimento e testes do projeto de MVP de Gestão de Tarefas.
+O projeto está faseado em releases, e usa blueprints como forma de especificação lógica da solução empregada. 
+Foi entregue a release 0.1.0 e agora iremos planejar os prompts para o desenvolvimento das demais até a entrega da release 1.0.0.
+O tutor do curso ofereceu exemplos de prompts para desenvolvimento que servem como descrições mínimas, as quais precisam ser adequadas ao nosso projeto..
+OBJETIVO: Entregar um arquivo com todos os prompts para o desenvolvimento, em sequência, enumerados. 
+Foi fornecido um exemplo dos prompts usados pelo tutor do curso em /docs/release-prompts-solon-020.md 
+O nosso projeto é similar, precisamos adequar as definições mínimas ao que desenhamos e arquitetamos até aqui, respeitando o nosso projeto,
+para gerar um conjunto próprio de prompts para o desenvolvimento.
+ESTILO: Seguir o estilo do exemplo, uma lista enumerada e sequencial, entregar arquivo único markdown.
+TOM: Objetivo, descrições mínimas que cubram tudo o que é necessário.
+RESPOSTA: Crie o arquivo único com todos os prompts sugeridos enumerados em sequência, grave em /prompts/prompts-desenvolvimento.md para minha revisão. Quanto ao git, crie uma branch e adicione todos os arquivos novos.
+
+---
+
+Execução: Claude Fable 5.1 (claude-fable-5-1), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Fontes lidas: docs/release-prompts-solon-020.md (exemplo do tutor,
+   Prompts 21 a 26), docs/backlog.md (RT-01 a RT-17, RF-01 a RF-13),
+   docs/escopo-mvp.md (D-01 a D-08), docs/arquitetura.md (ADR-01 a
+   ADR-12), README (Roadmap, Configuração) e CLAUDE.md (Blueprint
+   executável, Fechamento de release, Testes).
+2. Criado prompts/prompts-desenvolvimento.md com 24 prompts (21 a 44),
+   em sequência, agrupados por release: v0.2.0 (21 a 24), v0.3.0 (25 a
+   31), v0.4.0 (32 a 35), v0.5.0 (36 a 40) e v1.0.0 (41 a 44). Cada
+   release tem um prompt de blueprint (com as decisões D-NN tomadas no
+   texto, a confirmar na aprovação), prompts de execução por item do
+   backlog e um prompt de fechamento. Campos Contexto, Objetivo, Estilo
+   e Resposta, como no exemplo do tutor; o campo TOM dos prompts deste
+   projeto não foi incluído, para seguir o estilo pedido.
+3. Adaptações em relação ao exemplo do tutor: repository em SQLite com
+   SQLAlchemy (não em memória); priority_advisor determinístico, sem
+   LLM nem OPENAI_API_KEY (escopo, seção 5.1); rotas incluem PATCH e
+   POST /tasks/{id}/complete; blueprint e fechamento por release; a
+   "revisão técnica" do tutor vira a release v0.5.0 (RT-11 a RT-14).
+4. A numeração começa em 21 por continuar a de prompts/ (último: 20);
+   coincide com a numeração do exemplo do tutor.
+5. Registros: este arquivo, docs/HISTORY-IA.md (Prompt 20), CHANGELOG.md
+   e README (Uso de IA generativa: Claude Fable 5.1 e Claude Sonnet 5.5
+   em modo chat, conforme docs/EXTRA-HISTORY-IA.md). CLAUDE.md: fontes
+   de verdade e estrutura de diretórios passam a listar
+   docs/EXTRA-HISTORY-IA.md, docs/release-prompts-solon-020.md e
+   prompts/prompts-desenvolvimento.md, criados fora da estrutura
+   original.
+6. Git: branch docs/prompts-desenvolvimento criada a partir do HEAD
+   atual (igual a main; a branch docs/correcoes-revisao-humana não tem
+   commits). As alterações do Prompt 13, ainda não comitadas, continuam
+   no stage e aparecem nesta branch. Arquivos novos adicionados; sem
+   commit.
+7. Testes: definição de pronto não aplicável (sem código em app/).

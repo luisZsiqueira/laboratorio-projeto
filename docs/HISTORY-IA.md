@@ -255,6 +255,26 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Arquivo por antecipação.** O `docs/decisoes.md` não foi criado vazio, por regra do `CLAUDE.md`; nasce com a primeira DT.
   - **Referências históricas.** O `docs/release-review-010.md` cita o nome antigo do Prompt 00; foi mantido, por ser um relatório datado.
 
+### Prompt 20: prompts para a fase de desenvolvimento
+
+- **Data:** 05/10/2026
+- **Fase:** planejamento do desenvolvimento (`v0.2.0` a `v1.0.0`)
+- **Modelo:** Claude Fable 5.1, via Claude Code. Antes, Claude Sonnet 5.5 em modo *chat* extraiu das capturas de tela do curso os *prompts* de exemplo do tutor, gravados em [`release-prompts-solon-020.md`](release-prompts-solon-020.md) (registro em [`EXTRA-HISTORY-IA.md`](EXTRA-HISTORY-IA.md))
+- **Uso da IA:**
+  - leitura do exemplo do tutor (seis *prompts* de "definições mínimas": modelos, *repository*, *service*, `PriorityAdvisor`, rotas e revisão) e das fontes de verdade do projeto (backlog, escopo, arquitetura, `CLAUDE.md`);
+  - geração de [`prompts/prompts-desenvolvimento.md`](../prompts/prompts-desenvolvimento.md): 24 *prompts* (21 a 44) em sequência, por *release*, cada um com Contexto, Objetivo, Estilo e Resposta, citando os itens do backlog (RT/RF), as decisões (D-NN) e os ADRs que cobre;
+  - adaptação do exemplo ao processo do projeto: um *prompt* de *blueprint* por *release* (com as decisões tomadas no texto, a confirmar na aprovação), *prompts* de execução por item do backlog e um *prompt* de fechamento; a "revisão técnica" do tutor vira a *release* `v0.5.0`;
+  - registro dos arquivos criados fora da estrutura original (`docs/EXTRA-HISTORY-IA.md`, `docs/release-prompts-solon-020.md`, `prompts/prompts-desenvolvimento.md`) no `CLAUDE.md` e no README.
+- **Prompt:** [`prompts/Prompt 20 - criando os prompts para desenvolvimento`](../prompts/Prompt%2020%20-%20criando%20os%20prompts%20para%20desenvolvimento)
+- **Refinamentos:** nenhum até a revisão do autor; o arquivo foi entregue como proposta.
+- **Ganho percebido:** ~1,5 h (estimativa: mapear 30 itens do backlog, 8 decisões e 12 ADRs em *prompts* coerentes com o `CLAUDE.md`)
+- **Desafios:**
+  - **Exemplo com premissas diferentes.** O tutor usa *repository* em memória, `PriorityAdvisor` com LLM opcional via `OPENAI_API_KEY` e um arquivo de código por *prompt*. O projeto decidiu SQLite com SQLAlchemy, `priority_advisor` determinístico (escopo, seção 5.1) e *blueprint* aprovado antes do código. A IA manteve o formato dos campos e trocou o conteúdo, sem reabrir decisões.
+  - **Passos ainda não existem.** Os *prompts* de execução não podem citar números de passo, porque cada *blueprint* será escrito depois; citam os itens RT/RF e deixam ao *blueprint* a ordem exata.
+  - **Decisões D-NN.** O `CLAUDE.md` exige *blueprint* sem decisões em aberto, mas a decisão é do autor. Os *prompts* de *blueprint* mandam tomar a decisão no texto com a recomendação do escopo, para confirmação na aprovação.
+  - **Campo TOM.** Os *prompts* deste projeto usam cinco campos (com TOM); o exemplo do tutor, quatro. Seguiu-se o exemplo, como pedido.
+  - **Estado do git.** A *branch* anterior (`docs/correcoes-revisao-humana`) tinha alterações no *stage* sem *commit*; a nova *branch* foi criada do mesmo ponto e carrega essas alterações. Separá-las em *commits* distintos fica para o autor.
+
 ## Release v0.1.0: consolidação
 
 - **Período:** 03/10/2026 a 04/10/2026 (Prompts 00 a 08)
