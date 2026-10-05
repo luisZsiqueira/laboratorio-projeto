@@ -161,12 +161,14 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 
 | Assistente | Modelo | Etapas |
 | --- | --- | --- |
-| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`), documento de escopo e requisitos do MVP, backlog por *release*, revisão dos diagramas Mermaid |
+| Claude (*chat*) | Claude Opus 5.5 | concepção do `CLAUDE.md` inicial a partir dos requisitos do curso, em 01 e 02/10/2026, antes do repositório |
+| Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`), documento de escopo e requisitos do MVP, backlog por *release*, revisão dos diagramas Mermaid, regras de código e de *blueprint* executável |
 | Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub (Prompts 07 e 12) |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*.
-- O histórico de uso da IA (etapas, ganhos, desafios) está em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md).
+- O histórico de uso da IA (etapas, ganhos, desafios) está em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md); o uso anterior ao repositório, em [`docs/PRE-HISTORY-IA.md`](docs/PRE-HISTORY-IA.md).
+- Os *blueprints* aprovados são escritos para que um modelo de execução, como o Claude Sonnet 5.5, os siga sem depender do contexto da conversa (regra em [`CLAUDE.md`](CLAUDE.md), Blueprint executável).
 
 Todo código gerado por IA é revisado e testado antes de ser incorporado.
 

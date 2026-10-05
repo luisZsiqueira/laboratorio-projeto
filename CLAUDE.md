@@ -6,7 +6,7 @@ Guia de trabalho para o assistente de IA neste repositório. Este arquivo define
 
 Você é um engenheiro de software sênior e meu copiloto no desenvolvimento de uma micro-API REST de gestão de tarefas (*To-Do List*) em Python, FastAPI e SQLite3. É um miniprojeto acadêmico do curso 1 da pós-graduação SWE-GENAI, que exige o uso de IA generativa no ciclo de vida do software e tem orçamento de cerca de 30 horas. A prioridade é um MVP pequeno, claro, funcional, bem testado e bem documentado, publicado em repositório público no GitHub e executável por um avaliador em uma máquina limpa.
 
-O projeto começa de um diretório vazio. Este arquivo é o primeiro a existir; os demais são criados na ordem descrita em [Inicialização do projeto](#inicialização-do-projeto), respeitando a [Estrutura de diretórios](#estrutura-de-diretórios), que é fechada: não criar diretórios nem arquivos na raiz fora dela.
+O projeto começa de um diretório vazio. Este arquivo é o primeiro a existir (foi elaborado pelo autor com apoio do Claude em modo *chat* antes do repositório, como registra `docs/PRE-HISTORY-IA.md`); os demais são criados na ordem descrita em [Inicialização do projeto](#inicialização-do-projeto), respeitando a [Estrutura de diretórios](#estrutura-de-diretórios), que é fechada: não criar diretórios nem arquivos na raiz fora dela.
 
 Repositório: https://github.com/luisZsiqueira/laboratorio-projeto.git (confirmar na inicialização).
 
@@ -21,12 +21,14 @@ Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a
 | Resumo do escopo, previsões futuras (fora do MVP), roadmap de *releases* | `README.md` (Objetivo, Roadmap, Limitações e Próximos Passos) | o resumo segue o `docs/escopo-mvp.md` |
 | Stack e versões | `README.md` (Stack) e `requirements.txt` | versões fixadas e verificadas; mudar só com justificativa e fonte |
 | Arquitetura, pacotes, fluxo de dados, modelo de dados, decisões (ADRs) | `docs/arquitetura.md` | regra de separação de camadas |
+| Decisões técnicas de implementação (DT) | `docs/decisoes.md` | [formato e limite com os ADRs](#decisões-técnicas) |
+| Plano aprovado de cada *release* | `docs/blueprint-vXYZ.md` | [blueprint executável](#blueprint-executável) |
 | Histórico visual dos diagramas (antes e depois de cada revisão) | `docs/mermaid.md` | catálogo; a versão oficial de cada diagrama fica em `docs/arquitetura.md` ou no README |
 | Endpoints, códigos de resposta, exemplos de uso | `README.md` (Endpoints) | — |
 | Configuração (variáveis de ambiente e valores padrão) | `README.md` (Configuração) | toda configuração vem do ambiente |
 | Comandos de instalação, execução e teste | `README.md` (Como rodar) | só os comandos da definição de pronto |
 | Requisitos de entrega do curso | `docs/requerimentos.md` | — |
-| Histórico do uso de IA no projeto | `docs/HISTORY-IA.md`, `prompts/PromptNN - <título>` (um arquivo por *prompt*) e `README.md` (Uso de IA generativa) | formato e momento do registro |
+| Histórico do uso de IA no projeto | `docs/PRE-HISTORY-IA.md` (antes do repositório), `docs/HISTORY-IA.md`, `prompts/Prompt NN - <título>` (um arquivo por *prompt*) e `README.md` (Uso de IA generativa) | formato e momento do registro |
 | Mudanças por *release* | `CHANGELOG.md` | atualizado no [fechamento de cada release](#fechamento-de-release) |
 | O que o git ignora | `.gitignore` | o que nunca versionar |
 
@@ -64,6 +66,25 @@ Ordem de criação na primeira *release* (`v0.1.0`), cada passo com seu arquivo 
 - Riscos de produção entram no *blueprint* de cada *release*: configuração por variáveis de ambiente, documentação da API desabilitada em produção, *health check* confiável, ausência de literais de configuração no código.
 - Segurança entra no *blueprint* onde couber (ver [Segurança](#segurança)).
 - Se a implementação se afastar do *blueprint* aprovado, avisar explicitamente o que mudou e por quê.
+
+#### Blueprint executável
+
+O *blueprint* aprovado deve poder ser seguido sem erro por um modelo de execução, como o Claude Sonnet 5.5, que não participou da discussão. Por isso:
+
+- **Persistido e autossuficiente.** Depois de aprovado, o *blueprint* é gravado em `docs/blueprint-vXYZ.md` (por exemplo, `docs/blueprint-v020.md`). Quem executa lê esse arquivo e este `CLAUDE.md`; nada depende do histórico do *chat*.
+- **Sem decisões em aberto.** Todas as decisões da *release* (D-NN do escopo, novos ADRs e DTs) já vêm tomadas e citadas. Proibido no texto final: "a definir", "se preferir", "ou", "por exemplo" como instrução, "conforme necessário".
+- **Passos numerados e pequenos**, na ordem de execução. Cada passo traz:
+  1. arquivos a criar ou alterar, com o caminho exato;
+  2. o que escrever: classes e funções com assinatura completa e tipada (parâmetros, retorno, exceções), e a regra de comportamento de cada uma;
+  3. os testes do passo: arquivo, nome de cada função de teste, entrada e resultado esperado;
+  4. o comando de verificação e o resultado esperado;
+  5. os IDs atendidos (RF, RT, ADR, DT).
+- **Estado verde a cada passo.** Ao fim de cada passo, a [definição de pronto](#definição-de-pronto) passa.
+- **APIs explícitas.** Linhas de `import` e padrões permitidos, e os proibidos do [roteiro de checagem](#apis-deprecadas-roteiro-de-checagem), escritos no próprio *blueprint*.
+- **Código só onde há risco de erro.** Trechos curtos para os pontos sensíveis (por exemplo, *fixture* com `StaticPool` e `engine.dispose()`, `lifespan`, conversão de datas para UTC); no resto, assinatura e regra bastam.
+- **Lista do que não fazer:** arquivos que não podem ser tocados, dependências proibidas, funcionalidades fora do escopo.
+- **Condição de parada.** Se um passo falhar de forma não prevista ou exigir uma decisão que o *blueprint* não traz, quem executa para e reporta, sem improvisar.
+- **Fechamento.** O último passo lista os arquivos dependentes a atualizar (ver [Arquivos a manter atualizados](#arquivos-a-manter-atualizados)) e o registro do uso de IA.
 
 ### Fluxo de uma mudança
 
@@ -119,6 +140,8 @@ O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem co
 | Nova dependência ou mudança de versão | `requirements.txt` (versão fixada), `README.md` (Stack) e nova rodada do [roteiro de checagem](#apis-deprecadas-roteiro-de-checagem) |
 | Nova variável de ambiente | `README.md` (Configuração, com valor padrão e sem valores sensíveis) |
 | Implementação diverge do desenho | `docs/arquitetura.md` (ajuste pontual; não refazer diagramas) |
+| Decisão técnica tomada na implementação | `docs/decisoes.md` (nova DT) |
+| *Blueprint* aprovado | `docs/blueprint-vXYZ.md` |
 | Diagrama Mermaid alterado ou criado | versão oficial (`docs/arquitetura.md` ou README) e `docs/mermaid.md` (nova seção com o antes e o depois, mudança destacada) |
 | Nova tecnologia ou novo tipo de artefato gerado | `.gitignore` |
 | Novo modelo ou assistente de IA, ou nova etapa apoiada por IA | `README.md` (Uso de IA generativa), exigência R3.4 do curso |
@@ -129,7 +152,7 @@ O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem co
 
 Dois registros complementares, ambos obrigatórios:
 
-**`prompts/`: o que foi pedido.** Um arquivo por *prompt*, nomeado `Prompt NN - <título>`, com `NN` sequencial de dois dígitos a partir de `00` (por exemplo, `Prompt 01 - criar .gitignore`); o primeiro arquivo, `Prompt00 - Inicio`, mantém o nome original para não quebrar referências. A numeração dá a ordem cronológica. O usuário cria o arquivo com o *prompt* (contexto, objetivo, estilo, resposta esperada); após a execução, o assistente acrescenta ao final: separador; modelo e data de execução; resposta ou resumo; interações seguintes.
+**`prompts/`: o que foi pedido.** Um arquivo por *prompt*, nomeado `Prompt NN - <título>`, com `NN` sequencial de dois dígitos a partir de `00` (por exemplo, `Prompt 01 - criar .gitignore`). O primeiro arquivo, originalmente `Prompt00 - Inicio`, foi renomeado para `Prompt 00 - criar diretorios e main` no Prompt 13. O uso de IA anterior ao repositório está em `docs/PRE-HISTORY-IA.md`. A numeração dá a ordem cronológica. O usuário cria o arquivo com o *prompt* (contexto, objetivo, estilo, resposta esperada); após a execução, o assistente acrescenta ao final: separador; modelo e data de execução; resposta ou resumo; interações seguintes.
 
 **`docs/HISTORY-IA.md`: como a IA foi usada.** Arquivo vivo, em ordem cronológica, uma entrada por interação relevante (etapa, *release* ou revisão). Cada entrada registra:
 
@@ -162,7 +185,9 @@ Ao final do projeto, o `HISTORY-IA.md` é a base do histórico de uso de IA exig
 
 ## Convenções de código
 
-- *Type hints* em todas as funções, métodos e retornos; o código passa no `mypy`.
+- **Nomenclatura semântica.** Nomes dizem o que a coisa é ou faz, no vocabulário do domínio (`task`, `due_at`, `priority`, `mark_task_done`); nada de abreviações opacas, nomes genéricos (`data`, `obj`, `tmp`, `helper`, `utils`) ou sufixos numéricos. Funções com verbo; booleanos com `is_`/`has_`; exceções terminando em `Error`.
+- **Funções coesas.** Cada função faz uma coisa, no nível de abstração da sua camada, com efeitos colaterais explícitos no nome ou na *docstring*. Se precisa de "e" para ser descrita, ou passa de cerca de 30 linhas, é candidata a divisão. Sem parâmetros *flag* que mudam o comportamento da função.
+- **Atenção à tipagem.** *Type hints* em todas as funções, métodos e retornos; o código passa no `mypy`. Sem `Any` nem `# type: ignore` sem justificativa em comentário; ausência explícita com `X | None`; coleções parametrizadas (`list[Task]`); retorno preciso, nunca mais largo que o necessário.
 - *Docstrings* em português em todas as classes e funções públicas (propósito, parâmetros, retorno, exceções).
 - Conjuntos fechados de valores sempre com `typing.Literal` (por exemplo `TaskStatus`, `TaskPriority` e `ENVIRONMENT`). Nunca `str` ou `int` livre para esses casos.
 - Datas e horas sempre *timezone-aware* em UTC, na persistência e nos esquemas.
@@ -174,8 +199,17 @@ Ao final do projeto, o `HISTORY-IA.md` é a base do histórico de uso de IA exig
   - `app/main.py`: apenas composição (criação da aplicação, `lifespan` e registro das rotas).
 - Configuração só via pydantic-settings (`app/models/settings.py`); nenhum literal de configuração no código.
 - Toda entrada e saída externa passa por esquemas Pydantic v2, com tipos, tamanhos máximos e `Literal`.
-- Decisões de implementação ficam nos ADRs de `docs/arquitetura.md`. Segui-las; mudar só com nova decisão registrada lá.
+- Decisões de arquitetura ficam nos ADRs de `docs/arquitetura.md`, e decisões técnicas de implementação em `docs/decisoes.md` (ver [Decisões técnicas](#decisões-técnicas)). Segui-las; mudar só com nova decisão registrada no arquivo correspondente.
 - Não adicionar funcionalidades, dependências, abstrações, diretórios ou arquivos de raiz além do escopo definido no README e da [Estrutura de diretórios](#estrutura-de-diretórios). Itens listados em "Limitações e Próximos Passos" são previsão futura, não meta do MVP; não antecipar código, dependências ou configuração para eles.
+
+### Decisões técnicas
+
+Toda escolha técnica feita durante a implementação que não esteja no *blueprint* nem nos ADRs, e que outra pessoa precisaria conhecer para manter o código, é registrada em `docs/decisoes.md`. Exemplos: forma de converter datas para UTC, padrão de tratamento de exceções, nomes de exceções de domínio, estrutura de uma *fixture*.
+
+- O arquivo é criado com a primeira decisão registrada (não antes), com uma entrada por decisão, numerada `DT-NN`.
+- Cada entrada traz: data e *release*; contexto (o problema); decisão; alternativas consideradas e por que foram descartadas; consequências; IDs relacionados (RF, RT, ADR).
+- Limite com os ADRs: decisão que afeta camadas, dependências entre módulos, persistência ou contrato da API é ADR em `docs/arquitetura.md`; decisão local ao código é DT. Na dúvida, DT, e a revisão da `v0.5.0` promove a ADR o que for estrutural.
+- A DT nasce no mesmo *commit* do código que a aplica.
 
 ### APIs deprecadas: roteiro de checagem
 
@@ -254,11 +288,13 @@ laboratorio-projeto/
 │   ├── backlog.md             # itens RF/RT por release, critérios de aceite e estimativas
 │   ├── mermaid.md             # catálogo dos diagramas, com antes e depois de cada revisão
 │   ├── requerimentos.md       # requisitos de entrega do curso
+│   ├── PRE-HISTORY-IA.md      # uso de IA antes do repositório (concepção do CLAUDE.md)
 │   ├── HISTORY-IA.md          # histórico do uso de IA no projeto
+│   ├── decisoes.md            # decisões técnicas de implementação (DT), criado na primeira decisão
+│   ├── blueprint-vXYZ.md      # blueprint aprovado de cada release (ex.: blueprint-v020.md)
 │   └── release-review-010.md  # revisão de publicação da release v0.1.0
 ├── prompts/
-│   ├── Prompt00 - Inicio      # primeiro prompt (nome original mantido)
-│   └── Prompt NN - <título>   # um arquivo por prompt, numeração sequencial (01, 02...)
+│   └── Prompt NN - <título>   # um arquivo por prompt, numeração sequencial (00, 01, 02...)
 ├── tests/
 │   ├── test_priority_advisor.py # unitários do priority_advisor
 │   ├── test_task_routes.py    # integração dos endpoints (inclui /health)

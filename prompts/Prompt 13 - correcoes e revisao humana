@@ -1,0 +1,44 @@
+CONTEXTO: O projeto iniciou com arquivos sem que houvesse documentação prévia.
+OBJETIVO: Corrigir erros e fazer revisão a partir da observação humana, nos seguintes pontos: 1) renomear o arquivo "/prompts/Prompt00 - Inicio" para "/prompts/Prompt 00 - criar diretorios e main"; 2) criar um arquivo /docs/PRE-HISTORY-IA.md informando que o projeto iniciou com um arquivo CLAUDE.md definidor do contexto, que esse arquivo foi formado pelo aluno com uso do chat Claude Opus 5.5, através do qual foram fornecidos prints de tela do curso C4-LICMIAG do curso SWE-GENIA , com requerimentos do mini-projeto para submissão gravados no arquivo /docs/requerimentos.md após sua criação, e características gerais do MVP, havendo sido realizadas sessões em 01 e 02 de outubro de 2026, não documentadas no projeto pois esse foi iniciado de fato no ambiente Claude Code; 3) Atualizar o arquivo CLAUDE.md informando que para o código python a ser fatorado deve ser utilizada nomenclatura semântica, funções coesas, atenção à tipagem, e registro de decisões técnicas em docs/decisoes.md; 4) Ao criar blueprints, faça-o de form que possam ser seguidos sem erro pelo modelo Sonnet 5.5 para fatoração do código; 
+ESTILO: Técnico e objetivo, estilo desenvolvedor sênior realizado revisão dos gráficos e fluxos mermaid.
+TOM: Neutro e criterioso.
+RESPOSTA: Crie os arquivos conforme solicitado no objetivo e atualize os arquivos do projeto conforme a necessidade. Quanto ao git, adicione a branch os faltantes. Não comite. 
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 04/10/2026
+
+Resumo da execução:
+
+1. Renomeação: "prompts/Prompt00 - Inicio" -> "prompts/Prompt 00 - criar
+   diretorios e main", com git mv (histórico preservado). Referências
+   atualizadas no CLAUDE.md (regra de nomes e estrutura) e no
+   docs/HISTORY-IA.md (link do Prompt 00). Nota de renomeação acrescentada
+   ao final do próprio arquivo. O docs/release-review-010.md mantém o nome
+   antigo, por ser um relatório datado.
+2. Criado docs/PRE-HISTORY-IA.md: sessões de 01 e 02/10/2026 no Claude em
+   modo chat (Claude Opus 5.5), conduzidas pelo aluno, com capturas de tela
+   do curso C4-LICMIAG (requisitos de submissão, depois gravados em
+   docs/requerimentos.md) e as características gerais do MVP; resultado: o
+   CLAUDE.md inicial. Fonte declarada (autor); sem reconstrução do conteúdo
+   das conversas. Nome do curso grafado SWE-GENAI, como no restante do
+   projeto (o prompt diz "SWE-GENIA").
+3. CLAUDE.md, convenções de código: nomenclatura semântica, funções
+   coesas e atenção à tipagem; nova seção "Decisões técnicas" com o
+   registro em docs/decisoes.md (DT-NN), formato da entrada e limite com
+   os ADRs. O arquivo docs/decisoes.md não foi criado vazio: nasce com a
+   primeira DT.
+4. CLAUDE.md, nova subseção "Blueprint executável": blueprint aprovado
+   gravado em docs/blueprint-vXYZ.md, sem decisões em aberto, com passos
+   numerados (arquivos, assinaturas tipadas, testes nomeados, comando de
+   verificação, IDs), estado verde a cada passo, APIs permitidas e
+   proibidas explícitas, lista do que não fazer e condição de parada, para
+   que o Claude Sonnet 5.5 possa segui-lo sem erro.
+5. Atualizados: CLAUDE.md (papel e contexto, fontes de verdade, arquivos a
+   manter atualizados, estrutura de diretórios), README.md (Uso de IA
+   generativa: Claude em modo chat e blueprint executável), CHANGELOG.md,
+   docs/HISTORY-IA.md e este arquivo.
+6. Git: branch docs/correcoes-revisao-humana criada a partir de main;
+   arquivos adicionados ao stage; sem commit, como pedido.
+7. Testes: definição de pronto não aplicável (sem código em app/).
