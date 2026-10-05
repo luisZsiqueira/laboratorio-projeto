@@ -1,0 +1,51 @@
+Contexto: Release v0.2.0 (base técnica) do docs/backlog.md: RT-01 a RT-04, RF-12 e RF-13. Decisão em aberto D-08 (esquema da resposta de /health e arquivo onde fica). É o primeiro código do projeto; o roteiro de checagem de APIs deprecadas do CLAUDE.md já está preenchido para as versões do requirements.txt.
+Objetivo: Escrever docs/blueprint-v020.md conforme a seção "Blueprint executável" do CLAUDE.md: D-08 tomada no texto com a recomendação do escopo (novo app/models/health_schemas.py), a confirmar na aprovação; passos numerados com arquivos, assinaturas tipadas, regra de comportamento, testes nomeados por arquivo, comando de verificação e IDs (RT, RF, ADR); imports permitidos e padrões proibidos do roteiro de checagem; lista do que não fazer; estimativa frente às 4 h do backlog.
+Estilo: Sem decisões em aberto; trechos de código só nos pontos sensíveis (SettingsConfigDict, lifespan com @asynccontextmanager, fixture com sqlite:// + StaticPool e engine.dispose()).
+Resposta: Apenas o arquivo docs/blueprint-v020.md, para aprovação; nenhum código em app/ ou tests/. Git: branch feat/base-tecnica a partir de main; adicionar o arquivo; não comitar.
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Fontes lidas: CLAUDE.md, docs/backlog.md (seção 4.1), docs/escopo-mvp.md
+   (D-08), docs/arquitetura.md (ADR-01 a ADR-12, fluxo de /health),
+   requirements.txt, README (Configuração, Como rodar),
+   docs/release-review-010.md (testes mínimos do roteiro de checagem) e
+   prompts/prompts-desenvolvimento.md (Prompts 22 a 24).
+2. Criado docs/blueprint-v020.md com seis passos: configuração (RT-01),
+   base e acesso ao banco (RT-02), esquema e service de saúde (D-08),
+   rota, composição e testes de integração (RT-03, RT-04, RF-12, RF-13),
+   execução manual com uvicorn e fechamento. Treze testes nomeados em
+   tests/test_task_routes.py, com entrada e resultado esperado.
+3. Decisões no texto, a confirmar na aprovação: D-08 conforme a
+   recomendação do escopo (app/models/health_schemas.py, HealthRead com
+   status e database do tipo Literal["ok", "unavailable"]), registrada
+   como ADR-13 por ser contrato da API; DT-01 (fábrica create_app com
+   settings e engine injetados, para os testes não criarem tasks.db e
+   poderem testar ENVIRONMENT=production); DT-02 (get_settings com
+   lru_cache); DT-03 (dublês SessionSpy e FailingSession).
+4. Verificação: os trechos do blueprint foram executados em protótipo no
+   diretório temporário do assistente, fora do repositório, com o .venv
+   do projeto: 13 testes passando com -W error, mypy sem erros, uvicorn
+   respondendo 200 em /health e /docs, nenhum arquivo criado pelos
+   testes. Nenhum código em app/ ou tests/.
+5. Estimativa: 4 h para os itens (igual ao backlog) e 1,5 h para
+   blueprint e fechamento, fora das estimativas por item.
+6. Git: branch feat/base-tecnica criada a partir de main; blueprint
+   adicionado ao stage; sem commit. A entrada em docs/HISTORY-IA.md fica
+   para o Prompt 24, como previsto no índice dos prompts.
+   
+
+---
+
+Execução: Claude Code; modelo não registrado (registro acrescentado no Prompt 24, a partir do próprio blueprint)
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Gerado docs/blueprint-v020.md no formato de blueprint executável: D-08 tomada com a recomendação do escopo (app/models/health_schemas.py), DT-01 a DT-03, importações permitidas por arquivo, padrões proibidos, seis passos com assinaturas, testes nomeados, verificação e IDs, riscos, lista do que não fazer, condição de parada e estimativa (4 h dos itens, 5,5 h com blueprint e fechamento).
+2. Verificação prévia: os trechos foram executados em protótipo fora do repositório, no .venv do projeto (13 testes com -W error, mypy sem erros, uvicorn respondendo em /health e /docs).
+3. Git: branch feat/base-tecnica criada a partir de main; blueprint adicionado ao stage; sem commit.
+4. Interações seguintes: aprovado pelo autor e executado pelos Prompts 22, 23 e 24.

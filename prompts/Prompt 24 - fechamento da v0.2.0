@@ -1,0 +1,22 @@
+Contexto: Todos os passos de docs/blueprint-v020.md executados com a definição de pronto verde na branch feat/base-tecnica.
+Objetivo: Aplicar a seção "Fechamento de release" do CLAUDE.md: README revisado por inteiro (status, roadmap com a v0.2.0 concluída, endpoint /health, Configuração, Como rodar, Uso de IA generativa); docs/arquitetura.md ajustada no que a implementação divergiu; docs/decisoes.md com as DTs surgidas (criar só se houver a primeira); docs/backlog.md com RT-01 a RT-04, RF-12 e RF-13 concluídos e as horas reais; CHANGELOG.md com a seção 0.2.0 agrupada por tipo de commit; docs/HISTORY-IA.md com as entradas dos Prompts 21 a 24 e a consolidação da release; remoção da seção "Ponto de partida" do CLAUDE.md.
+Estilo: README descreve o projeto como ele está, não como foi planejado; divergências do blueprint listadas explicitamente.
+Resposta: Lista dos arquivos alterados e das divergências. Git, após minha aprovação do fechamento: commits no padrão Conventional Commits na branch, merge --no-ff em main, tag anotada v0.2.0 e push; em seguida, definição de pronto em clone limpo.
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Fechamento aplicado conforme o CLAUDE.md (Fechamento de release) e o passo 6 do blueprint. Duas interrupções por erro de API no meio da execução; retomada a partir do estado em disco, sem perda.
+2. README: status com v0.1.0 e v0.2.0 concluídas; nova seção Endpoints (GET /health com 200 e 503, corpos da D-08, exemplos em PowerShell e Bash; /docs, /redoc e /openapi.json por ambiente); Configuração (ENVIRONMENT inválido impede a partida, configuração lida uma vez); Como rodar sem a nota de "a partir da v0.2.0"; roadmap com a v0.2.0 concluída; Uso de IA generativa com Sonnet 5.5 (Prompts 22 e 23) e Opus 5.5 (Prompt 24).
+3. docs/arquitetura.md: diagrama de módulos com health_schemas.py e a aresta main → database rotulada (create_tables, engine); diagrama de /health com check_health e os corpos de 200 e 503; observações sobre create_app (DT-01), HealthRead (ADR-13) e dublês de sessão (DT-03). docs/mermaid.md: nova seção com o antes e o depois dos dois diagramas.
+4. docs/decisoes.md: sem DT nova; DT-01 a DT-03 já registradas nos Prompts 22 e 23.
+5. docs/backlog.md: RT-01 a RT-04, RF-12 e RF-13 concluídos. Horas reais não medidas, registrado como tal.
+6. CHANGELOG.md: seção 0.2.0 (feat e docs), absorvendo o que estava em [Não publicado]; links de comparação atualizados.
+7. docs/HISTORY-IA.md: entradas dos Prompts 21 a 24, linhas no Resumo (incluindo o Prompt 20, que faltava) e consolidação da release.
+8. CLAUDE.md: seção Ponto de partida removida com as referências a ela; health_schemas.py na Estrutura de diretórios. docs/blueprint-v020.md: status "aprovado e executado".
+9. Divergências do blueprint: nenhuma no código. Documentais: o modelo do Prompt 21 não estava registrado; as horas reais não foram medidas; a execução manual usou a porta 8765.
+10. Git: aguardando aprovação do autor para commits, merge --no-ff, tag v0.2.0, push e definição de pronto em clone limpo.

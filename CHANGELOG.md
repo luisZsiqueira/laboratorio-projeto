@@ -6,8 +6,27 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+## [0.2.0] - 2026-10-05
+
+Base técnica: configuração por ambiente, acesso ao banco SQLite, aplicação FastAPI com `lifespan`, `GET /health` e infraestrutura de testes de integração. Primeiro código da aplicação, executado a partir de [`docs/blueprint-v020.md`](docs/blueprint-v020.md). Inclui também as mudanças de documentação feitas em `main` depois da `v0.1.0`.
+
+### feat
+
+- Adiciona `app/models/settings.py` com `Settings` (pydantic-settings, `SettingsConfigDict`), `DATABASE_URL` e `ENVIRONMENT` tipada com `Literal`, e `get_settings()` com `lru_cache` (RT-01, DT-02).
+- Adiciona `app/models/base.py` (`class Base(DeclarativeBase)`) e `app/repositories/database.py` com *engine*, `SessionLocal`, `get_db`, `create_tables` e `ping` (`SELECT 1` via `text()`, falha registrada só no log) (RT-02).
+- Adiciona `GET /health` em camadas: `app/models/health_schemas.py` (`HealthRead`, D-08 e ADR-13), `app/services/health_service.py` (`check_health`) e `app/api/health_routes.py`; responde `200` ou `503` sem detalhes internos (RF-12).
+- Adiciona `app/main.py` com a fábrica `create_app(settings, db_engine)`, `lifespan` com `@asynccontextmanager` que cria as tabelas, e documentação interativa desabilitada com `ENVIRONMENT=production` (RT-03, RF-13, DT-01).
+- Adiciona `tests/test_task_routes.py` com 13 testes: configuração, `get_db`, `ping`, `lifespan`, `/health` 200 e 503 e documentação por ambiente; SQLite em memória com `StaticPool`, `engine.dispose()` e dublês de sessão sem biblioteca de *mock* (RT-04, DT-03).
+
 ### docs
 
+- Adiciona `docs/blueprint-v020.md`, o *blueprint* executável da *release*, e `docs/decisoes.md` com as decisões técnicas DT-01 a DT-03.
+- Adiciona o ADR-13 (contrato de `GET /health`) em `docs/arquitetura.md` e marca a D-08 como decidida em `docs/escopo-mvp.md`.
+- Ajusta os diagramas de módulos e de `GET /health` à implementação e registra o antes e o depois em `docs/mermaid.md`.
+- Revisa o README: status, seção Endpoints com `GET /health`, Configuração, Como rodar, roadmap com a `v0.2.0` concluída e Uso de IA generativa.
+- Marca RT-01 a RT-04, RF-12 e RF-13 como concluídos em `docs/backlog.md`.
+- Remove do `CLAUDE.md` a seção Ponto de partida, já migrada, e inclui `health_schemas.py` na estrutura de diretórios.
+- Registra os Prompts 21 a 24 em `prompts/` e em `docs/HISTORY-IA.md`, com a consolidação da *release*.
 - Adiciona `docs/escopo-mvp.md` com objetivo, critérios de sucesso, requisitos funcionais (RF-01 a RF-13) e não funcionais (RNF-01 a RNF-15), fora de escopo, decisões em aberto e rastreabilidade com os requisitos do curso.
 - Torna `docs/escopo-mvp.md` a fonte de verdade dos requisitos no `CLAUDE.md` e migra para ele as decisões em aberto do Ponto de partida e de `docs/arquitetura.md`; o README passa a apontar para o documento.
 - Registra o Prompt 10 no histórico de uso de IA.
@@ -49,5 +68,6 @@ Fundação do projeto: regras de trabalho com a IA, documentação, dependência
 - Inicializa o repositório com `.gitignore`, `CLAUDE.md` (regras de trabalho com a IA) e o primeiro *prompt*; os diretórios de `app/` e `tests/` entram no repositório com seus primeiros arquivos (`94f30f2`).
 - Amplia o `.gitignore` com seções por tecnologia e corrige o padrão que ignorava o `.env.example` (`c6ca4dd`).
 
-[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.1.0...HEAD
+[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/luisZsiqueira/laboratorio-projeto/releases/tag/v0.1.0

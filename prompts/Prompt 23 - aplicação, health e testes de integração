@@ -1,0 +1,19 @@
+Contexto: settings.py, base.py e database.py prontos. Itens RT-03, RT-04, RF-12 e RF-13; ADR-05 a ADR-09; D-08 conforme o blueprint.
+Objetivo: Executar os passos do blueprint que criam app/models/health_schemas.py, app/services/health_service.py, app/api/health_routes.py e app/main.py (FastAPI com lifespan em @asynccontextmanager, Base.metadata.create_all no lifespan, documentação desabilitada com ENVIRONMENT=production, registro das rotas), e tests/test_task_routes.py com a fixture de banco em memória (sqlite:// com StaticPool, dependency_overrides de get_db, engine.dispose() e limpeza dos overrides ao final) e os testes: /health 200 com banco disponível e 503 com ping falhando, corpo sem SQL, caminho nem stack trace; /docs e /openapi.json 200 em development e 404 com /redoc em production; padrões de DATABASE_URL e ENVIRONMENT; ENVIRONMENT fora do conjunto impede a inicialização.
+Estilo: Rotas sem acesso ao banco; service sem HTTP; TestClient com httpx2; nenhum arquivo criado pelos testes (git status limpo).
+Resposta: Código dos arquivos e dos testes; saída de python -m pytest -W error e de python -m mypy --explicit-package-bases app; confirmação de que python -m uvicorn app.main:app --reload sobe a API a partir da raiz.
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Duas tentativas anteriores terminaram em erro de API no meio da execução. Nesta, o estado foi verificado antes de qualquer alteração: os arquivos dos passos 3 e 4 já estavam gravados (app/models/health_schemas.py, app/services/health_service.py, app/api/health_routes.py, app/main.py e os testes de /health, de documentação e do lifespan em tests/test_task_routes.py) e conferidos linha a linha contra o docs/blueprint-v020.md, sem divergência.
+2. Definição de pronto: python -m pytest -W error com 13 testes passando; python -m mypy --explicit-package-bases app sem erros em 11 arquivos. Os testes não criam tasks.db (o tasks.db da raiz vem da execução manual e do servidor do autor; é ignorado pelo .gitignore).
+3. Faltava o que era documentação dos passos 3 e 4, e foi concluído: ADR-13 (contrato de GET /health) em docs/arquitetura.md, D-08 marcada como decidida em docs/escopo-mvp.md e DT-01 (create_app) em docs/decisoes.md.
+4. Passo 5 (execução manual): python -m uvicorn app.main:app --reload a partir da raiz, na porta 8765 (a 8000 estava ocupada por outro servidor do autor). Log com "Application startup complete."; GET /health devolveu {"status":"ok","database":"ok"} e GET /docs devolveu 200. Servidor encerrado em seguida.
+5. Divergências: nenhuma em relação ao blueprint, exceto a porta da execução manual (8765 no lugar de 8000), por ocupação.
+6. Fora desta execução (Prompt 24): README, CHANGELOG, backlog, HISTORY-IA, ajustes dos diagramas em docs/arquitetura.md e docs/mermaid.md, CLAUDE.md e demais arquivos do passo 6.
+7. Git: sem commit; arquivos novos e alterados sem stage, além do blueprint já adicionado.

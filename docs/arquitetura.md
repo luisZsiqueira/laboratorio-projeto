@@ -1,6 +1,6 @@
 # Arquitetura
 
-> **Status:** desenho aprovado na *release* `v0.1.0`, antes do código, e diagramas revisados em 04/10/2026 (Prompt 12). Serve de *blueprint* para as *releases* `v0.2.0` a `v0.4.0` e será revisado na `v0.5.0`. Divergências da implementação são ajustadas pontualmente no fechamento de cada *release*. O histórico visual dos diagramas (antes e depois de cada revisão) está em [`docs/mermaid.md`](mermaid.md).
+> **Status:** desenho aprovado na *release* `v0.1.0`, antes do código, diagramas revisados em 04/10/2026 (Prompt 12) e ajustados à implementação da `v0.2.0` em 05/10/2026 (Prompt 24). Serve de *blueprint* para as *releases* `v0.2.0` a `v0.4.0` e será revisado na `v0.5.0`. Divergências da implementação são ajustadas pontualmente no fechamento de cada *release*. O histórico visual dos diagramas (antes e depois de cada revisão) está em [`docs/mermaid.md`](mermaid.md).
 
 ## 1. Visão geral
 
@@ -42,6 +42,7 @@ flowchart TD
 
     subgraph models["app/models (estruturas, sem lógica)"]
         task_schemas["task_schemas.py"]
+        health_schemas["health_schemas.py"]
         task["task.py"]
         base["base.py"]
         settings["settings.py"]
@@ -51,12 +52,13 @@ flowchart TD
 
     main --> task_routes
     main --> health_routes
-    main --> database
+    main -->|"create_tables, engine"| database
     main --> settings
 
     task_routes --> task_service
     task_routes --> task_schemas
     health_routes --> health_service
+    health_routes --> health_schemas
     task_routes -.->|"Depends(get_db)"| database
     health_routes -.->|"Depends(get_db)"| database
 
@@ -65,6 +67,7 @@ flowchart TD
     task_service --> task_schemas
     task_service --> task
     health_service --> database
+    health_service --> health_schemas
 
     task_repository --> task
     database --> base
@@ -74,11 +77,12 @@ flowchart TD
     database --> db
 ```
 
-Correspondência com os nomes genéricos: *config* = `settings.py`; *schemas* = `task_schemas.py`; *models* = `task.py` e `base.py`; *repository* = `task_repository.py`; *service* = `task_service.py`; *routes* = `task_routes.py` e `health_routes.py`.
+Correspondência com os nomes genéricos: *config* = `settings.py`; *schemas* = `task_schemas.py` e `health_schemas.py`; *models* = `task.py` e `base.py`; *repository* = `task_repository.py`; *service* = `task_service.py`; *routes* = `task_routes.py` e `health_routes.py`.
 
 Observações:
 
-- `main.py` importa `database.py` só para criar as tabelas (`Base.metadata.create_all`) no `lifespan`, e `settings.py` para desabilitar a documentação em produção.
+- `main.py` importa de `database.py` só `create_tables` (chamada no `lifespan`, que executa `Base.metadata.create_all`) e o `engine`, e de `settings.py` as configurações que desabilitam a documentação em produção. A aplicação é montada pela fábrica `create_app(settings, db_engine)`, e `app = create_app(get_settings(), engine)` fica no nível do módulo; os testes criam a aplicação com `Settings` e *engine* próprios (DT-01 em [`docs/decisoes.md`](decisoes.md)).
+- `health_schemas.py` define `HealthStatus` (`Literal["ok", "unavailable"]`) e o modelo `HealthRead`, devolvido pelo `health_service` e usado como `response_model` pela rota (ADR-13).
 - `priority_advisor.py` contém funções puras: não importa repositório, banco nem HTTP.
 - `task_schemas.py` define os tipos `TaskStatus` e `TaskPriority` (`typing.Literal`) usados também pelo *service*.
 - `task_service.py` importa `task.py` porque converte o esquema de entrada no objeto ORM `Task` que entrega ao *repository*.
@@ -134,18 +138,18 @@ sequenceDiagram
     participant DB as SQLite3
 
     C->>H: GET /health
-    H->>HS: check(session)
+    H->>HS: check_health(session)
     HS->>D: ping(session)
     D->>DB: SELECT 1 via text()
     alt banco responde
         DB-->>D: 1
         D-->>HS: True
-        HS-->>H: saudável
-        H-->>C: 200 OK (JSON)
+        HS-->>H: HealthRead(status="ok", database="ok")
+        H-->>C: 200 OK {"status": "ok", "database": "ok"}
     else falha do banco (SQLAlchemyError)
         D-->>HS: False (detalhe registrado no log)
-        HS-->>H: indisponível
-        H-->>C: 503 Service Unavailable (JSON sem detalhes internos)
+        HS-->>H: HealthRead(status="unavailable", database="unavailable")
+        H-->>C: 503 {"status": "unavailable", "database": "unavailable"}
     end
 ```
 
@@ -241,6 +245,7 @@ flowchart LR
 
 - Os unitários não abrem banco nem HTTP. O `priority_advisor` recebe a data/hora de referência como parâmetro, para resultados determinísticos.
 - A integração cobre todos os endpoints, incluindo `/health` com banco indisponível e a documentação com `ENVIRONMENT=production`. A fixture chama `engine.dispose()` ao final (ADR-06).
+- O `503` de `/health` e o fechamento da sessão em `get_db` são testados com dublês simples de sessão (`FailingSession` e `SessionSpy`), sem biblioteca de *mock* (DT-03 em [`docs/decisoes.md`](decisoes.md)).
 
 ## 6. Decisões de arquitetura
 
@@ -258,3 +263,4 @@ flowchart LR
 | ADR-10 | Datas *timezone-aware* em UTC nos esquemas e na persistência | o SQLite não guarda fuso horário; a conversão para UTC na leitura e na escrita fica na camada de modelos/*repository* e é coberta por testes |
 | ADR-11 | Checagem de tipos com `python -m mypy --explicit-package-bases app` | com `app/` sem `__init__.py` (ADR-03), `mypy app` acusa o mesmo arquivo sob dois nomes de módulo (`models.x` e `app.models.x`); a opção faz o mypy derivar o nome do módulo a partir da raiz. Verificado no mypy 2.4.0 em 04/10/2026 |
 | ADR-12 | Operações de escrita confirmadas no *repository* (`commit` seguido de `refresh`); `get_db` só abre e fecha a sessão | mantém a persistência num único ponto; o `refresh` devolve os valores gerados pelo banco (`id`, datas); uma sessão fechada sem `commit` descarta alterações pendentes de uma requisição que falhou. Decidido na revisão dos diagramas (Prompt 12), em 04/10/2026 |
+| ADR-13 | Contrato de `GET /health` (D-08): modelo `HealthRead` em `app/models/health_schemas.py`, com `status` e `database` do tipo `HealthStatus = Literal["ok", "unavailable"]`. Banco disponível: `200` com `{"status": "ok", "database": "ok"}`; banco indisponível: `503` com `{"status": "unavailable", "database": "unavailable"}` | o corpo não traz mensagem de erro, nome de exceção nem SQL (detalhes só no log, ADR-07); o esquema fica separado dos de tarefa. Decidido no *blueprint* da `v0.2.0` ([`blueprint-v020.md`](blueprint-v020.md)), em 05/10/2026 |

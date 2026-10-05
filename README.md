@@ -1,6 +1,6 @@
 # laboratorio-projeto: micro-API de gestão de tarefas
 
-> **Status:** em desenvolvimento. A *release* `v0.1.0` (fundação: documentação, dependências e arquitetura) está publicada; o código da aplicação começa na `v0.2.0`. As mudanças de cada *release* estão no [`CHANGELOG.md`](CHANGELOG.md).
+> **Status:** em desenvolvimento. As *releases* `v0.1.0` (fundação: documentação, dependências e arquitetura) e `v0.2.0` (base técnica: configuração, banco, aplicação FastAPI e `GET /health`) estão concluídas. Os endpoints de tarefas chegam na `v0.3.0`. As mudanças de cada *release* estão no [`CHANGELOG.md`](CHANGELOG.md).
 
 Micro-API REST de gestão de tarefas (*To-Do List*) com prioridades, em Python, FastAPI e SQLite3. É o miniprojeto acadêmico do curso 1 da pós-graduação SWE-GENAI, que exige o uso de IA generativa em todo o ciclo de vida do software.
 
@@ -62,6 +62,43 @@ flowchart LR
 
 Os módulos e suas dependências, o fluxo de dados de `POST /tasks`, `GET /health` e dos erros em `/tasks/{id}`, o modelo de dados, a estratégia de testes e as decisões de arquitetura (ADRs) estão em [`docs/arquitetura.md`](docs/arquitetura.md). O histórico visual dos diagramas, com o antes e o depois de cada revisão, está em [`docs/mermaid.md`](docs/mermaid.md).
 
+## Endpoints
+
+Disponíveis na `v0.2.0`. Os endpoints de tarefas (`/tasks`) entram na `v0.3.0`.
+
+| Método e caminho | Descrição | Respostas |
+| --- | --- | --- |
+| `GET /health` | verifica a aplicação e o banco de dados, com uma consulta real (`SELECT 1`) | `200` banco disponível; `503` banco indisponível |
+| `GET /docs`, `GET /redoc`, `GET /openapi.json` | documentação interativa e esquema OpenAPI | `200` em `development` e `test`; `404` em `production` |
+
+### `GET /health`
+
+PowerShell:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+```
+
+Bash:
+
+```bash
+curl -i http://127.0.0.1:8000/health
+```
+
+Banco disponível, `200 OK`:
+
+```json
+{"status": "ok", "database": "ok"}
+```
+
+Banco indisponível, `503 Service Unavailable`:
+
+```json
+{"status": "unavailable", "database": "unavailable"}
+```
+
+O corpo do `503` não traz mensagem de erro, SQL nem *stack trace*; o detalhe da falha vai para o log da aplicação. Os campos `status` e `database` aceitam só `ok` e `unavailable` (ADR-13 em [`docs/arquitetura.md`](docs/arquitetura.md)).
+
 ## Configuração
 
 Toda configuração vem de variáveis de ambiente, opcionalmente lidas de um arquivo `.env` na raiz do repositório. O `.env` não é versionado.
@@ -69,7 +106,7 @@ Toda configuração vem de variáveis de ambiente, opcionalmente lidas de um arq
 | Variável | Valores | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `DATABASE_URL` | URL do SQLAlchemy | `sqlite:///./tasks.db` | banco de dados; cria o arquivo `tasks.db` na raiz |
-| `ENVIRONMENT` | `development`, `test`, `production` | `development` | em `production`, a documentação interativa (`/docs`, `/redoc`) fica desabilitada |
+| `ENVIRONMENT` | `development`, `test`, `production` | `development` | em `production`, a documentação interativa (`/docs`, `/redoc`) e o `/openapi.json` ficam desabilitados; valor fora do conjunto impede a inicialização da aplicação |
 
 Exemplo de `.env`:
 
@@ -78,9 +115,9 @@ DATABASE_URL=sqlite:///./tasks.db
 ENVIRONMENT=development
 ```
 
-## Como rodar localmente
+As configurações são lidas uma única vez, na partida da aplicação: para mudar um valor, reinicie o servidor. As tabelas são criadas na partida, se ainda não existirem.
 
-> A instalação das dependências já funciona. Os comandos de execução da API e dos testes passam a valer quando o código da aplicação existir, a partir da *release* `v0.2.0`.
+## Como rodar localmente
 
 Pré-requisitos: Python 3.11 ou superior e Git.
 
@@ -119,7 +156,7 @@ python -m pip install -r requirements.txt
 python -m uvicorn app.main:app --reload
 ```
 
-A API fica disponível em `http://127.0.0.1:8000`, e a documentação interativa em `http://127.0.0.1:8000/docs`.
+A API fica disponível em `http://127.0.0.1:8000`, e a documentação interativa em `http://127.0.0.1:8000/docs`. O log do *uvicorn* mostra `Application startup complete.` quando a aplicação está pronta; o primeiro início cria o arquivo `tasks.db` na raiz, que não é versionado. Para conferir, use o exemplo de [`GET /health`](#get-health).
 
 ### 5. Rodar os testes e a checagem de tipos
 
@@ -128,7 +165,7 @@ python -m pytest -W error
 python -m mypy --explicit-package-bases app
 ```
 
-Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` na raiz (ADR-03 e ADR-11 em [`docs/arquitetura.md`](docs/arquitetura.md)).
+Os testes usam SQLite em memória e não criam arquivos no repositório. Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` na raiz (ADR-03 e ADR-11 em [`docs/arquitetura.md`](docs/arquitetura.md)).
 
 ### Solução de problemas (Windows)
 
@@ -149,7 +186,7 @@ Os itens de cada *release* (requisitos funcionais RF e técnicos RT), com crité
 | Release | Conteúdo | Situação |
 | --- | --- | --- |
 | `v0.1.0` | Fundação: estrutura, `.gitignore`, README, requisitos do curso, dependências verificadas, arquitetura e ADRs | concluída (04/10/2026, *tag* `v0.1.0`) |
-| `v0.2.0` | Base técnica: configuração por ambiente, banco SQLite, aplicação FastAPI com `lifespan` e `/health` | planejada |
+| `v0.2.0` | Base técnica: configuração por ambiente, banco SQLite, aplicação FastAPI com `lifespan` e `/health` | concluída (05/10/2026, *tag* `v0.2.0`) |
 | `v0.3.0` | CRUD de tarefas: criar, listar com filtro por *status*, consultar, atualizar (total e parcial), concluir e excluir | planejada |
 | `v0.4.0` | Prioridades e `priority_advisor` (regras determinísticas) | planejada |
 | `v0.5.0` | Revisão da arquitetura, de segurança e da documentação | planejada |
@@ -166,6 +203,8 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 | Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub (Prompts 07 e 12) |
 | Claude (*chat*) | Claude Sonnet 5.5 | extração, a partir de capturas de tela do curso, dos *prompts* de exemplo do tutor ([`docs/release-prompts-solon-020.md`](docs/release-prompts-solon-020.md)), em 04/10/2026 |
 | Claude Code | Claude Fable 5.1 | planejamento dos *prompts* da fase de desenvolvimento ([`prompts/prompts-desenvolvimento.md`](prompts/prompts-desenvolvimento.md), Prompt 20) |
+| Claude Code | Claude Sonnet 5.5 | execução do *blueprint* da `v0.2.0` ([`docs/blueprint-v020.md`](docs/blueprint-v020.md)): código da aplicação, testes de integração e execução manual da API (Prompts 22 e 23) |
+| Claude Code | Claude Opus 5.5 | fechamento da `v0.2.0`: revisão do README, ajuste dos diagramas, backlog, `CHANGELOG.md` e histórico de uso de IA (Prompt 24) |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*; os *prompts* planejados para as *releases* `v0.2.0` a `v1.0.0` estão em [`prompts/prompts-desenvolvimento.md`](prompts/prompts-desenvolvimento.md).

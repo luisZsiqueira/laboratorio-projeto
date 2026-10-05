@@ -12,7 +12,7 @@ Repositório: https://github.com/luisZsiqueira/laboratorio-projeto.git (confirma
 
 ## Fontes de verdade
 
-Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a fonte é o pedido do usuário e a seção [Ponto de partida](#ponto-de-partida); em caso de dúvida, perguntar, não supor. Depois que o arquivo existir, ler a seção pertinente antes de implementar.
+Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a fonte é o pedido do usuário; em caso de dúvida, perguntar, não supor. Depois que o arquivo existir, ler a seção pertinente antes de implementar.
 
 | Assunto | Arquivo dono | O que este arquivo diz a respeito |
 | --- | --- | --- |
@@ -32,12 +32,6 @@ Cada assunto tem um único arquivo dono. Enquanto o arquivo dono não existir, a
 | *Prompts* planejados para a fase de desenvolvimento (`v0.2.0` a `v1.0.0`) | `prompts/prompts-desenvolvimento.md` | índice; cada *prompt* vira um arquivo `Prompt NN - <título>` ao ser usado |
 | Mudanças por *release* | `CHANGELOG.md` | atualizado no [fechamento de cada release](#fechamento-de-release) |
 | O que o git ignora | `.gitignore` | o que nunca versionar |
-
-## Ponto de partida
-
-Decisões já acordadas entre o usuário e o assistente antes de existir código. Cada item deve ser migrado para seu arquivo dono na *release* que o criar; depois da migração, esta seção é reduzida até desaparecer, e o CLAUDE.md passa a conter apenas regras de trabalho.
-
-Na `v0.1.0`, o escopo do MVP, as prioridades, os itens fora do MVP, a *stack* e a configuração mínima foram migrados para o `README.md` (Objetivo, Stack, Configuração, Limitações e Próximos Passos). Em 04/10/2026, as decisões em aberto sobre prioridade e `priority_advisor` foram migradas para `docs/escopo-mvp.md` (Decisões em aberto), que passa a ser a referência dos *blueprints*. Nada mais resta nesta seção; ela pode ser removida no fechamento da `v0.2.0`.
 
 ## Inicialização do projeto
 
@@ -89,7 +83,7 @@ O *blueprint* aprovado deve poder ser seguido sem erro por um modelo de execuç�
 
 ### Fluxo de uma mudança
 
-1. Ler a fonte de verdade pertinente (ou o [Ponto de partida](#ponto-de-partida), enquanto ela não existir).
+1. Ler a fonte de verdade pertinente (ou o pedido do usuário, enquanto ela não existir).
 2. Criar a *branch* a partir de `main` (ver [Git](#git)).
 3. Se for *release* ou refatoração relevante: *blueprint* e aprovação.
 4. Implementar código e testes juntos. Toda mudança de código vem com testes.
@@ -109,7 +103,6 @@ Ao concluir cada *release* do roadmap, além do fluxo acima:
 - Marcar no `docs/backlog.md` a situação dos itens da *release* (concluídos ou movidos, com justificativa).
 - Acrescentar ao `CHANGELOG.md` a seção da *release*, com as mudanças agrupadas por tipo de *commit*.
 - Após o *merge* em `main`, criar a *tag* anotada `vX.Y.Z` e publicá-la (com autorização de *push*).
-- Migrar para os arquivos donos os itens do [Ponto de partida](#ponto-de-partida) que a *release* materializou e removê-los desta seção.
 - Confirmar que a definição de pronto passa em ambiente limpo (ver [Reprodutibilidade](#reprodutibilidade)).
 
 ### Definição de pronto
@@ -136,7 +129,7 @@ O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem co
 
 | Quando | Atualizar |
 | --- | --- |
-| *Release* concluída | `README.md` por inteiro (ver [Fechamento de release](#fechamento-de-release)), `CHANGELOG.md`, `docs/arquitetura.md`, `docs/HISTORY-IA.md`, `docs/backlog.md`, seção [Ponto de partida](#ponto-de-partida) deste arquivo |
+| *Release* concluída | `README.md` por inteiro (ver [Fechamento de release](#fechamento-de-release)), `CHANGELOG.md`, `docs/arquitetura.md`, `docs/HISTORY-IA.md`, `docs/backlog.md` |
 | Muda como configurar, executar ou testar; novo endpoint | `README.md` (seção correspondente) |
 | Nova dependência ou mudança de versão | `requirements.txt` (versão fixada), `README.md` (Stack) e nova rodada do [roteiro de checagem](#apis-deprecadas-roteiro-de-checagem) |
 | Nova variável de ambiente | `README.md` (Configuração, com valor padrão e sem valores sensíveis) |
@@ -272,6 +265,7 @@ laboratorio-projeto/
 │   │   ├── base.py            # Base declarativo do SQLAlchemy
 │   │   ├── task.py            # modelo ORM da tarefa
 │   │   ├── task_schemas.py    # esquemas Pydantic e tipos TaskStatus, TaskPriority
+│   │   ├── health_schemas.py  # esquema HealthRead e tipo HealthStatus da resposta de /health
 │   │   └── settings.py        # configurações lidas do ambiente/.env (pydantic-settings)
 │   ├── repositories/          # acesso ao banco
 │   │   ├── __init__.py
@@ -292,7 +286,7 @@ laboratorio-projeto/
 │   ├── PRE-HISTORY-IA.md      # uso de IA antes do repositório (concepção do CLAUDE.md)
 │   ├── EXTRA-HISTORY-IA.md    # uso de IA em modo chat fora do repositório (registro do autor)
 │   ├── HISTORY-IA.md          # histórico do uso de IA no projeto
-│   ├── decisoes.md            # decisões técnicas de implementação (DT), criado na primeira decisão
+│   ├── decisoes.md            # decisões técnicas de implementação (DT-NN)
 │   ├── blueprint-vXYZ.md      # blueprint aprovado de cada release (ex.: blueprint-v020.md)
 │   ├── release-review-010.md  # revisão de publicação da release v0.1.0
 │   └── release-prompts-solon-020.md # prompts de exemplo do tutor do curso (referência)

@@ -15,7 +15,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | Item | Valor |
 | --- | --- |
 | Assistente | Claude Code (CLI), no VS Code, em Windows 11 com PowerShell |
-| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) |
+| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) por padrão; outros modelos indicados na entrada (Fable 5.1 no Prompt 20, Sonnet 5.5 nos Prompts 22 e 23) |
 | Regras de trabalho com a IA | [`CLAUDE.md`](../CLAUDE.md) |
 | Formato dos *prompts* | Contexto, Objetivo, Estilo, Resposta (e Observações, a partir do Prompt 04) |
 
@@ -36,6 +36,11 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 11 | 04/10/2026 | Planejamento / backlog | `docs/backlog.md` (itens RF/RT por *release*, critérios de aceite, estimativas) | ~1,5 h |
 | 12 | 04/10/2026 | Arquitetura / revisão | revisão dos diagramas Mermaid, ADR-12, `docs/mermaid.md` (antes e depois), *merge* e *push* | ~2 h |
 | 13 | 04/10/2026 | Processo / revisão humana | `docs/PRE-HISTORY-IA.md`, regras de código e de *blueprint* executável no `CLAUDE.md`, renomeação do Prompt 00 | ~0,7 h |
+| 20 | 05/10/2026 | Planejamento do desenvolvimento | `prompts/prompts-desenvolvimento.md` (Prompts 21 a 44) | ~1,5 h |
+| 21 | 05/10/2026 | Planejamento / *blueprint* | `docs/blueprint-v020.md`, com protótipo verificado fora do repositório | ~2 h |
+| 22 | 05/10/2026 | Código / testes | `settings.py`, `base.py`, `database.py`, DT-02 e DT-03, 8 testes | ~1 h |
+| 23 | 05/10/2026 | Código / testes / execução | `/health` em camadas, `main.py`, 13 testes, ADR-13, DT-01, execução manual | ~1,5 h |
+| 24 | 05/10/2026 | Documentação / fechamento de *release* | README, diagramas, backlog, `CHANGELOG.md`, este histórico, `CLAUDE.md` | ~1,5 h |
 
 ## Entradas
 
@@ -291,6 +296,78 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - o bloqueio do SQLAlchemy pelo Smart App Control e o comando do mypy (Prompt 08).
 
   Na `v0.2.0`, o primeiro código já nasce sob o roteiro de checagem preenchido.
+
+## Entradas da release v0.2.0
+
+### Prompt 21: *blueprint* da `v0.2.0`
+
+- **Data:** 05/10/2026
+- **Fase:** planejamento da *release* `v0.2.0`
+- **Modelo:** Claude Code; o modelo não foi registrado no arquivo do *prompt* (não verificado)
+- **Uso da IA:**
+  - leitura do backlog (RT-01 a RT-04, RF-12, RF-13), do escopo (D-08), dos ADRs e do roteiro de checagem de APIs;
+  - geração de [`docs/blueprint-v020.md`](blueprint-v020.md) no formato de *blueprint* executável do `CLAUDE.md`: decisões tomadas (D-08, DT-01 a DT-03), importações permitidas por arquivo, padrões proibidos, seis passos com assinaturas, testes nomeados e IDs, riscos, lista do que não fazer e estimativa;
+  - verificação prévia: os trechos de código foram executados em protótipo fora do repositório, no `.venv` do projeto (13 testes com `-W error`, mypy sem erros, uvicorn respondendo).
+- **Prompt:** [`prompts/Prompt 21 - blueprint da v0.2.0`](../prompts/Prompt%2021%20-%20blueprint%20da%20v0.2.0)
+- **Refinamentos:** aprovado pelo autor sem alteração registrada.
+- **Ganho percebido:** ~2 h (desenho detalhado e verificado de seis itens e três decisões técnicas)
+- **Desafios:**
+  - **Fábrica da aplicação.** Sem `create_app`, os testes criariam `tasks.db` na raiz pelo `lifespan` e não haveria como testar `production` sem recarregar módulos. O problema apareceu no protótipo e gerou a DT-01.
+  - **Sintaxe do Python 3.12.** O *blueprint* proíbe `type X = ...`, porque o mínimo do projeto é 3.11, embora o ambiente rode 3.14.6.
+
+### Prompt 22: configuração e acesso ao banco
+
+- **Data:** 05/10/2026
+- **Fase:** código e testes (`v0.2.0`, passos 1 e 2 do *blueprint*)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code, como modelo de execução que não participou do desenho
+- **Uso da IA:** geração dos `__init__.py`, de `settings.py`, `base.py` e `database.py`, das DT-02 e DT-03 em [`docs/decisoes.md`](decisoes.md) e dos 8 primeiros testes, com a definição de pronto ao fim de cada passo.
+- **Prompt:** [`prompts/Prompt 22 - configuração e acesso ao banco`](../prompts/Prompt%2022%20-%20configura%C3%A7%C3%A3o%20e%20acesso%20ao%20banco)
+- **Refinamentos:** nenhum; sem divergência do *blueprint*.
+- **Ganho percebido:** ~1 h
+- **Desafios:** um comando de *shell* travou por um `python -` sem entrada, incluído por engano pelo assistente; os arquivos já estavam gravados e foram conferidos.
+
+### Prompt 23: aplicação, `/health` e testes de integração
+
+- **Data:** 05/10/2026
+- **Fase:** código, testes e execução manual (`v0.2.0`, passos 3 a 5 do *blueprint*)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code
+- **Uso da IA:**
+  - geração de `health_schemas.py`, `health_service.py`, `health_routes.py`, `main.py` e dos 5 testes de integração restantes;
+  - ADR-13 em `docs/arquitetura.md`, D-08 marcada como decidida e DT-01;
+  - execução manual com `python -m uvicorn app.main:app --reload`: `/health` com `200` e corpo `ok`, `/docs` com `200`.
+- **Prompt:** [`prompts/Prompt 23 - aplicação, health e testes de integração`](../prompts/Prompt%2023%20-%20aplica%C3%A7%C3%A3o%2C%20health%20e%20testes%20de%20integra%C3%A7%C3%A3o)
+- **Refinamentos:** duas execuções interrompidas por erro de API. Na terceira, a IA verificou o estado antes de agir, encontrou o código e os testes gravados e completou só a documentação e a execução manual.
+- **Ganho percebido:** ~1,5 h
+- **Desafios:**
+  - **Interrupções da API.** Retomar sem refazer exigiu conferir arquivo a arquivo contra o *blueprint*; o *blueprint* persistido em disco tornou isso possível sem depender do histórico do *chat*.
+  - **Porta ocupada e arquivo preso.** A porta 8000 estava ocupada por um servidor do autor, que também mantinha o `tasks.db` aberto; a execução manual usou a porta 8765, e a IA não encerrou o processo que não iniciou.
+
+### Prompt 24: fechamento da `v0.2.0`
+
+- **Data:** 05/10/2026
+- **Fase:** documentação e fechamento de *release*
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - revisão do README por inteiro (status, nova seção Endpoints com `GET /health`, Configuração, Como rodar, roadmap, Uso de IA generativa);
+  - ajuste dos diagramas de módulos e de `/health` em `docs/arquitetura.md` e registro do antes e do depois em `docs/mermaid.md`;
+  - backlog com os seis itens concluídos, `CHANGELOG.md` com a seção `0.2.0`, este histórico, remoção da seção Ponto de partida do `CLAUDE.md` e status do *blueprint*;
+  - após aprovação do autor: *commits*, *merge*, *tag* `v0.2.0`, *push* e definição de pronto em clone limpo.
+- **Prompt:** [`prompts/Prompt 24 - fechamento da v0.2.0`](../prompts/Prompt%2024%20-%20fechamento%20da%20v0.2.0)
+- **Refinamentos:** duas interrupções por erro de API durante a execução; retomada a partir do estado em disco, sem perda.
+- **Ganho percebido:** ~1,5 h
+- **Desafios:**
+  - **Horas reais.** O *prompt* pede as horas reais no backlog, mas elas não foram medidas; a IA registrou isso em vez de inventar números.
+  - **Seção `[Não publicado]` do `CHANGELOG.md`.** As mudanças de documentação feitas em `main` depois da `v0.1.0` entram na `0.2.0`, porque a *tag* as inclui.
+
+## Release v0.2.0: consolidação
+
+- **Período:** 05/10/2026 (Prompts 21 a 24)
+- **Entregas:** primeiro código da aplicação. São 11 arquivos em `app/`: configuração, banco, `/health` em camadas e composição com `create_app`. Somam-se 13 testes de integração em `tests/test_task_routes.py`, o *blueprint* executável, três DTs, o ADR-13, o README com a seção Endpoints e a *tag* `v0.2.0`.
+- **Uso da IA:**
+  - divisão de papéis entre modelos: o Opus 5.5 fechou a *release*, e o Sonnet 5.5 executou o *blueprint* sem participar do desenho;
+  - a execução seguiu o *blueprint* sem divergência de código, o que valida a regra de *blueprint* executável do `CLAUDE.md`.
+- **Ganho percebido acumulado:** ~6 h (soma das estimativas dos Prompts 21 a 24).
+- **Lição principal:** o protótipo executado antes do *blueprint* evitou os erros típicos de primeira execução: `ResourceWarning`, `tasks.db` criado pelos testes e configuração lida na importação. Com isso, o modelo de execução chegou ao verde em cada passo sem improvisar. As interrupções de API mostraram outro valor do *blueprint* persistido: ele permite retomar o trabalho a partir do disco.
 
 ## Observações transversais
 
