@@ -4,6 +4,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 
 ## Como ler este arquivo
 
+- O uso de IA anterior ao repositório (concepção do `CLAUDE.md` no Claude em modo *chat*, em 01 e 02/10/2026) está em [`PRE-HISTORY-IA.md`](PRE-HISTORY-IA.md). Este arquivo começa no Prompt 00.
 - Cada entrada corresponde a uma interação relevante e referencia o arquivo do *prompt* em [`prompts/`](../prompts/), onde estão o texto enviado e o registro da execução.
 - Campos de cada entrada: data, fase do ciclo de vida, modelo/assistente, como a IA foi usada, *prompt* aplicado, refinamentos, ganho percebido e desafios.
 - O **ganho percebido** é uma estimativa das horas que a mesma tarefa levaria sem IA, menos o tempo efetivamente gasto. É uma percepção, não uma medição, e deve ser lida como ordem de grandeza.
@@ -34,6 +35,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 10 | 04/10/2026 | Requisitos / escopo | `docs/escopo-mvp.md` (requisitos funcionais e não funcionais, fora de escopo, decisões em aberto) | ~1,5 h |
 | 11 | 04/10/2026 | Planejamento / backlog | `docs/backlog.md` (itens RF/RT por *release*, critérios de aceite, estimativas) | ~1,5 h |
 | 12 | 04/10/2026 | Arquitetura / revisão | revisão dos diagramas Mermaid, ADR-12, `docs/mermaid.md` (antes e depois), *merge* e *push* | ~2 h |
+| 13 | 04/10/2026 | Processo / revisão humana | `docs/PRE-HISTORY-IA.md`, regras de código e de *blueprint* executável no `CLAUDE.md`, renomeação do Prompt 00 | ~0,7 h |
 
 ## Entradas
 
@@ -43,7 +45,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Fase:** planejamento e configuração do ambiente
 - **Modelo:** Claude Opus 5.5, via Claude Code
 - **Uso da IA:** geração da estrutura de diretórios a partir do `CLAUDE.md`, criação do `.gitignore` inicial, `git init` em `main` e primeiro *commit*
-- **Prompt:** [`prompts/Prompt00 - Inicio`](../prompts/Prompt00%20-%20Inicio)
+- **Prompt:** [`prompts/Prompt 00 - criar diretorios e main`](../prompts/Prompt%2000%20-%20criar%20diretorios%20e%20main) (nome original `Prompt00 - Inicio`, renomeado no Prompt 13)
 - **Refinamentos:** nenhum
 - **Ganho percebido:** ~0,5 h
 - **Desafios:**
@@ -231,6 +233,27 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Cópias de diagramas.** Um catálogo separado pode divergir da versão oficial. Mitigação: `docs/arquitetura.md` continua dono, e o `CLAUDE.md` passou a exigir a atualização dos dois lugares.
   - **Limites do Mermaid.** O `erDiagram` não permite destacar um atributo com cor; a mudança foi explicada em texto.
   - **Renderização.** Sem Node.js na máquina, a validação da sintaxe depende do GitHub: a *branch* foi publicada antes do *merge* e conferida no navegador. Os 10 diagramas do catálogo e os 6 de `docs/arquitetura.md` renderizaram, com os destaques visíveis. A captura de tela travou duas vezes, como no Prompt 07; a navegação direta por âncora resolveu.
+
+### Prompt 13: correções a partir da revisão humana
+
+- **Data:** 04/10/2026
+- **Fase:** processo e governança do uso de IA
+- **Modelo:** Claude Opus 5.5, via Claude Code
+- **Uso da IA:**
+  - renomeação de `Prompt00 - Inicio` para `Prompt 00 - criar diretorios e main` (`git mv`, preservando o histórico) e atualização das referências;
+  - criação de [`PRE-HISTORY-IA.md`](PRE-HISTORY-IA.md) a partir da declaração do autor sobre as sessões de 01 e 02/10/2026 no Claude em modo *chat*;
+  - regras no `CLAUDE.md`: nomenclatura semântica, funções coesas, tipagem e registro de decisões técnicas (DT) em `docs/decisoes.md`, com o limite entre DT e ADR;
+  - regra de *blueprint* executável, para que o Claude Sonnet 5.5 possa segui-lo sem erro: arquivo próprio por *release*, sem decisões em aberto, passos com assinaturas tipadas, testes nomeados, comando de verificação e condição de parada;
+  - atualização do README (Uso de IA generativa), do `CHANGELOG.md` e deste arquivo.
+- **Prompt:** [`prompts/Prompt 13 - correcoes e revisao humana`](../prompts/Prompt%2013%20-%20correcoes%20e%20revisao%20humana)
+- **Refinamentos:** nenhum
+- **Ganho percebido:** ~0,7 h
+- **Desafios:**
+  - **Registrar sem inventar.** A pré-história se apoia só na declaração do autor; a IA não reconstruiu o conteúdo das conversas e marcou a fonte no próprio arquivo. A única informação acrescentada (as seções do `CLAUDE.md` inicial) foi conferida no *commit* `94f30f2`.
+  - **Duas casas para decisões.** O `CLAUDE.md` já mandava registrar decisões nos ADRs. A IA definiu o limite: decisão estrutural é ADR; decisão local ao código é DT.
+  - **Onde guardar o *blueprint*.** Para outro modelo segui-lo, o *blueprint* precisa existir fora do *chat*. A IA definiu o arquivo `docs/blueprint-vXYZ.md`, no padrão de `docs/release-review-010.md`.
+  - **Arquivo por antecipação.** O `docs/decisoes.md` não foi criado vazio, por regra do `CLAUDE.md`; nasce com a primeira DT.
+  - **Referências históricas.** O `docs/release-review-010.md` cita o nome antigo do Prompt 00; foi mantido, por ser um relatório datado.
 
 ## Release v0.1.0: consolidação
 
