@@ -1,6 +1,6 @@
 # Backlog do MVP
 
-> **Status:** backlog inicial, criado após a *release* `v0.1.0`, antes do código da aplicação. É revisado no *blueprint* e no fechamento de cada *release*: itens concluídos são marcados, e itens novos só entram com decisão do autor.
+> **Status:** backlog criado após a *release* `v0.1.0`; itens da `v0.2.0` concluídos em 05/10/2026. É revisado no *blueprint* e no fechamento de cada *release*: itens concluídos são marcados, e itens novos só entram com decisão do autor.
 
 O backlog organiza por *release* o trabalho que falta para entregar o MVP descrito em [`docs/escopo-mvp.md`](escopo-mvp.md). Os requisitos são definidos lá; aqui eles viram itens executáveis, com critérios de aceite verificáveis por teste ou por inspeção.
 
@@ -49,22 +49,24 @@ Executado ao final de cada *release*, conforme o `CLAUDE.md` (Fechamento de rele
 | `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h |
 | **Total** | | 17 RT, 13 RF | **18,5 h** |
 
-O tempo gasto na `v0.1.0` não foi medido. A estimativa total deixa folga dentro do orçamento de cerca de 30 horas, mas deve ser conferida contra as horas reais no fechamento de cada *release*.
+O tempo gasto na `v0.1.0` e na `v0.2.0` não foi medido (seção 4.1). A estimativa total deixa folga dentro do orçamento de cerca de 30 horas, mas deve ser conferida contra as horas reais no fechamento de cada *release*.
 
 ## 4. Backlog por *release*
 
 ### 4.1 `v0.2.0`: base técnica
 
-Decisão do *blueprint*: D-08 (esquema da resposta de `/health`).
+Decisão do *blueprint*: D-08 (esquema da resposta de `/health`), tomada em [`docs/blueprint-v020.md`](blueprint-v020.md) e registrada no ADR-13.
+
+**Situação da *release*:** concluída em 05/10/2026. Os seis itens foram entregues como planejados, sem item movido. As horas reais não foram medidas por item: a execução foi feita pelo assistente nos Prompts 22 e 23, em uma sessão interrompida duas vezes por erro de API, e o tempo do autor em revisão não foi cronometrado. Os 4 h estimados ficam como referência.
 
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |
-| RT-01 | Configuração por ambiente em `app/models/settings.py` (pydantic-settings) | 1. `DATABASE_URL` e `ENVIRONMENT` lidas do ambiente ou do `.env`, com os padrões do README (Configuração) **[T]** `test_task_routes.py`<br>2. `ENVIRONMENT` tipada com `Literal["development", "test", "production"]`; valor fora do conjunto impede a inicialização **[T]**<br>3. Uso de `SettingsConfigDict`, sem `class Config` **[I]**<br>4. Nenhum literal de configuração fora de `settings.py` **[I]** | RNF-07 | 0,5 h | a fazer |
-| RT-02 | Base declarativa e acesso ao banco em `app/models/base.py` e `app/repositories/database.py` | 1. `class Base(DeclarativeBase)` em `base.py` (ADR-02) **[I]**<br>2. *Engine* criada a partir de `DATABASE_URL`, com `check_same_thread=False` (ADR-04) **[I]**<br>3. `get_db` abre uma sessão por requisição e a fecha ao final, inclusive em caso de erro **[T]**<br>4. `ping(session)` executa `SELECT 1` via `text()` e devolve `False` em `SQLAlchemyError`, registrando o detalhe no log (ADR-07) **[T]** | RNF-09, RNF-12 | 1 h | a fazer |
-| RT-03 | Composição da aplicação em `app/main.py` | 1. `FastAPI(lifespan=...)` com `@asynccontextmanager`; sem `on_event` (ADR-05) **[I]**<br>2. Tabelas criadas com `Base.metadata.create_all` no `lifespan` **[T]**<br>3. `main.py` contém só criação da aplicação, `lifespan` e registro das rotas **[I]**<br>4. `python -m uvicorn app.main:app --reload` sobe a API a partir da raiz **[C]** | RNF-06 | 0,5 h | a fazer |
-| RT-04 | Infraestrutura de testes de integração em `tests/test_task_routes.py` | 1. Fixture com `sqlite://` e `StaticPool`, substituindo `get_db` por `dependency_overrides` (ADR-06) **[I]**<br>2. Fixture chama `engine.dispose()` e limpa os *overrides* ao final; nenhum `ResourceWarning` com `-W error` **[C]**<br>3. `TestClient` usando `httpx2`, sem aviso de deprecação (ADR-09) **[C]**<br>4. Testes não criam arquivos no repositório **[C]** `git status` limpo após os testes | RNF-03, RNF-04 | 1 h | a fazer |
-| RF-12 | Verificar saúde: `GET /health` | 1. Banco disponível: **200** com corpo JSON indicando aplicação e banco saudáveis **[T]** `test_task_routes.py`<br>2. Banco indisponível (`ping` falha): **503** com corpo JSON genérico, sem SQL, caminho nem *stack trace* **[T]**<br>3. Fluxo `health_routes` → `health_service` → `database.ping` (ADR-07) **[I]**<br>4. Corpo da resposta definido por esquema Pydantic, no arquivo decidido em D-08 **[I]** | RNF-10, RNF-12 | 0,5 h | a fazer |
-| RF-13 | Documentação interativa conforme o ambiente | 1. Com `ENVIRONMENT=development`, `/docs` e `/openapi.json` respondem **200** **[T]** `test_task_routes.py`<br>2. Com `ENVIRONMENT=production`, `/docs`, `/redoc` e `/openapi.json` respondem **404** (ADR-08) **[T]** | RNF-10 | 0,5 h | a fazer |
+| RT-01 | Configuração por ambiente em `app/models/settings.py` (pydantic-settings) | 1. `DATABASE_URL` e `ENVIRONMENT` lidas do ambiente ou do `.env`, com os padrões do README (Configuração) **[T]** `test_task_routes.py`<br>2. `ENVIRONMENT` tipada com `Literal["development", "test", "production"]`; valor fora do conjunto impede a inicialização **[T]**<br>3. Uso de `SettingsConfigDict`, sem `class Config` **[I]**<br>4. Nenhum literal de configuração fora de `settings.py` **[I]** | RNF-07 | 0,5 h | concluído (05/10/2026) |
+| RT-02 | Base declarativa e acesso ao banco em `app/models/base.py` e `app/repositories/database.py` | 1. `class Base(DeclarativeBase)` em `base.py` (ADR-02) **[I]**<br>2. *Engine* criada a partir de `DATABASE_URL`, com `check_same_thread=False` (ADR-04) **[I]**<br>3. `get_db` abre uma sessão por requisição e a fecha ao final, inclusive em caso de erro **[T]**<br>4. `ping(session)` executa `SELECT 1` via `text()` e devolve `False` em `SQLAlchemyError`, registrando o detalhe no log (ADR-07) **[T]** | RNF-09, RNF-12 | 1 h | concluído (05/10/2026) |
+| RT-03 | Composição da aplicação em `app/main.py` | 1. `FastAPI(lifespan=...)` com `@asynccontextmanager`; sem `on_event` (ADR-05) **[I]**<br>2. Tabelas criadas com `Base.metadata.create_all` no `lifespan` **[T]**<br>3. `main.py` contém só criação da aplicação, `lifespan` e registro das rotas **[I]**<br>4. `python -m uvicorn app.main:app --reload` sobe a API a partir da raiz **[C]** | RNF-06 | 0,5 h | concluído (05/10/2026) |
+| RT-04 | Infraestrutura de testes de integração em `tests/test_task_routes.py` | 1. Fixture com `sqlite://` e `StaticPool`, substituindo `get_db` por `dependency_overrides` (ADR-06) **[I]**<br>2. Fixture chama `engine.dispose()` e limpa os *overrides* ao final; nenhum `ResourceWarning` com `-W error` **[C]**<br>3. `TestClient` usando `httpx2`, sem aviso de deprecação (ADR-09) **[C]**<br>4. Testes não criam arquivos no repositório **[C]** `git status` limpo após os testes | RNF-03, RNF-04 | 1 h | concluído (05/10/2026) |
+| RF-12 | Verificar saúde: `GET /health` | 1. Banco disponível: **200** com corpo JSON indicando aplicação e banco saudáveis **[T]** `test_task_routes.py`<br>2. Banco indisponível (`ping` falha): **503** com corpo JSON genérico, sem SQL, caminho nem *stack trace* **[T]**<br>3. Fluxo `health_routes` → `health_service` → `database.ping` (ADR-07) **[I]**<br>4. Corpo da resposta definido por esquema Pydantic, no arquivo decidido em D-08 **[I]** | RNF-10, RNF-12 | 0,5 h | concluído (05/10/2026) |
+| RF-13 | Documentação interativa conforme o ambiente | 1. Com `ENVIRONMENT=development`, `/docs` e `/openapi.json` respondem **200** **[T]** `test_task_routes.py`<br>2. Com `ENVIRONMENT=production`, `/docs`, `/redoc` e `/openapi.json` respondem **404** (ADR-08) **[T]** | RNF-10 | 0,5 h | concluído (05/10/2026) |
 
 ### 4.2 `v0.3.0`: CRUD de tarefas
 

@@ -1,6 +1,6 @@
 # Diagramas Mermaid
 
-> **Status:** catálogo criado na revisão dos diagramas de 04/10/2026 (Prompt 12). A cada nova revisão, acrescentar uma seção com o antes e o depois.
+> **Status:** catálogo criado na revisão dos diagramas de 04/10/2026 (Prompt 12) e atualizado no fechamento da `v0.2.0` (05/10/2026, Prompt 24). A cada nova revisão, acrescentar uma seção com o antes e o depois.
 
 Este arquivo é o histórico visual dos diagramas do projeto: mostra cada diagrama **antes** e **depois** de uma revisão, com o que mudou e por quê. A versão oficial de cada diagrama continua no arquivo de origem, indicado em cada item: [`docs/arquitetura.md`](arquitetura.md) ou o [`README.md`](../README.md). Quem altera um diagrama atualiza os dois lugares (regra do [`CLAUDE.md`](../CLAUDE.md)).
 
@@ -380,4 +380,200 @@ flowchart LR
     t_routes --> client
     client --> app
     app -->|"get_db substituído<br/>(dependency_overrides)"| mem
+```
+
+## Revisão de 05/10/2026 (Prompt 24, fechamento da `v0.2.0`)
+
+Os diagramas foram ajustados ao código da `v0.2.0`. **Antes** é a versão do *commit* `4aa717c`; **depois** é a versão oficial atual de [`docs/arquitetura.md`](arquitetura.md), com o destaque em laranja.
+
+| # | Diagrama | Origem | Resultado | Motivo |
+| --- | --- | --- | --- | --- |
+| 1 | Módulos e dependências | `arquitetura.md`, seção 2 | **alterado** | novo `health_schemas.py` (D-08, ADR-13), importado por `health_routes` e `health_service`; a seta `main → database` passa a dizer o que é importado (`create_tables` e `engine`, DT-01) |
+| 2 | Fluxo de `GET /health` | `arquitetura.md`, seção 3 | **alterado** | a função do *service* chama-se `check_health`, e as respostas mostram o `HealthRead` e os corpos de `200` e `503` |
+
+Os demais diagramas (visão em camadas, `POST /tasks`, erros em `/tasks/{id}`, modelo de dados e testes) não mudaram: descrevem código das `v0.3.0` e `v0.4.0` ou continuam corretos.
+
+### 1. Módulos e dependências: alterado
+
+**O que mudou:** nó `health_schemas.py` em `app/models`, arestas `health_routes --> health_schemas` e `health_service --> health_schemas`, e rótulo `create_tables, engine` na aresta `main --> database`.
+
+**Antes**
+
+```mermaid
+flowchart TD
+    main["main.py"]
+
+    subgraph api["app/api (controller)"]
+        task_routes["task_routes.py"]
+        health_routes["health_routes.py"]
+    end
+
+    subgraph services["app/services (regras de negócio)"]
+        task_service["task_service.py"]
+        priority_advisor["priority_advisor.py"]
+        health_service["health_service.py"]
+    end
+
+    subgraph repositories["app/repositories (acesso ao banco)"]
+        task_repository["task_repository.py"]
+        database["database.py<br/>engine, get_db, ping"]
+    end
+
+    subgraph models["app/models (estruturas, sem lógica)"]
+        task_schemas["task_schemas.py"]
+        task["task.py"]
+        base["base.py"]
+        settings["settings.py"]
+    end
+
+    db[("SQLite3")]
+
+    main --> task_routes
+    main --> health_routes
+    main --> database
+    main --> settings
+
+    task_routes --> task_service
+    task_routes --> task_schemas
+    health_routes --> health_service
+    task_routes -.->|"Depends(get_db)"| database
+    health_routes -.->|"Depends(get_db)"| database
+
+    task_service --> priority_advisor
+    task_service --> task_repository
+    task_service --> task_schemas
+    task_service --> task
+    health_service --> database
+
+    task_repository --> task
+    database --> base
+    database --> settings
+    task --> base
+
+    database --> db
+```
+
+**Depois**
+
+```mermaid
+flowchart TD
+    main["main.py"]
+
+    subgraph api["app/api (controller)"]
+        task_routes["task_routes.py"]
+        health_routes["health_routes.py"]
+    end
+
+    subgraph services["app/services (regras de negócio)"]
+        task_service["task_service.py"]
+        priority_advisor["priority_advisor.py"]
+        health_service["health_service.py"]
+    end
+
+    subgraph repositories["app/repositories (acesso ao banco)"]
+        task_repository["task_repository.py"]
+        database["database.py<br/>engine, get_db, ping"]
+    end
+
+    subgraph models["app/models (estruturas, sem lógica)"]
+        task_schemas["task_schemas.py"]
+        health_schemas["health_schemas.py"]
+        task["task.py"]
+        base["base.py"]
+        settings["settings.py"]
+    end
+
+    db[("SQLite3")]
+
+    main --> task_routes
+    main --> health_routes
+    main -->|"create_tables, engine"| database
+    main --> settings
+
+    task_routes --> task_service
+    task_routes --> task_schemas
+    health_routes --> health_service
+    health_routes --> health_schemas
+    task_routes -.->|"Depends(get_db)"| database
+    health_routes -.->|"Depends(get_db)"| database
+
+    task_service --> priority_advisor
+    task_service --> task_repository
+    task_service --> task_schemas
+    task_service --> task
+    health_service --> database
+    health_service --> health_schemas
+
+    task_repository --> task
+    database --> base
+    database --> settings
+    task --> base
+
+    database --> db
+
+    linkStyle 2,7,15 stroke:#d97706,stroke-width:3px
+```
+
+### 2. Fluxo de `GET /health`: alterado
+
+**O que mudou:** `check(session)` passa a `check_health(session)`; as mensagens "saudável" e "indisponível" passam a mostrar o `HealthRead` devolvido, e as respostas HTTP mostram o corpo da D-08.
+
+**Antes**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant H as health_routes
+    participant HS as health_service
+    participant D as database
+    participant DB as SQLite3
+
+    C->>H: GET /health
+    H->>HS: check(session)
+    HS->>D: ping(session)
+    D->>DB: SELECT 1 via text()
+    alt banco responde
+        DB-->>D: 1
+        D-->>HS: True
+        HS-->>H: saudável
+        H-->>C: 200 OK (JSON)
+    else falha do banco (SQLAlchemyError)
+        D-->>HS: False (detalhe registrado no log)
+        HS-->>H: indisponível
+        H-->>C: 503 Service Unavailable (JSON sem detalhes internos)
+    end
+```
+
+**Depois**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant H as health_routes
+    participant HS as health_service
+    participant D as database
+    participant DB as SQLite3
+
+    C->>H: GET /health
+    rect rgba(217, 119, 6, 0.18)
+        H->>HS: check_health(session)
+    end
+    HS->>D: ping(session)
+    D->>DB: SELECT 1 via text()
+    alt banco responde
+        DB-->>D: 1
+        D-->>HS: True
+        rect rgba(217, 119, 6, 0.18)
+            HS-->>H: HealthRead(status="ok", database="ok")
+            H-->>C: 200 OK {"status": "ok", "database": "ok"}
+        end
+    else falha do banco (SQLAlchemyError)
+        D-->>HS: False (detalhe registrado no log)
+        rect rgba(217, 119, 6, 0.18)
+            HS-->>H: HealthRead(status="unavailable", database="unavailable")
+            H-->>C: 503 {"status": "unavailable", "database": "unavailable"}
+        end
+    end
 ```

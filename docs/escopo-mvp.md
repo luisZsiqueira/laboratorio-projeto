@@ -135,7 +135,7 @@ Decisões deixadas para o *blueprint* da *release* indicada. A recomendação é
 | D-05 | Prioridade 4 exige data/hora, e data/hora exige prioridade 4 | prioridade 4 exige `due_at`; `due_at` não exige prioridade 4 (uma tarefa mandatória pode ter prazo) | `v0.4.0` |
 | D-06 | Filtro da listagem por prioridade | incluir, nos mesmos moldes do RF-03, se couber no orçamento | `v0.4.0` |
 | D-07 | Regras e exposição do `priority_advisor` (RF-10 e RF-11) | validação de coerência na criação e na atualização; sugestão por proximidade do prazo devolvida como campo calculado na resposta, sem alterar a prioridade gravada | `v0.4.0` |
-| D-08 | Esquema Pydantic da resposta de `/health` e arquivo onde fica | novo `app/models/health_schemas.py`, separado dos esquemas de tarefa; alternativa: dentro de `task_schemas.py`. Levantada na revisão dos diagramas (Prompt 12) | `v0.2.0` |
+| D-08 | Esquema Pydantic da resposta de `/health` e arquivo onde fica | **Decidida** em 05/10/2026: novo `app/models/health_schemas.py`, separado dos esquemas de tarefa, com o modelo `HealthRead` (`status` e `database`, ambos `ok` ou `unavailable`); contrato no ADR-13 de [`docs/arquitetura.md`](arquitetura.md) e em [`docs/blueprint-v020.md`](blueprint-v020.md). Levantada na revisão dos diagramas (Prompt 12) | `v0.2.0` |
 
 ## 7. Rastreabilidade com os requisitos de entrega do curso
 
