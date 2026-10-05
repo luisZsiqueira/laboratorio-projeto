@@ -204,7 +204,7 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 | Claude (*chat*) | Claude Sonnet 5.5 | extração, a partir de capturas de tela do curso, dos *prompts* de exemplo do tutor ([`docs/release-prompts-solon-020.md`](docs/release-prompts-solon-020.md)), em 04/10/2026 |
 | Claude Code | Claude Fable 5.1 | planejamento dos *prompts* da fase de desenvolvimento ([`prompts/prompts-desenvolvimento.md`](prompts/prompts-desenvolvimento.md), Prompt 20) |
 | Claude Code | Claude Sonnet 5.5 | execução do *blueprint* da `v0.2.0` ([`docs/blueprint-v020.md`](docs/blueprint-v020.md)): código da aplicação, testes de integração e execução manual da API (Prompts 22 e 23) |
-| Claude Code | Claude Opus 5.5 | fechamento da `v0.2.0`: revisão do README, ajuste dos diagramas, backlog, `CHANGELOG.md` e histórico de uso de IA (Prompt 24) |
+| Claude Code | Claude Opus 5.5 | *blueprint* da `v0.2.0`, com protótipo verificado antes da aprovação (Prompt 21), e fechamento da *release*: revisão do README, ajuste dos diagramas, backlog, `CHANGELOG.md`, histórico de uso de IA e validação em clone limpo (Prompt 24) |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*; os *prompts* planejados para as *releases* `v0.2.0` a `v1.0.0` estão em [`prompts/prompts-desenvolvimento.md`](prompts/prompts-desenvolvimento.md).

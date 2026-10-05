@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+### docs
+
+- Registra o resultado do fechamento da `v0.2.0` (*commits*, *merge*, *tag*, *push* e clone limpo) no Prompt 24 e em `docs/HISTORY-IA.md`.
+- Identifica o modelo do Prompt 21 (Claude Opus 5.5) no arquivo do *prompt*, no histórico e no README.
+- Registra a validação de sintaxe dos diagramas alterados pelo serviço mermaid.ink e deixa as horas reais da `v0.2.0` para preenchimento do autor no backlog.
+
 ## [0.2.0] - 2026-10-05
 
 Base técnica: configuração por ambiente, acesso ao banco SQLite, aplicação FastAPI com `lifespan`, `GET /health` e infraestrutura de testes de integração. Primeiro código da aplicação, executado a partir de [`docs/blueprint-v020.md`](docs/blueprint-v020.md). Inclui também as mudanças de documentação feitas em `main` depois da `v0.1.0`.
