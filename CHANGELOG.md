@@ -6,6 +6,11 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+### docs
+
+- Registra o resultado do fechamento da `v0.3.0` no Prompt 31 e em `docs/HISTORY-IA.md`: *commits*, *merge*, *tag*, *push*, clone limpo e renderização dos diagramas no GitHub.
+- Registra em `docs/backlog.md` as horas reais informadas pelo autor: 4 h para a `v0.2.0` e 8 h para a `v0.3.0`.
+
 ## [0.3.0] - 2026-10-06
 
 CRUD de tarefas: criar, listar com filtro por *status*, consultar, atualizar (total e parcial), concluir e excluir, com datas em UTC e erros sem detalhes internos. Código executado a partir de [`docs/blueprint-v030.md`](docs/blueprint-v030.md). Inclui também as mudanças de documentação feitas em `main` depois da `v0.2.0`.

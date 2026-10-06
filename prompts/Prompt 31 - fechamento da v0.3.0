@@ -22,3 +22,11 @@ Resumo da execução:
 10. CLAUDE.md: error_handlers.py e a descrição de base.py na estrutura; referência à rodada de checagem de 05/10/2026. docs/blueprint-v030.md: status de executado.
 11. Divergências e limitações: a validação de sintaxe dos diagramas pelo mermaid.ink foi bloqueada pelo modo automático do Claude Code (envio a serviço externo) e não foi contornada; fica a conferência no GitHub depois do push. Horas reais não medidas; ficam para o autor.
 12. Git: aguardando aprovação do autor para commits, merge, tag, push e clone limpo.
+Interações seguintes (06/10/2026, Claude Opus 5.5):
+
+1. Fechamento aprovado pelo autor. Commits na branch feat/crud-tarefas: 3bff3cb (docs: blueprint), bf0d6c7 (feat: CRUD de tarefas) e f068e6e (docs: fechamento). Merge --no-ff em main (f1aae05), tag anotada v0.3.0 e push de main, da tag e da branch.
+2. Logo após o push, falhas de conexão com a API impediram o relatório final. Em nova sessão, o autor pediu a verificação: main, feat/crud-tarefas e a tag v0.3.0 no origin iguais às locais; árvore de trabalho limpa.
+3. Definição de pronto em clone limpo da tag v0.3.0, em diretório temporário, com .venv novo e só os comandos do README: instalação sem erro, 69 testes passando com -W error, mypy sem erros em 17 arquivos, git status limpo após os testes.
+4. Diagramas conferidos no GitHub com o Claude in Chrome: docs/arquitetura.md da tag v0.3.0 renderizou os seis diagramas (módulos, POST /tasks, GET /health, erros em /tasks/{id}, modelo de dados e testes), sem mensagem de erro de sintaxe.
+5. Horas reais informadas pelo autor e registradas em docs/backlog.md: v0.2.0 com 4 h; v0.3.0 com 8 h, das quais cerca de metade se perdeu com falhas de conexão com a API do Claude (internet por hotspot compartilhado do celular). Resumo do backlog com a coluna de horas reais.
+6. Registro em docs/HISTORY-IA.md (Prompt 31 e consolidações da v0.2.0 e da v0.3.0) e em CHANGELOG.md ([Não publicado]), na branch docs/registro-fechamento-v030, com merge em main e push após a autorização do autor.

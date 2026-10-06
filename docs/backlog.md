@@ -40,16 +40,16 @@ Executado ao final de cada *release*, conforme o `CLAUDE.md` (Fechamento de rele
 
 ## 3. Resumo
 
-| *Release* | Objetivo | Itens | Estimativa |
-| --- | --- | --- | --- |
-| `v0.2.0` | base técnica: configuração, banco, aplicação, `/health` | RT-01 a RT-04, RF-12, RF-13 | 4 h |
-| `v0.3.0` | CRUD de tarefas | RT-05 a RT-09, RF-01 a RF-08 | 6,5 h |
-| `v0.4.0` | prioridades e `priority_advisor` | RT-10, RF-09 a RF-11 | 3,5 h |
-| `v0.5.0` | revisão de arquitetura, segurança e documentação | RT-11 a RT-14 | 2,5 h |
-| `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h |
-| **Total** | | 17 RT, 13 RF | **18,5 h** |
+| *Release* | Objetivo | Itens | Estimativa | Horas reais |
+| --- | --- | --- | --- | --- |
+| `v0.2.0` | base técnica: configuração, banco, aplicação, `/health` | RT-01 a RT-04, RF-12, RF-13 | 4 h | 4 h |
+| `v0.3.0` | CRUD de tarefas | RT-05 a RT-09, RF-01 a RF-08 | 6,5 h | 8 h |
+| `v0.4.0` | prioridades e `priority_advisor` | RT-10, RF-09 a RF-11 | 3,5 h | — |
+| `v0.5.0` | revisão de arquitetura, segurança e documentação | RT-11 a RT-14 | 2,5 h | — |
+| `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h | — |
+| **Total** | | 17 RT, 13 RF | **18,5 h** | **12 h** (até a `v0.3.0`) |
 
-O tempo gasto na `v0.1.0`, na `v0.2.0` e na `v0.3.0` não foi medido pelo assistente (seções 4.1 e 4.2). A estimativa total deixa folga dentro do orçamento de cerca de 30 horas, mas deve ser conferida contra as horas reais no fechamento de cada *release*.
+As horas reais são informadas pelo autor por *release*, e não por item. Elas incluem o *blueprint*, o fechamento e o *git*, que as estimativas por item não cobrem. O tempo da `v0.1.0` (inicialização e documentação) não foi medido. Até a `v0.3.0`, foram gastas 12 h contra 10,5 h estimadas. Somadas às 8 h estimadas para as *releases* restantes, chega-se a cerca de 20 h, dentro do orçamento de cerca de 30 horas. A comparação é refeita no fechamento de cada *release*.
 
 ## 4. Backlog por *release*
 
@@ -57,7 +57,7 @@ O tempo gasto na `v0.1.0`, na `v0.2.0` e na `v0.3.0` não foi medido pelo assist
 
 Decisão do *blueprint*: D-08 (esquema da resposta de `/health`), tomada em [`docs/blueprint-v020.md`](blueprint-v020.md) e registrada no ADR-13.
 
-**Situação da *release*:** concluída em 05/10/2026. Os seis itens foram entregues como planejados, sem item movido. As horas reais por item não foram medidas pelo assistente e serão preenchidas manualmente pelo autor; até lá, os 4 h estimados ficam como referência.
+**Situação da *release*:** concluída em 05/10/2026. Os seis itens foram entregues como planejados, sem item movido. Horas reais (informadas pelo autor em 06/10/2026): 4 h para a *release* inteira, iguais à estimativa, que não incluía *blueprint* e fechamento. Não há medição por item.
 
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |
@@ -72,7 +72,7 @@ Decisão do *blueprint*: D-08 (esquema da resposta de `/health`), tomada em [`do
 
 Decisões do *blueprint*: D-01 (valores de `TaskStatus`), D-02 (rota de conclusão), D-03 (coluna `priority` já nesta *release*) e D-04 (prioridade padrão), tomadas em [`docs/blueprint-v030.md`](blueprint-v030.md) com a recomendação do escopo e registradas nos requisitos e no ADR-15. O *blueprint* também criou o ADR-14 e as DT-04 a DT-08.
 
-**Situação da *release*:** concluída em 06/10/2026. Os treze itens foram entregues como planejados, sem item movido. O código foi executado em 05/10/2026 (Prompts 26 a 29), e os exemplos do README e o fechamento em 06/10/2026 (Prompts 30 e 31). As horas reais por item não foram medidas pelo assistente e serão preenchidas manualmente pelo autor; até lá, os 6,5 h estimados ficam como referência.
+**Situação da *release*:** concluída em 06/10/2026. Os treze itens foram entregues como planejados, sem item movido. O código foi executado em 05/10/2026 (Prompts 26 a 29), e os exemplos do README e o fechamento em 06/10/2026 (Prompts 30 e 31). Horas reais (informadas pelo autor em 06/10/2026): 8 h para a *release* inteira, contra 6,5 h estimadas. Segundo o autor, o trabalho em si caberia em 3 a 4 h. O excedente veio de falhas repetidas de conexão com a API do Claude, causadas pelo uso de internet por *hotspot* compartilhado do celular, que forçaram retomadas da execução. Não há medição por item.
 
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |
