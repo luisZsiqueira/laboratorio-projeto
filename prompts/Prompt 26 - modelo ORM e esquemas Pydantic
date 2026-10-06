@@ -1,0 +1,22 @@
+Contexto: docs/blueprint-v030.md aprovado. Itens RT-05 e RT-06; ADR-02 e ADR-10.
+Objetivo: Executar os passos do blueprint que criam app/models/task.py (Task com Mapped e mapped_column: id, title, description, status, priority, due_at, created_at e updated_at; datas em UTC; updated_at muda a cada alteração; datas lidas do SQLite voltam timezone-aware) e app/models/task_schemas.py (TaskStatus e TaskPriority como Literal; esquemas de criação, atualização total, parcial e leitura com os limites de tamanho; leitura com ConfigDict(from_attributes=True); campos somente leitura tratados como o blueprint define), com os testes previstos para esses passos.
+Estilo: Pydantic v2 e SQLAlchemy 2 declarativo; sem class Config nem datetime.utcnow(); docstrings em português; modelos sem lógica.
+Resposta: Código dos arquivos, testes do passo e saída da definição de pronto.
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Passo 1 do docs/blueprint-v030.md executado na branch feat/crud-tarefas (RT-05, RT-06), com a definição de pronto ao final.
+2. app/models/base.py: acrescentados utc_now() e UTCDateTime (TypeDecorator[datetime]: grava em UTC sem fuso, lê com tzinfo=UTC, recusa data/hora sem fuso com ValueError); Base mantida.
+3. app/models/task_schemas.py (novo): TaskStatus, TaskPriority, TaskTitle, TaskDescription, TaskCreate, TaskUpdate, TaskPatch (com reject_null da DT-05) e TaskRead (from_attributes=True); extra="forbid" nos três esquemas de entrada.
+4. app/models/task.py (novo): Task com Mapped e mapped_column, tipos de coluna explícitos, created_at e updated_at com default=utc_now e updated_at com onupdate=utc_now.
+5. tests/test_task_routes.py: fixture task_engine e 2 testes (test_task_dates_are_stored_in_utc_and_read_back_timezone_aware e test_task_rejects_naive_datetime_on_write), com as importações do passo 1.
+6. docs/decisoes.md: DT-04 e DT-05. CLAUDE.md: duas linhas novas no roteiro de checagem (status.HTTP_422_UNPROCESSABLE_ENTITY proibido; session.query estilo legado), com a situação verificada pelo blueprint em 05/10/2026; a rodada de execução não foi repetida neste passo.
+7. Resultado: python -m pytest -W error com 15 testes passando; python -m mypy --explicit-package-bases app sem erros em 13 arquivos. Verificação adicional fora dos testes previstos: título só com espaços, campo id na entrada, due_at sem fuso e prioridade 5 respondem erro de validação; null em title, status e priority no TaskPatch é rejeitado e em description é aceito; TaskPatch() sem campos resulta em exclude_unset vazio; due_at com -03:00 mantém o deslocamento na entrada (a conversão para UTC ocorre na gravação).
+8. Divergências: nenhuma em relação ao blueprint. As docstrings dos métodos process_bind_param e process_result_value, que o trecho do blueprint omite, foram acrescentadas por exigência do CLAUDE.md.
+9. Fora desta execução (Prompts 27 a 31): repository, service, rotas, tradutores de erro, README e fechamento. docs/HISTORY-IA.md não foi alterado, por ser do fechamento. Nenhum tasks.db criado.
+10. Git: sem commit; arquivos novos e alterados sem stage, além do blueprint já adicionado.

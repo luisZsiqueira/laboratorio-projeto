@@ -1,0 +1,20 @@
+Contexto: Repository pronto. Item RT-08; ADR-01.
+Objetivo: Executar os passos do blueprint que criam app/services/task_service.py (casos de uso criar, listar com filtro, consultar, atualizar total, atualizar parcial, concluir e excluir; tarefa inexistente sinalizada pela exceção de domínio do blueprint, sem código HTTP; conversão do esquema de entrada em Task) e tests/test_task_service.py (dublê simples do repository em memória, sem banco; sucesso e tarefa inexistente de cada caso de uso; concluir idempotente; atualização parcial preserva os campos não enviados).
+Estilo: Service sem importar FastAPI nem Starlette; dublê como classe simples, sem biblioteca de mocks; funções coesas, uma por caso de uso.
+Resposta: Código dos arquivos e saída da definição de pronto.
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Passo 3 do docs/blueprint-v030.md executado na branch feat/crud-tarefas (RT-08), com a definição de pronto ao final.
+2. app/services/task_service.py (novo): TaskNotFoundError (guarda task_id), TaskStore (Protocol), TaskService com create_task, list_tasks, get_task, replace_task, patch_task (exclude_unset), complete_task (idempotente, sem chamar save se já done) e delete_task; apply_changes e build_task_service. Não importa FastAPI nem Starlette e não conhece códigos HTTP.
+3. tests/test_task_service.py (novo): dublê InMemoryTaskRepository (DT-07), fixtures repository e service e 14 testes (sucesso e tarefa inexistente de cada caso de uso; conclusão idempotente; atualização parcial preserva os campos não enviados).
+4. docs/decisoes.md: DT-06 e DT-07. docs/arquitetura.md: ADR-14 na tabela da seção 6.
+5. Resultado: python -m pytest -W error com 31 testes passando (17 + 14); python -m mypy --explicit-package-bases app sem erros em 15 arquivos.
+6. Divergências: nenhuma em relação ao blueprint. Acrescentados docstrings nos métodos do dublê e o auxiliar build_update_body em tests/test_task_service.py, para não repetir o corpo de TaskUpdate nos dois testes de replace_task.
+7. Fora desta execução (Prompts 29 a 31): tradutores de erro, rotas, testes de integração, README e fechamento. Nenhum tasks.db criado.
+8. Git: sem commit; arquivos novos e alterados sem stage, além do blueprint já adicionado.
