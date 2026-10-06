@@ -27,3 +27,6 @@ Divergências do blueprint: listadas na consolidação da v0.4.0 em docs/HISTORY
 Interações seguintes (06/10/2026, Claude Opus 5.5):
 
 1. O autor informou 3 h reais para a v0.4.0, registradas no backlog (resumo, situação da release e projeção de cerca de 22 h) e em docs/HISTORY-IA.md, e aprovou o git.
+2. Git: commits 3961430 (blueprint), 9291ec1 (código; definição de pronto verde só com ele em disco) e 65390be (fechamento) na branch feat/priority-advisor; merge --no-ff d7aba86 em main; tag anotada v0.4.0; push de main, da tag e da branch.
+3. Verificação: definição de pronto em clone limpo da tag v0.4.0 (.venv novo, requirements.txt): 134 testes passando com -W error, mypy sem erros em 18 arquivos e git status limpo. Diagramas conferidos no GitHub pelo Claude in Chrome: os três diagramas alterados de docs/arquitetura.md e os seis da seção nova de docs/mermaid.md renderizam sem erro, com o destaque em laranja.
+4. A pedido do autor, este registro foi feito na branch docs/registro-fechamento-v040.

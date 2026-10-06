@@ -566,6 +566,8 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Desafios:**
   - **Arquivo do *prompt* vazio.** O arquivo `prompts/Prompt 35 - fechamento da v0.4.0` existia sem conteúdo. A IA usou o texto planejado em `prompts/prompts-desenvolvimento.md` e o gravou no arquivo, informando o autor.
   - **Horas reais.** O assistente não as mede. O autor informou 3 h para a `v0.4.0`, registradas no backlog.
+  - **Sintaxe dos diagramas.** Sem validação externa antes do *push*, a conferência foi feita depois, no GitHub, pelo Claude in Chrome: os diagramas alterados renderizaram sem erro.
+- **Resultado do git:** *commits* `3961430` (*blueprint*), `9291ec1` (código) e `65390be` (fechamento) na *branch* `feat/priority-advisor`; *merge* `d7aba86` em `main`; *tag* anotada `v0.4.0` e *push* de `main`, da *tag* e da *branch*. A definição de pronto passou em clone limpo da *tag*: 134 testes, mypy sem erros em 18 arquivos e `git status` limpo. O registro foi feito na *branch* `docs/registro-fechamento-v040`.
 
 ## Release v0.4.0: consolidação
 
@@ -577,7 +579,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Divergências do *blueprint*:**
   - passos 1 a 4: nenhuma de código;
   - passo 5: o exemplo de filtro combinado do README usa `?status=done&priority=1` (lista não vazia), e os exemplos novos foram executados no fim da sequência, o que o README informa;
-  - passo 6: o README ganhou duas limitações além das previstas (sugestão variável no tempo e `422` de formato com duas entradas); os diagramas de erros em `/tasks/{id}` e de testes não mudaram, só o texto das seções; a sintaxe dos diagramas alterados não foi validada antes do *push* (a validação externa ficou bloqueada na `v0.3.0`) e deve ser conferida no GitHub.
+  - passo 6: o README ganhou duas limitações além das previstas (sugestão variável no tempo e `422` de formato com duas entradas); os diagramas de erros em `/tasks/{id}` e de testes não mudaram, só o texto das seções; a sintaxe dos diagramas alterados não foi validada antes do *push* (a validação externa ficou bloqueada na `v0.3.0`); foi conferida depois, no GitHub, sem erro.
 - **Ganho percebido acumulado:** ~9 h (soma das estimativas dos Prompts 32 a 35).
 - **Horas reais:** 3 h, informadas pelo autor, contra 7,25 h estimadas (5,75 h dos itens, mais *blueprint* e fechamento). Foi a primeira *release* abaixo da estimativa; a projeção do projeto caiu para cerca de 22 h.
 - **Lição principal:** o *blueprint* executável, com protótipo prévio, transferiu o risco para o planejamento: os seis problemas encontrados no protótipo (formato da *query string*, base de fusos no Windows, conversões do Pydantic, teste antigo invalidado) foram resolvidos antes da execução, e o modelo de execução seguiu os passos sem improvisar. A mudança de escopo pedida pelo autor (D-09) entrou pelo mesmo caminho: decisão registrada, custo estimado e testes previstos.
