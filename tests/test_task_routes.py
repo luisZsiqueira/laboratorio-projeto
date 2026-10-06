@@ -77,9 +77,16 @@ def build_get_db_override(
 
 
 @contextmanager
-def open_test_client(environment: Environment, engine: Engine) -> Iterator[TestClient]:
-    """Abre um TestClient com o ambiente pedido e get_db apontando para o engine de teste."""
-    application = create_app(Settings(_env_file=None, environment=environment), engine)
+def open_test_client(
+    environment: Environment, engine: Engine, local_utc_offset: str = "-03:00"
+) -> Iterator[TestClient]:
+    """Abre um TestClient com o ambiente e o fuso pedidos e get_db apontando para o engine de teste."""
+    application = create_app(
+        Settings(
+            _env_file=None, environment=environment, local_utc_offset=local_utc_offset
+        ),
+        engine,
+    )
     application.dependency_overrides[get_db] = build_get_db_override(sessionmaker(bind=engine))
     try:
         with TestClient(application) as client:
@@ -117,11 +124,13 @@ def test_settings_use_readme_defaults_without_environment(
     """Sem variáveis de ambiente nem .env, valem os padrões do README."""
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("ENVIRONMENT", raising=False)
+    monkeypatch.delenv("LOCAL_UTC_OFFSET", raising=False)
 
     settings = Settings(_env_file=None)
 
     assert settings.database_url == "sqlite:///./tasks.db"
     assert settings.environment == "development"
+    assert settings.local_utc_offset == "-03:00"
 
 
 def test_settings_read_values_from_environment_variables(
@@ -327,7 +336,7 @@ def test_repository_find_all_filters_by_status_in_id_order(
 
 
 OLD_TIMESTAMP = datetime(2020, 1, 1, tzinfo=UTC)
-OLD_TIMESTAMP_TEXT = "2020-01-01T00:00:00Z"
+OLD_TIMESTAMP_TEXT = "2019-12-31T21:00:00-03:00"
 PUT_BODY = {
     "title": "B",
     "description": None,
@@ -384,16 +393,19 @@ def test_create_task_returns_201_with_generated_fields_and_defaults(
     assert task["due_at"] is None
     assert task["status"] == "pending"
     assert task["priority"] == 3
-    assert str(task["created_at"]).endswith("Z")
+    assert str(task["created_at"]).endswith("-03:00")
     assert task["created_at"] == task["updated_at"]
 
 
-def test_create_task_converts_due_at_to_utc(client: TestClient) -> None:
-    """due_at com fuso é devolvido em UTC, na criação e na consulta seguinte."""
-    task = create_task_through_api(client, due_at="2026-10-10T10:00:00-03:00")
+def test_create_task_returns_due_at_in_local_offset(client: TestClient) -> None:
+    """due_at em ISO com fuso é devolvido no fuso local, na criação e na consulta seguinte."""
+    task = create_task_through_api(client, due_at="2026-10-10T13:00:00Z")
 
-    assert task["due_at"] == "2026-10-10T13:00:00Z"
-    assert client.get(f"/tasks/{task['id']}").json()["due_at"] == "2026-10-10T13:00:00Z"
+    assert task["due_at"] == "2026-10-10T10:00:00-03:00"
+    assert (
+        client.get(f"/tasks/{task['id']}").json()["due_at"]
+        == "2026-10-10T10:00:00-03:00"
+    )
 
 
 @pytest.mark.parametrize(
@@ -405,7 +417,7 @@ def test_create_task_converts_due_at_to_utc(client: TestClient) -> None:
         {"title": "A", "description": "x" * 1001},
         {"title": "A", "status": "archived"},
         {"title": "A", "priority": 5},
-        {"title": "A", "due_at": "10/10/2026"},
+        {"title": "A", "due_at": "10-10-2026"},
         {"title": "A", "due_at": "2026-10-10T10:00:00"},
         {"title": "A", "id": 7},
         {"title": "A", "created_at": "2026-10-10T10:00:00Z"},
@@ -621,3 +633,207 @@ def test_database_failure_returns_500_without_internal_details(
     assert "tasks" not in response.text
     assert "SELECT" not in response.text
     assert "no such table" in caplog.text
+
+
+INCOHERENT_PRIORITY_RESPONSE = {
+    "detail": "Prioridade 4 (agendada) exige due_at preenchido"
+}
+
+
+def test_create_task_accepts_open_and_specific_tasks(client: TestClient) -> None:
+    """Tarefa aberta (sem prazo) e tarefa específica (prioridade 4 com prazo) são gravadas."""
+    open_task = create_task_through_api(client, title="Aberta")
+    specific_task = create_task_through_api(
+        client, title="Específica", priority=4, due_at="2026-10-10T13:00:00Z"
+    )
+
+    open_read = client.get(f"/tasks/{open_task['id']}").json()
+    specific_read = client.get(f"/tasks/{specific_task['id']}").json()
+
+    assert open_read["due_at"] is None
+    assert (specific_read["priority"], specific_read["due_at"]) == (
+        4,
+        "2026-10-10T10:00:00-03:00",
+    )
+
+
+def test_create_task_rejects_priority_four_without_due_at_with_422(
+    client: TestClient,
+) -> None:
+    """POST com prioridade 4 sem prazo responde 422 em texto e não grava nada."""
+    response = client.post("/tasks", json={"title": "A", "priority": 4})
+
+    assert response.status_code == 422
+    assert response.json() == INCOHERENT_PRIORITY_RESPONSE
+    assert client.get("/tasks").json() == []
+
+
+def test_replace_task_rejects_incoherent_priority_with_422(client: TestClient) -> None:
+    """PUT com prioridade 4 sem prazo responde 422 e a tarefa fica como estava."""
+    task = create_task_through_api(client)
+
+    response = client.put(f"/tasks/{task['id']}", json={**PUT_BODY, "priority": 4})
+
+    assert response.status_code == 422
+    assert response.json() == INCOHERENT_PRIORITY_RESPONSE
+    assert client.get(f"/tasks/{task['id']}").json() == task
+
+
+@pytest.mark.parametrize(
+    ("create_fields", "patch_body"),
+    [
+        ({}, {"priority": 4}),
+        ({"priority": 4, "due_at": "2026-10-10T13:00:00Z"}, {"due_at": None}),
+    ],
+)
+def test_patch_task_rejects_incoherent_priority_with_422(
+    client: TestClient,
+    create_fields: dict[str, object],
+    patch_body: dict[str, object],
+) -> None:
+    """PATCH que deixa a tarefa com prioridade 4 sem prazo responde 422, sem alterar nada."""
+    task = create_task_through_api(client, **create_fields)
+
+    response = client.patch(f"/tasks/{task['id']}", json=patch_body)
+
+    assert response.status_code == 422
+    assert response.json() == INCOHERENT_PRIORITY_RESPONSE
+    assert client.get(f"/tasks/{task['id']}").json() == task
+
+
+def test_task_response_includes_suggested_priority_without_changing_priority(
+    client: TestClient,
+) -> None:
+    """Prazo em 1 h sugere 1 no POST e no GET; a prioridade gravada continua 3."""
+    due_at = (datetime.now(UTC) + timedelta(hours=1)).isoformat()
+
+    task = create_task_through_api(client, due_at=due_at)
+    task_read = client.get(f"/tasks/{task['id']}").json()
+
+    assert (task["priority"], task["suggested_priority"]) == (3, 1)
+    assert (task_read["priority"], task_read["suggested_priority"]) == (3, 1)
+
+
+def test_task_response_has_null_suggestion_for_open_task(client: TestClient) -> None:
+    """Tarefa aberta (sem prazo) responde suggested_priority nulo."""
+    task = create_task_through_api(client)
+
+    assert task["suggested_priority"] is None
+
+
+def test_list_tasks_filters_by_priority(client: TestClient) -> None:
+    """O parâmetro priority filtra a listagem."""
+    for title, priority in [("A", 1), ("B", 2), ("C", 1)]:
+        create_task_through_api(client, title=title, priority=priority)
+
+    titles = [task["title"] for task in client.get("/tasks?priority=1").json()]
+
+    assert titles == ["A", "C"]
+
+
+def test_list_tasks_combines_status_and_priority_filters(client: TestClient) -> None:
+    """Status e prioridade juntos devolvem só as tarefas que atendem aos dois."""
+    create_task_through_api(client, title="A", priority=1, status="pending")
+    create_task_through_api(client, title="B", priority=1, status="done")
+    create_task_through_api(client, title="C", priority=2, status="done")
+
+    titles = [
+        task["title"] for task in client.get("/tasks?status=done&priority=1").json()
+    ]
+
+    assert titles == ["B"]
+
+
+@pytest.mark.parametrize("invalid_priority", ["0", "5", "alta"])
+def test_list_tasks_rejects_invalid_priority_with_422(
+    client: TestClient, invalid_priority: str
+) -> None:
+    """Prioridade fora de 1 a 4 ou não inteira responde 422."""
+    assert client.get(f"/tasks?priority={invalid_priority}").status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("method", "json_body"),
+    [("PUT", {**PUT_BODY, "priority": 5}), ("PATCH", {"priority": 0})],
+)
+def test_update_routes_reject_priority_outside_range_with_422(
+    client: TestClient, method: str, json_body: dict[str, object]
+) -> None:
+    """PUT e PATCH com prioridade fora de 1 a 4 respondem 422."""
+    task = create_task_through_api(client)
+
+    response = client.request(method, f"/tasks/{task['id']}", json=json_body)
+
+    assert response.status_code == 422
+
+
+def test_settings_read_local_utc_offset_from_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """LOCAL_UTC_OFFSET do ambiente substitui o padrão."""
+    monkeypatch.setenv("LOCAL_UTC_OFFSET", "+01:00")
+
+    assert Settings(_env_file=None).local_utc_offset == "+01:00"
+
+
+@pytest.mark.parametrize("invalid_offset", ["-3", "-03", "03:00", "-25:00", "UTC"])
+def test_settings_reject_invalid_local_utc_offset(
+    monkeypatch: pytest.MonkeyPatch, invalid_offset: str
+) -> None:
+    """Deslocamento fora do formato ±HH:MM impede a criação das configurações."""
+    monkeypatch.setenv("LOCAL_UTC_OFFSET", invalid_offset)
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)
+
+
+def test_create_task_accepts_local_date_time(client: TestClient) -> None:
+    """DD/MM/AAAA HH:MM é gravado como horário local e devolvido no mesmo fuso."""
+    task = create_task_through_api(client, due_at="20/10/2026 14:30")
+
+    assert task["due_at"] == "2026-10-20T14:30:00-03:00"
+
+
+def test_create_task_date_only_means_end_of_day(client: TestClient) -> None:
+    """DD/MM/AAAA vale até 23:59 do dia, no horário local."""
+    task = create_task_through_api(client, priority=4, due_at="20/10/2026")
+
+    assert task["due_at"] == "2026-10-20T23:59:00-03:00"
+
+
+def test_patch_task_accepts_date_only(client: TestClient) -> None:
+    """PATCH com só o dia grava 23:59 local."""
+    task = create_task_through_api(client)
+
+    response = client.patch(f"/tasks/{task['id']}", json={"due_at": "21/10/2026"})
+
+    assert response.status_code == 200
+    assert response.json()["due_at"] == "2026-10-21T23:59:00-03:00"
+
+
+@pytest.mark.parametrize(
+    "invalid_due_at",
+    [
+        "2026-10-20",
+        "2026-10-20T14:30:00",
+        "31/02/2026",
+        "20/10/26",
+        "20/10/2026 14h",
+    ],
+)
+def test_due_at_rejects_unsupported_formats_with_422(
+    client: TestClient, invalid_due_at: str
+) -> None:
+    """Formatos fora dos três aceitos respondem 422."""
+    response = client.post("/tasks", json={"title": "A", "due_at": invalid_due_at})
+
+    assert response.status_code == 422
+
+
+def test_responses_use_configured_local_utc_offset(test_engine: Engine) -> None:
+    """As datas da resposta seguem LOCAL_UTC_OFFSET."""
+    with open_test_client("test", test_engine, local_utc_offset="+01:00") as client:
+        task = create_task_through_api(client, due_at="20/10/2026 14:30")
+
+    assert task["due_at"] == "2026-10-20T14:30:00+01:00"
+    assert str(task["created_at"]).endswith("+01:00")

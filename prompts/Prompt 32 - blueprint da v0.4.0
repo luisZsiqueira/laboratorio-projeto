@@ -1,0 +1,28 @@
+Contexto: Release v0.4.0 (prioridades e priority_advisor) do backlog: RT-10 e RF-09 a RF-11; decisões em aberto D-05 a D-07; item condicionado RF-14 (filtro por prioridade, D-06). Horas reais das releases anteriores registradas no backlog.
+Objetivo: Escrever docs/blueprint-v040.md: D-05 (prioridade 4 exige due_at; due_at não exige prioridade 4), D-06 (incluir ou não RF-14, decidido no texto a partir das horas reais frente ao orçamento) e D-07 (validação de coerência na criação e na atualização; sugestão por proximidade do prazo como campo calculado na resposta, sem alterar a prioridade gravada) tomadas com a recomendação do escopo, a confirmar na aprovação; regras de sugestão em tabela com as faixas de prazo em números; assinaturas das funções puras do advisor recebendo a data/hora de referência como parâmetro; nome da exceção de domínio de prioridade incoerente e sua tradução para 422 com mensagem clara; passos, testes nomeados (test_priority_advisor.py, test_task_service.py, test_task_routes.py) e estimativa frente às 3,5 h.
+Estilo: Sem decisões em aberto; sem IA nem serviço externo no advisor; sem alterar o esquema do banco além do que create_all cria.
+Resposta: Apenas docs/blueprint-v040.md, para aprovação. Git: branch feat/priority-advisor a partir de main; adicionar; não comitar.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 06/10/2026
+
+Resumo da execução:
+
+1. Lidos docs/escopo-mvp.md (seções 2, 3, 5 e 6), docs/backlog.md (seções 3 e 4.3, com as horas reais), docs/arquitetura.md, docs/decisoes.md, docs/blueprint-v030.md (modelo do blueprint), o código de app/ e os Prompts 33 a 35 de prompts/prompts-desenvolvimento.md, para alinhar os passos aos prompts de execução.
+2. Protótipo completo fora do repositório, no .venv do projeto: 91, 100 e 114 testes passando com -W error ao fim dos passos 1, 2 e 3 (22 do advisor, 9 do service e 14 das rotas); mypy sem erros em 18 arquivos.
+3. O protótipo revelou três pontos: o Literal[1, 2, 3, 4] recusa ?priority=1 na query string (resolvido pela DT-12, com BeforeValidator que converte só texto decimal, para que ?priority=alta não exponha a mensagem do int()); status.HTTP_422_UNPROCESSABLE_CONTENT existe no Starlette 1.7.0 sem aviso; o dublê InMemoryTaskRepository precisa do novo parâmetro de find_all.
+4. Gerado docs/blueprint-v040.md: D-05 (prioridade 4 exige due_at, conferida no estado resultante do PATCH), D-06 (RF-14 incluído: projeção de cerca de 24,5 h frente às 30 h, a partir das 12 h reais) e D-07 (suggested_priority calculado a cada resposta, nunca gravado), tomadas com a recomendação do escopo; tabela de sugestão (até 4 h: 1; até 24 h: 2; até 7 dias: 3; acima: 4; null para tarefa aberta ou concluída); exceção IncoherentPriorityError traduzida em 422 com {"detail": "Prioridade 4 (agendada) exige due_at preenchido"}; ADR-16 (advisor puro e relógio injetado no service) e ADR-17 (contrato); DT-09 a DT-12; cinco passos (Prompts 33 a 35) com código dos pontos sensíveis, testes nomeados e contagem por passo; riscos; o que não fazer; estimativa de 4 h dos itens (3,5 h do backlog + 0,5 h do RF-14) e 5,5 h da release.
+5. Decisões do assistente a confirmar na aprovação, além de D-05 a D-07: corpo do 422 de regra de negócio em texto, e não em lista; sugestão null para tarefa concluída; limites das faixas inclusivos na faixa mais urgente; relógio injetado no TaskService; build_task_read no service; conclusão e exclusão sem conferir a coerência.
+6. Git: branch feat/priority-advisor criada a partir de main; blueprint e este arquivo adicionados ao stage; sem commit.
+
+Interações seguintes (06/10/2026, Claude Opus 5.5):
+
+1. A pedido do autor, exemplos de tarefas por prioridade, campo a campo; o autor achou o formato ISO de due_at difícil de preencher.
+2. Proposta do assistente: due_at em DD/MM/AAAA HH:MM no horário local, com deslocamento configurável (LOCAL_UTC_OFFSET, padrão -03:00) e respostas no fuso local; ISO com fuso mantido para programas. Verificado no .venv: ZoneInfo("America/Sao_Paulo") falha sem o pacote tzdata, por isso o deslocamento fixo; o Pydantic não aceita DD/MM/AAAA e converte ISO só com a data para 00:00.
+3. Melhoria pedida pelo autor: aceitar só o dia (DD/MM/AAAA), valendo até 23:59. Analisada (sugestão coerente: prazo "hoje" sugere 2; ressalvas: não fica registrado que só o dia foi informado, e ISO só com a data continua recusado) e confirmada pelo autor.
+4. Blueprint revisado: D-09 (datas no horário local), ADR-18 (ajusta ADR-10 e ADR-15), DT-13 (união AwareDatetime | LocalDueAt com strptime e END_OF_DAY), DT-14 (LOCAL_UTC_OFFSET como texto ±HH:MM e parse_utc_offset), DT-15 (Settings em app.state para a rota); novo passo 4 (horário local), README no passo 5 e fechamento no passo 6; tabela dos testes existentes que mudam; estimativa de 7,25 h da release e projeção de cerca de 26,3 h.
+5. Protótipo refeito com o passo 4: 134 testes passando com -W error (22 do advisor, 28 do service, 84 das rotas) e mypy sem erros em 18 arquivos. O protótipo revelou que o caso "10/10/2026" de test_create_task_rejects_invalid_body_with_422 passa a ser válido; o blueprint o troca por "10-10-2026".
+6. Git: blueprint e este arquivo atualizados no stage da branch feat/priority-advisor; sem commit.

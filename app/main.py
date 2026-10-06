@@ -38,6 +38,7 @@ def create_app(settings: Settings, db_engine: Engine) -> FastAPI:
         redoc_url=None if is_production else "/redoc",
         openapi_url=None if is_production else "/openapi.json",
     )
+    application.state.settings = settings
     application.include_router(health_router)
     application.include_router(task_router)
     register_error_handlers(application)

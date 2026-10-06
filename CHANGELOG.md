@@ -4,10 +4,31 @@ Todas as mudanças relevantes do projeto são registradas neste arquivo.
 
 O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico 2.0.0](https://semver.org/lang/pt-BR/). Dentro de cada *release*, as mudanças são agrupadas pelo tipo de *commit* do padrão [Conventional Commits 1.0.0](https://www.conventionalcommits.org/pt-br/v1.0.0/). Os *commits* de *merge* usam a mensagem padrão do git e não são listados.
 
-## [Não publicado]
+## [0.4.0] - 2026-10-06
+
+Prioridades e `priority_advisor`: coerência entre prioridade e prazo, prioridade sugerida pela proximidade do prazo, filtro por prioridade e datas no horário local. Código executado a partir de [`docs/blueprint-v040.md`](docs/blueprint-v040.md). Inclui também as mudanças de documentação feitas em `main` depois da `v0.3.0`.
+
+**Mudança de contrato:** as datas da resposta (`due_at`, `created_at`, `updated_at`) passam a vir no fuso local de `LOCAL_UTC_OFFSET` (padrão `-03:00`), e não mais em UTC com sufixo `Z`; o ISO 8601 com fuso continua aceito na entrada (ADR-18).
+
+### feat
+
+- Adiciona `app/services/priority_advisor.py`, só com funções puras: `ensure_priority_is_coherent` (prioridade 4 exige `due_at`) e `suggest_priority` (por faixas de 4 h, 24 h e 7 dias, com a data/hora de referência como parâmetro), e a exceção `IncoherentPriorityError` (RT-10, D-05, D-07, ADR-16, DT-09).
+- Integra o *advisor* ao `TaskService`: coerência na criação, no `PUT` e no `PATCH` (no estado resultante, antes de alterar a tarefa) e resposta montada por `build_task_read`, com `suggested_priority` calculada com o relógio injetado e nunca gravada (RF-10, RF-11, DT-10, DT-11).
+- Traduz `IncoherentPriorityError` em `422` com `{"detail": "Prioridade 4 (agendada) exige due_at preenchido"}` em `app/api/error_handlers.py` (ADR-17).
+- Adiciona o filtro `GET /tasks?priority=1` a `4`, combinável com `?status=`, com `TaskPriorityQuery` para aceitar o texto da *query string* (RF-14, D-06, DT-12).
+- Aceita `due_at` em `DD/MM/AAAA HH:MM` e `DD/MM/AAAA` (até 23:59) no horário local, além de ISO 8601 com fuso, e devolve as datas no fuso local; nova variável `LOCAL_UTC_OFFSET` (`±HH:MM`, padrão `-03:00`) (RF-09, D-09, ADR-18, DT-13 a DT-15).
+- Adiciona `tests/test_priority_advisor.py` (22 casos) e 43 casos em `tests/test_task_service.py` e `tests/test_task_routes.py`; ajusta os testes da `v0.3.0` afetados pelas datas no fuso local; são 134 testes no total.
 
 ### docs
 
+- Adiciona `docs/blueprint-v040.md`, o *blueprint* executável da *release*, com D-05 a D-07 e D-09, os ADR-16 a ADR-18 e as DT-09 a DT-15.
+- Adiciona os ADR-16 a ADR-18 em `docs/arquitetura.md` (com a observação de ajuste nos ADR-10 e ADR-15) e as DT-09 a DT-15 em `docs/decisoes.md`.
+- Atualiza no `CLAUDE.md` a linha de `HTTP_422_UNPROCESSABLE_ENTITY` do roteiro de checagem (`HTTP_422_UNPROCESSABLE_CONTENT` permitido) e a convenção de datas (UTC na persistência, fuso local na API).
+- Ajusta à implementação os diagramas de módulos, de `POST /tasks` e do modelo de dados, e registra o antes e o depois em `docs/mermaid.md`.
+- Incorpora D-05 a D-07 e D-09 aos requisitos de `docs/escopo-mvp.md`, inclui o RF-14 e atualiza a rastreabilidade com os requisitos do curso.
+- Revisa o README: status, escopo, prioridades com a tabela de sugestão, Endpoints (filtro, `suggested_priority`, formatos de `due_at`, `422` de coerência) com exemplos executados na API, Configuração com `LOCAL_UTC_OFFSET`, roadmap, Uso de IA generativa e limitações.
+- Marca RT-10, RF-09 a RF-11 e RF-14 como concluídos em `docs/backlog.md`, com o critério 3 do RF-09 substituído pelos da D-09.
+- Registra os Prompts 32 a 35 em `prompts/` e em `docs/HISTORY-IA.md`, com a consolidação da *release*.
 - Registra o resultado do fechamento da `v0.3.0` no Prompt 31 e em `docs/HISTORY-IA.md`: *commits*, *merge*, *tag*, *push*, clone limpo e renderização dos diagramas no GitHub.
 - Registra em `docs/backlog.md` as horas reais informadas pelo autor: 4 h para a `v0.2.0` e 8 h para a `v0.3.0`.
 
@@ -100,7 +121,7 @@ Fundação do projeto: regras de trabalho com a IA, documentação, dependência
 - Inicializa o repositório com `.gitignore`, `CLAUDE.md` (regras de trabalho com a IA) e o primeiro *prompt*; os diretórios de `app/` e `tests/` entram no repositório com seus primeiros arquivos (`94f30f2`).
 - Amplia o `.gitignore` com seções por tecnologia e corrige o padrão que ignorava o `.env.example` (`c6ca4dd`).
 
-[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.3.0...HEAD
+[0.4.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/luisZsiqueira/laboratorio-projeto/releases/tag/v0.1.0

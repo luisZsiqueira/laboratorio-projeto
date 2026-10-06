@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.task import Task
-from app.models.task_schemas import TaskStatus
+from app.models.task_schemas import TaskPriority, TaskStatus
 
 
 class TaskRepository:
@@ -46,11 +46,14 @@ class TaskRepository:
         """
         return self.session.get(Task, task_id)
 
-    def find_all(self, status: TaskStatus | None) -> list[Task]:
-        """Lista as tarefas em ordem crescente de `id`, com filtro opcional.
+    def find_all(
+        self, status: TaskStatus | None, priority: TaskPriority | None = None
+    ) -> list[Task]:
+        """Lista as tarefas em ordem crescente de `id`, com filtros opcionais.
 
         Args:
             status: se informado, devolve só as tarefas com essa situação.
+            priority: se informada, devolve só as tarefas com essa prioridade.
 
         Returns:
             As tarefas encontradas, possivelmente uma lista vazia.
@@ -58,6 +61,8 @@ class TaskRepository:
         statement = select(Task).order_by(Task.id)
         if status is not None:
             statement = statement.where(Task.status == status)
+        if priority is not None:
+            statement = statement.where(Task.priority == priority)
         return list(self.session.scalars(statement))
 
     def save(self, task: Task) -> Task:

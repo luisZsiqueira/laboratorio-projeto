@@ -184,7 +184,7 @@ Ao final do projeto, o `HISTORY-IA.md` é a base do histórico de uso de IA exig
 - **Atenção à tipagem.** *Type hints* em todas as funções, métodos e retornos; o código passa no `mypy`. Sem `Any` nem `# type: ignore` sem justificativa em comentário; ausência explícita com `X | None`; coleções parametrizadas (`list[Task]`); retorno preciso, nunca mais largo que o necessário.
 - *Docstrings* em português em todas as classes e funções públicas (propósito, parâmetros, retorno, exceções).
 - Conjuntos fechados de valores sempre com `typing.Literal` (por exemplo `TaskStatus`, `TaskPriority` e `ENVIRONMENT`). Nunca `str` ou `int` livre para esses casos.
-- Datas e horas sempre *timezone-aware* em UTC, na persistência e nos esquemas.
+- Datas e horas sempre *timezone-aware*: em UTC na persistência; na entrada e na saída da API, no fuso local de `LOCAL_UTC_OFFSET` (ADR-18).
 - Separação de camadas, um pacote por camada:
   - `app/api/`: rotas; não acessam o banco nem contêm regra de negócio.
   - `app/services/`: regras de negócio, incluindo o `priority_advisor`; não conhecem HTTP.
@@ -225,7 +225,7 @@ Padrões suspeitos a checar primeiro, por serem os que assistentes de IA costuma
 | cliente HTTP usado pelo `TestClient` (`httpx` vs. sucessor) | `httpx2` (2.13.1): sem ele, o Starlette recorre ao `httpx` e emite aviso de deprecação | proibido `httpx` (Starlette 1.7.0, 03/10/2026); `httpx2` permitido (04/10/2026) |
 | fixture de banco em memória sem `engine.dispose()` | chamar `engine.dispose()` ao final da fixture | proibido (SQLAlchemy 2.1.3, Python 3.14.6, 04/10/2026): `ResourceWarning` (`unclosed database`) vira `PytestUnraisableExceptionWarning`; com `dispose()` permitido |
 | `mypy app` sobre `app/` sem `__init__.py` na raiz | `python -m mypy --explicit-package-bases app` (ADR-11) | proibido `mypy app` (mypy 2.4.0, 04/10/2026): "Source file found twice under different module names"; com `--explicit-package-bases` permitido |
-| `status.HTTP_422_UNPROCESSABLE_ENTITY` | o inteiro `422` nos testes; o código não precisa da constante | proibido (Starlette 1.7.0, 05/10/2026): `StarletteDeprecationWarning`; o inteiro `422` permitido |
+| `status.HTTP_422_UNPROCESSABLE_ENTITY` | `status.HTTP_422_UNPROCESSABLE_CONTENT` no código; o inteiro `422` nos testes | proibido (Starlette 1.7.0, 05/10/2026): `StarletteDeprecationWarning`; `HTTP_422_UNPROCESSABLE_CONTENT` permitido (06/10/2026) |
 | `session.query(...)` | `session.get(Task, task_id)` e `session.scalars(select(Task)...)` | estilo legado, evitar (SQLAlchemy 2.1.3, 05/10/2026): sem aviso; `session.get` e `scalars` permitidos |
 
 Situação possível: "proibido (vX.Y, dd/mm/aaaa)", "permitido (vX.Y, dd/mm/aaaa)" ou "estilo legado, evitar". Os testes mínimos da rodada de 04/10/2026 estão em `docs/release-review-010.md`; a rodada de 05/10/2026 está em `docs/blueprint-v030.md` (seção 5.2) e em `docs/HISTORY-IA.md` (Prompt 25).

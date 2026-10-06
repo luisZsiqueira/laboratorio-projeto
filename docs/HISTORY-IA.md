@@ -48,6 +48,10 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 29 | 05/10/2026 | Código / testes | rotas de `/tasks`, tradutores de erro, ADR-15, DT-08, 38 casos de integração | ~2 h |
 | 30 | 06/10/2026 | Documentação / execução | seção Endpoints do README, com exemplos executados na API | ~1 h |
 | 31 | 06/10/2026 | Documentação / fechamento de *release* | README, diagramas, escopo, backlog, `CHANGELOG.md`, este histórico, `CLAUDE.md` | ~1,5 h |
+| 32 | 06/10/2026 | Planejamento / *blueprint* | `docs/blueprint-v040.md`, com protótipo verificado e revisão das datas no horário local (D-09) | ~3 h |
+| 33 | 06/10/2026 | Código / testes | `priority_advisor` (funções puras), DT-09, 22 testes unitários | ~1 h |
+| 34 | 06/10/2026 | Código / testes / documentação | integração do *advisor* ao *service* e às rotas, filtro por prioridade, datas no horário local, DT-10 a DT-15, ADR-16 a ADR-18, exemplos do README, 43 testes | ~3,5 h |
+| 35 | 06/10/2026 | Documentação / fechamento de *release* | README, diagramas, escopo, backlog, `CHANGELOG.md`, este histórico | ~1,5 h |
 
 ## Entradas
 
@@ -496,6 +500,87 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Ganho percebido acumulado:** ~9,5 h (soma das estimativas dos Prompts 25 a 31).
 - **Horas reais:** 8 h, informadas pelo autor, contra 6,5 h estimadas no backlog. Segundo o autor, o trabalho caberia em 3 a 4 h. O excedente veio de falhas de conexão com a API do Claude numa internet por *hotspot* compartilhado do celular, que forçaram retomadas de execução.
 - **Lição principal:** a execução em ambiente real encontrou o que testes e protótipo não mostram: a página de código do Git Bash, o comportamento do `Invoke-RestMethod` em erro e o bloqueio de arquivo no Windows. Documentar exemplos executados, e não inventados, transformou esses atritos em ressalvas úteis para o avaliador.
+
+## Entradas da release v0.4.0
+
+### Prompt 32: *blueprint* da `v0.4.0`
+
+- **Data:** 06/10/2026
+- **Fase:** planejamento da *release* `v0.4.0`
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - leitura do escopo (D-05 a D-07), do backlog com as horas reais, da arquitetura, do código e dos Prompts 33 a 35 planejados;
+  - protótipo completo fora do repositório, no `.venv` do projeto: 134 testes com `-W error` e mypy sem erros em 18 arquivos;
+  - `docs/blueprint-v040.md` com D-05 a D-07 e D-09, ADR-16 a ADR-18, DT-09 a DT-15, seis passos com testes nomeados, riscos e estimativa de 7,25 h.
+- **Prompt:** [`prompts/Prompt 32 - blueprint da v0.4.0`](../prompts/Prompt%2032%20-%20blueprint%20da%20v0.4.0)
+- **Refinamentos:**
+  - o autor pediu exemplos de tarefas por prioridade e achou o formato ISO de `due_at` difícil de preencher; a IA propôs datas em `DD/MM/AAAA HH:MM` no horário local, com fuso configurável;
+  - o autor pediu também aceitar só o dia (`DD/MM/AAAA`), valendo até 23:59; a IA analisou a sugestão, apontou as ressalvas (não fica registrado que só o dia foi informado; ISO só com a data continua recusado) e revisou o *blueprint* com a D-09 e o passo 4 novo.
+- **Ganho percebido:** ~3 h
+- **Desafios:**
+  - **O protótipo encontrou o que a leitura não mostraria.** O `Literal[1, 2, 3, 4]` recusa `?priority=1` na *query string* (DT-12); `ZoneInfo("America/Sao_Paulo")` falha no Windows sem o pacote `tzdata` (DT-14); o Pydantic converte ISO só com a data para 00:00 e aceita `-3` como `timedelta` de 3 segundos (DT-13 e DT-14); um caso de teste da `v0.3.0` (`"10/10/2026"` como data inválida) passaria a ser válido.
+  - **Mudança de escopo durante o planejamento.** A D-09 nasceu de uma observação do autor sobre usabilidade, não do backlog. Ela foi tratada como decisão de escopo registrada, com o custo (1,75 h) e a projeção de horas recalculados, e não como ajuste silencioso.
+
+### Prompt 33: `priority_advisor` com funções puras
+
+- **Data:** 06/10/2026
+- **Fase:** código e testes (passo 1 do `docs/blueprint-v040.md`)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code
+- **Uso da IA:**
+  - geração de `app/services/priority_advisor.py` (`IncoherentPriorityError`, `ensure_priority_is_coherent`, `suggest_priority`) e de `tests/test_priority_advisor.py` (22 casos), seguindo o código e a tabela de testes do *blueprint*;
+  - registro da DT-09 em `docs/decisoes.md`.
+- **Prompt:** [`prompts/Prompt 33 - priority_advisor com funções puras`](../prompts/Prompt%2033%20-%20priority_advisor%20com%20fun%C3%A7%C3%B5es%20puras)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~1 h
+- **Desafios:** nenhum erro do modelo; o *blueprint* executável deixou o passo sem decisões em aberto. Definição de pronto na primeira execução: 91 testes e mypy sem erros em 18 arquivos.
+
+### Prompt 34: prioridades no *service* e nas rotas, horário local e exemplos
+
+- **Data:** 06/10/2026
+- **Fase:** código, testes e documentação (passos 2 a 5 do `docs/blueprint-v040.md`)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code
+- **Uso da IA:**
+  - geração da integração do `priority_advisor` ao `task_service` (coerência na criação, no `PUT` e no `PATCH`; `build_task_read` com a sugestão), do filtro `?priority=`, do tradutor do `422` e das datas no horário local (`LOCAL_UTC_OFFSET`), seguindo o *blueprint* passo a passo, com a definição de pronto verde a cada passo (100, 114 e 134 testes);
+  - registro de DT-10 a DT-15 e ADR-16 a ADR-18;
+  - execução da API com banco temporário para obter as respostas reais dos exemplos do README (Bash e PowerShell) e atualização das seções Endpoints e Configuração.
+- **Prompt:** [`prompts/Prompt 34 - prioridades no service e nas rotas`](../prompts/Prompt%2034%20-%20prioridades%20no%20service%20e%20nas%20rotas)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~3,5 h
+- **Desafios:**
+  - **Divergências pequenas do *blueprint*.** O exemplo de filtro combinado do README passou a `?status=done&priority=1`, para mostrar uma lista não vazia, e os exemplos novos foram executados no fim da sequência; ambas as mudanças estão no README e no arquivo do *prompt*.
+  - **`422` de formato de `due_at`.** A união `AwareDatetime | LocalDueAt` gera duas entradas de erro, e o `loc` da segunda traz o nome interno `function-before[parse_local_due_at(), datetime]`. O comportamento foi documentado como é; a decisão de mudá-lo fica com o autor.
+  - **Ferramenta de edição.** Um `heredoc` longo com aspas falhou no *shell*; as edições passaram a ser feitas por *scripts* em Python no diretório temporário, preservando o fim de linha CRLF dos arquivos.
+
+### Prompt 35: fechamento da `v0.4.0`
+
+- **Data:** 06/10/2026
+- **Fase:** documentação e fechamento de *release*
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - README: status (todos os requisitos funcionais implementados), escopo do MVP sem "por exemplo" no `priority_advisor`, roadmap com a `v0.4.0` concluída, Uso de IA generativa e limitações (fuso fixo, perda do "só o dia", sugestão variável no tempo, `422` de formato com duas entradas);
+  - `docs/arquitetura.md`: diagramas de módulos, de `POST /tasks` e do modelo de dados ajustados ao código, conferidos contra as importações reais de `app/`; antes e depois em `docs/mermaid.md`, gerados por *script* que confere se o depois destacado, sem o destaque, é igual à versão oficial;
+  - `docs/escopo-mvp.md` com D-05 a D-07 e D-09 incorporadas e RF-14 incluído; backlog, `CHANGELOG.md`, este histórico e o status do *blueprint*.
+- **Prompt:** [`prompts/Prompt 35 - fechamento da v0.4.0`](../prompts/Prompt%2035%20-%20fechamento%20da%20v0.4.0)
+- **Refinamentos:** nenhum até o relatório.
+- **Ganho percebido:** ~1,5 h
+- **Desafios:**
+  - **Arquivo do *prompt* vazio.** O arquivo `prompts/Prompt 35 - fechamento da v0.4.0` existia sem conteúdo. A IA usou o texto planejado em `prompts/prompts-desenvolvimento.md` e o gravou no arquivo, informando o autor.
+  - **Horas reais.** O assistente não as mede. O autor informou 3 h para a `v0.4.0`, registradas no backlog.
+
+## Release v0.4.0: consolidação
+
+- **Período:** 06/10/2026 (Prompts 32 a 35)
+- **Entregas:** `priority_advisor` com funções puras; coerência entre prioridade 4 e `due_at` na criação, no `PUT` e no `PATCH`, com `422` em texto; `suggested_priority` em todas as respostas; filtro `?priority=` (RF-14); `due_at` em `DD/MM/AAAA HH:MM` ou `DD/MM/AAAA` no horário local e datas devolvidas no fuso de `LOCAL_UTC_OFFSET` (D-09). Os testes passam de 69 para 134, com `tests/test_priority_advisor.py` novo. Somam-se os ADR-16 a ADR-18, as DT-09 a DT-15 e os exemplos do README executados na API.
+- **Uso da IA:**
+  - manteve-se a divisão de papéis: o Opus 5.5 desenhou (Prompt 32) e fechou (Prompt 35), e o Sonnet 5.5 executou (Prompts 33 e 34);
+  - a execução chegou à contagem de testes prevista em cada passo (91, 100, 114 e 134), sem erro de teste ou de mypy em nenhum passo.
+- **Divergências do *blueprint*:**
+  - passos 1 a 4: nenhuma de código;
+  - passo 5: o exemplo de filtro combinado do README usa `?status=done&priority=1` (lista não vazia), e os exemplos novos foram executados no fim da sequência, o que o README informa;
+  - passo 6: o README ganhou duas limitações além das previstas (sugestão variável no tempo e `422` de formato com duas entradas); os diagramas de erros em `/tasks/{id}` e de testes não mudaram, só o texto das seções; a sintaxe dos diagramas alterados não foi validada antes do *push* (a validação externa ficou bloqueada na `v0.3.0`) e deve ser conferida no GitHub.
+- **Ganho percebido acumulado:** ~9 h (soma das estimativas dos Prompts 32 a 35).
+- **Horas reais:** 3 h, informadas pelo autor, contra 7,25 h estimadas (5,75 h dos itens, mais *blueprint* e fechamento). Foi a primeira *release* abaixo da estimativa; a projeção do projeto caiu para cerca de 22 h.
+- **Lição principal:** o *blueprint* executável, com protótipo prévio, transferiu o risco para o planejamento: os seis problemas encontrados no protótipo (formato da *query string*, base de fusos no Windows, conversões do Pydantic, teste antigo invalidado) foram resolvidos antes da execução, e o modelo de execução seguiu os passos sem improvisar. A mudança de escopo pedida pelo autor (D-09) entrou pelo mesmo caminho: decisão registrada, custo estimado e testes previstos.
 
 ## Observações transversais
 

@@ -1,11 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.orm import Session
 
+from app.models.settings import Settings
 from app.models.task_schemas import (
     TaskCreate,
     TaskPatch,
+    TaskPriorityQuery,
     TaskRead,
     TaskStatus,
     TaskUpdate,
@@ -20,16 +22,23 @@ NOT_FOUND_RESPONSE: dict[int | str, dict[str, object]] = {
 }
 
 
-def get_task_service(session: Annotated[Session, Depends(get_db)]) -> TaskService:
-    """Dependência que compõe o *service* com a sessão da requisição (ADR-14).
+def get_task_service(
+    request: Request, session: Annotated[Session, Depends(get_db)]
+) -> TaskService:
+    """Dependência que compõe o *service* da requisição (ADR-14, DT-15).
+
+    As configurações vêm de `request.app.state.settings`, gravadas por
+    `create_app`, para que cada aplicação use as suas.
 
     Args:
+        request: requisição atual.
         session: sessão aberta por `get_db`, apenas repassada ao *service*.
 
     Returns:
         O `TaskService` da requisição.
     """
-    return build_task_service(session)
+    settings: Settings = request.app.state.settings
+    return build_task_service(session, settings.local_utc_offset)
 
 
 TaskServiceDependency = Annotated[TaskService, Depends(get_task_service)]
@@ -46,24 +55,29 @@ def create_task(task_data: TaskCreate, service: TaskServiceDependency) -> TaskRe
     Returns:
         A tarefa criada, com `201`.
     """
-    return TaskRead.model_validate(service.create_task(task_data))
+    return service.build_task_read(service.create_task(task_data))
 
 
 @router.get("")
 def list_tasks(
     service: TaskServiceDependency,
     task_status: Annotated[TaskStatus | None, Query(alias="status")] = None,
+    task_priority: Annotated[TaskPriorityQuery | None, Query(alias="priority")] = None,
 ) -> list[TaskRead]:
-    """Lista as tarefas por `id`, com filtro opcional por situação.
+    """Lista as tarefas por `id`, com filtros opcionais por situação e prioridade.
 
     Args:
         service: *service* de tarefas.
         task_status: parâmetro de consulta `status` (`pending` ou `done`).
+        task_priority: parâmetro de consulta `priority` (1 a 4).
 
     Returns:
         As tarefas encontradas.
     """
-    return [TaskRead.model_validate(task) for task in service.list_tasks(task_status)]
+    return [
+        service.build_task_read(task)
+        for task in service.list_tasks(task_status, task_priority)
+    ]
 
 
 @router.get("/{task_id}", responses=NOT_FOUND_RESPONSE)
@@ -77,7 +91,7 @@ def read_task(task_id: int, service: TaskServiceDependency) -> TaskRead:
     Returns:
         A tarefa; `404` se não existir.
     """
-    return TaskRead.model_validate(service.get_task(task_id))
+    return service.build_task_read(service.get_task(task_id))
 
 
 @router.put("/{task_id}", responses=NOT_FOUND_RESPONSE)
@@ -94,7 +108,7 @@ def replace_task(
     Returns:
         A tarefa atualizada; `404` se não existir.
     """
-    return TaskRead.model_validate(service.replace_task(task_id, task_data))
+    return service.build_task_read(service.replace_task(task_id, task_data))
 
 
 @router.patch("/{task_id}", responses=NOT_FOUND_RESPONSE)
@@ -111,7 +125,7 @@ def patch_task(
     Returns:
         A tarefa atualizada; `404` se não existir.
     """
-    return TaskRead.model_validate(service.patch_task(task_id, task_data))
+    return service.build_task_read(service.patch_task(task_id, task_data))
 
 
 @router.post("/{task_id}/complete", responses=NOT_FOUND_RESPONSE)
@@ -125,7 +139,7 @@ def complete_task(task_id: int, service: TaskServiceDependency) -> TaskRead:
     Returns:
         A tarefa concluída; `404` se não existir.
     """
-    return TaskRead.model_validate(service.complete_task(task_id))
+    return service.build_task_read(service.complete_task(task_id))
 
 
 @router.delete(
