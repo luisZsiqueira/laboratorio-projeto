@@ -1,0 +1,18 @@
+Contexto: Release v0.3.0 (CRUD de tarefas) do backlog: RT-05 a RT-09 e RF-01 a RF-08. Decisões em aberto D-01 a D-04 (docs/escopo-mvp.md, seção 6). Base técnica da v0.2.0 em main; fluxos de dados e modelo de dados em docs/arquitetura.md (seções 3 e 4).
+Objetivo: Escrever docs/blueprint-v030.md conforme "Blueprint executável": D-01 (TaskStatus = pending e done), D-02 (POST /tasks/{id}/complete, idempotente), D-03 (coluna priority já nesta release) e D-04 (prioridade padrão 3) tomadas no texto com a recomendação do escopo, a confirmar na aprovação; modelo ORM Task com as colunas da seção 4; esquemas de criação, atualização total, atualização parcial e leitura (TaskCreate e TaskRead como na arquitetura; os demais nomeados no blueprint) com title de 1 a 200, description até 1000 e Literal; tratamento dos campos somente leitura na entrada; nome da exceção de domínio de tarefa inexistente; conversão de datas para UTC na escrita e na leitura (ADR-10); commit seguido de refresh no repository (ADR-12); tradução da exceção para 404 e da falha inesperada do banco para 500 com mensagem genérica; passos, testes nomeados por arquivo e estimativa frente às 6,5 h.
+Estilo: Sem decisões em aberto; código só nos pontos sensíveis (conversão UTC, handler de exceção de domínio, handler de 500, dublê do repository).
+Resposta: Apenas docs/blueprint-v030.md, para aprovação. Git: branch feat/crud-tarefas a partir de main; adicionar; não comitar.
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Lidos docs/backlog.md (seção 4.2), docs/escopo-mvp.md (seções 2, 3 e 6), docs/arquitetura.md (seções 3, 4 e 6) e os Prompts 26 a 31 de prompts/prompts-desenvolvimento.md, para alinhar os passos aos prompts de execução.
+2. Protótipo completo fora do repositório, no .venv do projeto: 69 testes passando com -W error, mypy sem erros em 17 arquivos e a API em uvicorn respondendo ao CRUD. O protótipo revelou o created_at diferente do updated_at na criação (resolvido pela DT-06) e o tipo exigido pelo mypy no parâmetro responses das rotas.
+3. Rodada do roteiro de checagem: status.HTTP_422_UNPROCESSABLE_ENTITY emite StarletteDeprecationWarning (novo proibido); session.query não emite aviso (estilo legado); .dict(), .from_orm() e @validator emitem PydanticDeprecatedSince20.
+4. Gerado docs/blueprint-v030.md: D-01 a D-04 tomadas com a recomendação do escopo; ADR-14 (service com repository injetado por Protocol) e ADR-15 (contrato dos endpoints de tarefa); DT-04 a DT-08; contrato da API; importações por arquivo; padrões proibidos; seis passos (Prompts 26 a 31) com assinaturas, trechos sensíveis (UTCDateTime, validador do TaskPatch, tradutores de 404 e 500, dublê do repository, fixture do 500), testes nomeados e contagem por passo (15, 17, 31 e 69); riscos; o que não fazer; estimativa de 6,5 h dos itens.
+5. Decisões do assistente a confirmar na aprovação, além de D-01 a D-04: campos desconhecidos e somente leitura rejeitados com 422 (extra="forbid"), due_at obrigatoriamente com fuso (sem fuso: 422), título sem os espaços das pontas, PATCH {} responde 200 sem alteração, novo arquivo app/api/error_handlers.py.
+6. Git: branch feat/crud-tarefas criada a partir de main; blueprint adicionado ao stage; sem commit.
