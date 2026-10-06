@@ -1,0 +1,29 @@
+Contexto: Todos os passos de docs/blueprint-v040.md executados com a definição de pronto verde. Com a v0.4.0, todos os requisitos funcionais do escopo estão implementados.
+Objetivo: Aplicar "Fechamento de release" do CLAUDE.md: README por inteiro (status, roadmap, Endpoints com prioridade e sugestão, Uso de IA generativa); docs/escopo-mvp.md com D-05 a D-07 migradas e RF-14 incluído ou registrado como não aprovado; docs/arquitetura.md ajustada (fluxo de POST /tasks com a sugestão, se mudar) e docs/mermaid.md se um diagrama mudar; docs/decisoes.md; docs/backlog.md com RT-10 e RF-09 a RF-11 (e RF-14) concluídos e horas reais; CHANGELOG.md com a seção 0.4.0; docs/HISTORY-IA.md com os Prompts 32 a 35 e a consolidação.
+Estilo: README como o projeto está; divergências do blueprint listadas.
+Resposta: Lista dos arquivos alterados e das divergências. Git, após minha aprovação: commits, merge --no-ff em main, tag anotada v0.4.0 e push; definição de pronto em clone limpo.
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 06/10/2026
+
+Observação: o arquivo deste prompt estava vazio; o texto acima foi copiado de prompts/prompts-desenvolvimento.md (Prompt 35), como planejado.
+
+Resumo da execução:
+
+1. Definição de pronto conferida antes e depois: 134 testes passando com -W error; mypy sem erros em 18 arquivos.
+2. README.md: status (todos os requisitos funcionais implementados), escopo do MVP (filtros, datas locais e priority_advisor sem "por exemplo"), roadmap com a v0.4.0 concluída, Uso de IA generativa (Prompts 32 a 35), link para o blueprint-v040 e limitações (fuso fixo sem horário de verão, perda do "só o dia", sugestão variável no tempo, 422 de formato com duas entradas). Endpoints e Configuração conferidas (escritas no Prompt 34).
+3. docs/arquitetura.md: diagramas de módulos (priority_advisor sem "(v0.4.0)", seta sólida task_service → priority_advisor, priority_advisor → task_schemas, error_handlers → priority_advisor, task_routes → settings, TaskPriority no repository), POST /tasks (ensure_priority_is_coherent, 422 pelo error_handlers, fuso local, build_task_read com suggest_priority) e modelo de dados (UTC no banco, fuso local na API); textos das observações, do fluxo, dos erros, do modelo e dos testes; status.
+4. docs/mermaid.md: seção da revisão do Prompt 35, com o antes (commit 649d8e4) e o depois dos três diagramas alterados, gerada por script que confere o depois contra a versão oficial.
+5. docs/escopo-mvp.md: D-05 a D-07 e D-09 decididas e incorporadas à seção 2, ao RF-09 a RF-11 e ao RNF-11; RF-14 incluído; seção 5.2 e rastreabilidade atualizadas; sem decisões em aberto.
+6. docs/decisoes.md: DT-09 a DT-15 conferidas; consequência da DT-09 ajustada à D-09.
+7. docs/backlog.md: RT-10, RF-09 a RF-11 e RF-14 concluídos; critério 3 do RF-09 substituído pelos da D-09; resumo da v0.4.0 com 5,75 h.
+8. CHANGELOG.md: seção 0.4.0 (feat e docs), com a mudança de contrato das datas e os itens que estavam em [Não publicado].
+9. docs/HISTORY-IA.md: entradas dos Prompts 32 e 35 (a do 33 e a do 34 já existiam) e consolidação da release; docs/blueprint-v040.md com status de executado.
+
+Divergências do blueprint: listadas na consolidação da v0.4.0 em docs/HISTORY-IA.md.
+
+Interações seguintes (06/10/2026, Claude Opus 5.5):
+
+1. O autor informou 3 h reais para a v0.4.0, registradas no backlog (resumo, situação da release e projeção de cerca de 22 h) e em docs/HISTORY-IA.md, e aprovou o git.

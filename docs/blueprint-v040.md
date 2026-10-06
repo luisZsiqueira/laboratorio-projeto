@@ -1,6 +1,6 @@
 # Blueprint da `v0.4.0`: prioridades e `priority_advisor`
 
-> **Status:** proposto em 06/10/2026 (Prompt 32) e revisado no mesmo dia, a pedido do autor, com a D-09 (datas no horário local, com só o dia valendo até 23:59). Aguarda aprovação do autor. Execução prevista: Prompt 33 (passo 1), Prompt 34 (passos 2 a 5) e Prompt 35 (passo 6, fechamento). Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
+> **Status:** proposto em 06/10/2026 (Prompt 32), revisado no mesmo dia, a pedido do autor, com a D-09 (datas no horário local, com só o dia valendo até 23:59), aprovado e executado pelos Prompts 33 (passo 1), 34 (passos 2 a 5) e 35 (passo 6, fechamento), concluído em 06/10/2026. As divergências da execução estão registradas em `docs/HISTORY-IA.md` (consolidação da `v0.4.0`). Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
 
 ## 1. Escopo da *release*
 

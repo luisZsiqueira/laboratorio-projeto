@@ -44,12 +44,12 @@ Executado ao final de cada *release*, conforme o `CLAUDE.md` (Fechamento de rele
 | --- | --- | --- | --- | --- |
 | `v0.2.0` | base técnica: configuração, banco, aplicação, `/health` | RT-01 a RT-04, RF-12, RF-13 | 4 h | 4 h |
 | `v0.3.0` | CRUD de tarefas | RT-05 a RT-09, RF-01 a RF-08 | 6,5 h | 8 h |
-| `v0.4.0` | prioridades e `priority_advisor` | RT-10, RF-09 a RF-11 | 3,5 h | — |
+| `v0.4.0` | prioridades e `priority_advisor`, filtro por prioridade e datas no horário local | RT-10, RF-09 a RF-11, RF-14; D-09 | 5,75 h | 3 h |
 | `v0.5.0` | revisão de arquitetura, segurança e documentação | RT-11 a RT-14 | 2,5 h | — |
 | `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h | — |
-| **Total** | | 17 RT, 13 RF | **18,5 h** | **12 h** (até a `v0.3.0`) |
+| **Total** | | 17 RT, 14 RF | **20,75 h** | **15 h** (até a `v0.4.0`) |
 
-As horas reais são informadas pelo autor por *release*, e não por item. Elas incluem o *blueprint*, o fechamento e o *git*, que as estimativas por item não cobrem. O tempo da `v0.1.0` (inicialização e documentação) não foi medido. Até a `v0.3.0`, foram gastas 12 h contra 10,5 h estimadas. Somadas às 8 h estimadas para as *releases* restantes, chega-se a cerca de 20 h, dentro do orçamento de cerca de 30 horas. A comparação é refeita no fechamento de cada *release*.
+As horas reais são informadas pelo autor por *release*, e não por item. Elas incluem o *blueprint*, o fechamento e o *git*, que as estimativas por item não cobrem. O tempo da `v0.1.0` (inicialização e documentação) não foi medido. Até a `v0.3.0`, foram gastas 12 h contra 10,5 h estimadas. Na `v0.4.0`, a estimativa passou de 3,5 h para 5,75 h com o RF-14 (0,5 h) e a D-09 (1,75 h), aprovados no *blueprint*; com o *blueprint* e o fechamento, a *release* foi estimada em 7,25 h. As horas reais da `v0.4.0` foram 3 h, abaixo da estimativa, e até a `v0.4.0` foram gastas 15 h contra 16,75 h estimadas. Somadas as estimativas das *releases* restantes, com *blueprint* e fechamento (`v0.5.0`: 4 h; `v1.0.0`: 3 h), a projeção é de cerca de 22 h, dentro do orçamento de cerca de 30 horas. A comparação é refeita no fechamento de cada *release*.
 
 ## 4. Backlog por *release*
 
@@ -92,16 +92,17 @@ Decisões do *blueprint*: D-01 (valores de `TaskStatus`), D-02 (rota de conclus�
 
 ### 4.3 `v0.4.0`: prioridades e `priority_advisor`
 
-Decisões do *blueprint*: D-05 (prioridade 4 e data/hora), D-06 (filtro por prioridade) e D-07 (regras e exposição do `priority_advisor`).
+Decisões do *blueprint* ([`docs/blueprint-v040.md`](blueprint-v040.md)): D-05 (prioridade 4 exige `due_at`), D-06 (filtro por prioridade incluído como RF-14), D-07 (coerência na criação e na atualização; sugestão em `suggested_priority`, sem gravar) e D-09 (datas no horário local, pedida pelo autor na revisão do *blueprint*).
+
+**Situação da *release*:** concluída em 06/10/2026. Os quatro itens planejados foram entregues, mais o RF-14 e a D-09, aprovados no *blueprint*; nenhum item foi movido. O código foi executado nos Prompts 33 e 34 e o fechamento no Prompt 35. Horas reais (informadas pelo autor em 06/10/2026): 3 h para a *release* inteira, contra 5,75 h estimadas para os itens e 7,25 h com *blueprint* e fechamento. Não há medição por item.
 
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |
-| RT-10 | `app/services/priority_advisor.py` com funções puras | 1. Não importa banco, *repository* nem HTTP **[I]**<br>2. Recebe a data/hora de referência como parâmetro, para testes determinísticos **[I]**<br>3. Testes unitários de cada regra, incluindo os limites **[T]** `test_priority_advisor.py` | RNF-03, RNF-06 | 1 h | a fazer |
-| RF-09 | Prioridade e tipo da tarefa | 1. Prioridade de 1 a 4 aceita na criação e na atualização; fora do conjunto: **422** **[T]** `test_task_routes.py`<br>2. Tarefa sem `due_at` (aberta) e com `due_at` (específica) persistidas e devolvidas corretamente **[T]**<br>3. `due_at` com fuso diferente de UTC é devolvido convertido para UTC **[T]** | RNF-11 | 0,5 h | a fazer |
-| RF-10 | Validar coerência de prioridade | 1. Combinação incoerente, conforme D-05, responde **422** com mensagem clara na criação, no `PUT` e no `PATCH` **[T]** `test_task_routes.py`<br>2. A regra é aplicada pelo *service* chamando o `priority_advisor` **[T]** `test_task_service.py` | — | 1 h | a fazer |
-| RF-11 | Sugerir prioridade | 1. Sugestão determinística pela proximidade do prazo, exposta conforme D-07 **[T]** `test_priority_advisor.py` e `test_task_routes.py`<br>2. A sugestão não altera a prioridade gravada, salvo decisão diferente em D-07 **[T]** | — | 1 h | a fazer |
-
-**Item condicionado:** filtro da listagem por prioridade (D-06). Recebe ID `RF-14` e entra no escopo e neste backlog só se aprovado no *blueprint* da `v0.4.0`.
+| RT-10 | `app/services/priority_advisor.py` com funções puras | 1. Não importa banco, *repository* nem HTTP **[I]**<br>2. Recebe a data/hora de referência como parâmetro, para testes determinísticos **[I]**<br>3. Testes unitários de cada regra, incluindo os limites **[T]** `test_priority_advisor.py` | RNF-03, RNF-06 | 1 h | concluído (06/10/2026) |
+| RF-09 | Prioridade e tipo da tarefa | 1. Prioridade de 1 a 4 aceita na criação e na atualização; fora do conjunto: **422** **[T]** `test_task_routes.py`<br>2. Tarefa sem `due_at` (aberta) e com `due_at` (específica) persistidas e devolvidas corretamente **[T]**<br>3. Critério substituído pela D-09: (a) `DD/MM/AAAA HH:MM` gravado como horário local **[T]**; (b) `DD/MM/AAAA` gravado como 23:59 local, no `POST` e no `PATCH` **[T]**; (c) formatos fora dos três aceitos respondem **422** **[T]**; (d) as datas da resposta vêm no deslocamento de `LOCAL_UTC_OFFSET` **[T]**; (e) `LOCAL_UTC_OFFSET` fora de `±HH:MM` impede a partida **[T]** | RNF-11 | 0,5 h (+ 1,75 h da D-09) | concluído (06/10/2026) |
+| RF-10 | Validar coerência de prioridade | 1. Combinação incoerente, conforme D-05, responde **422** com mensagem clara na criação, no `PUT` e no `PATCH` **[T]** `test_task_routes.py`<br>2. A regra é aplicada pelo *service* chamando o `priority_advisor` **[T]** `test_task_service.py` | — | 1 h | concluído (06/10/2026) |
+| RF-11 | Sugerir prioridade | 1. Sugestão determinística pela proximidade do prazo, exposta conforme D-07 **[T]** `test_priority_advisor.py` e `test_task_routes.py`<br>2. A sugestão não altera a prioridade gravada **[T]** | — | 1 h | concluído (06/10/2026) |
+| RF-14 | Filtrar a listagem por prioridade (D-06) | 1. `?priority=` devolve só as tarefas com aquela prioridade **[T]** `test_task_routes.py`<br>2. Combinado com `?status=`, devolve as que atendem aos dois **[T]**<br>3. Valor fora de 1 a 4 ou não inteiro responde **422** **[T]** | RNF-08 | 0,5 h | concluído (06/10/2026) |
 
 ### 4.4 `v0.5.0`: revisão
 
