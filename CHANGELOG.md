@@ -4,6 +4,12 @@ Todas as mudanças relevantes do projeto são registradas neste arquivo.
 
 O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico 2.0.0](https://semver.org/lang/pt-BR/). Dentro de cada *release*, as mudanças são agrupadas pelo tipo de *commit* do padrão [Conventional Commits 1.0.0](https://www.conventionalcommits.org/pt-br/v1.0.0/). Os *commits* de *merge* usam a mensagem padrão do git e não são listados.
 
+## [Não publicado]
+
+### docs
+
+- Registra o resultado do fechamento da `v0.4.0` no Prompt 35 e em `docs/HISTORY-IA.md`: *commits*, *merge*, *tag*, *push*, clone limpo e renderização dos diagramas no GitHub.
+
 ## [0.4.0] - 2026-10-06
 
 Prioridades e `priority_advisor`: coerência entre prioridade e prazo, prioridade sugerida pela proximidade do prazo, filtro por prioridade e datas no horário local. Código executado a partir de [`docs/blueprint-v040.md`](docs/blueprint-v040.md). Inclui também as mudanças de documentação feitas em `main` depois da `v0.3.0`.
@@ -121,6 +127,7 @@ Fundação do projeto: regras de trabalho com a IA, documentação, dependência
 - Inicializa o repositório com `.gitignore`, `CLAUDE.md` (regras de trabalho com a IA) e o primeiro *prompt*; os diretórios de `app/` e `tests/` entram no repositório com seus primeiros arquivos (`94f30f2`).
 - Amplia o `.gitignore` com seções por tecnologia e corrige o padrão que ignorava o `.env.example` (`c6ca4dd`).
 
+[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.4.0...HEAD
 [0.4.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.1.0...v0.2.0
