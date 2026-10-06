@@ -1,6 +1,6 @@
 # Backlog do MVP
 
-> **Status:** backlog criado após a *release* `v0.1.0`; itens da `v0.2.0` concluídos em 05/10/2026. É revisado no *blueprint* e no fechamento de cada *release*: itens concluídos são marcados, e itens novos só entram com decisão do autor.
+> **Status:** backlog criado após a *release* `v0.1.0`; itens da `v0.2.0` concluídos em 05/10/2026 e da `v0.3.0` em 06/10/2026. É revisado no *blueprint* e no fechamento de cada *release*: itens concluídos são marcados, e itens novos só entram com decisão do autor.
 
 O backlog organiza por *release* o trabalho que falta para entregar o MVP descrito em [`docs/escopo-mvp.md`](escopo-mvp.md). Os requisitos são definidos lá; aqui eles viram itens executáveis, com critérios de aceite verificáveis por teste ou por inspeção.
 
@@ -49,7 +49,7 @@ Executado ao final de cada *release*, conforme o `CLAUDE.md` (Fechamento de rele
 | `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h |
 | **Total** | | 17 RT, 13 RF | **18,5 h** |
 
-O tempo gasto na `v0.1.0` e na `v0.2.0` não foi medido (seção 4.1). A estimativa total deixa folga dentro do orçamento de cerca de 30 horas, mas deve ser conferida contra as horas reais no fechamento de cada *release*.
+O tempo gasto na `v0.1.0`, na `v0.2.0` e na `v0.3.0` não foi medido pelo assistente (seções 4.1 e 4.2). A estimativa total deixa folga dentro do orçamento de cerca de 30 horas, mas deve ser conferida contra as horas reais no fechamento de cada *release*.
 
 ## 4. Backlog por *release*
 
@@ -70,23 +70,25 @@ Decisão do *blueprint*: D-08 (esquema da resposta de `/health`), tomada em [`do
 
 ### 4.2 `v0.3.0`: CRUD de tarefas
 
-Decisões do *blueprint*: D-01 (valores de `TaskStatus`), D-02 (rota de conclusão), D-03 (coluna `priority` já nesta *release*) e D-04 (prioridade padrão).
+Decisões do *blueprint*: D-01 (valores de `TaskStatus`), D-02 (rota de conclusão), D-03 (coluna `priority` já nesta *release*) e D-04 (prioridade padrão), tomadas em [`docs/blueprint-v030.md`](blueprint-v030.md) com a recomendação do escopo e registradas nos requisitos e no ADR-15. O *blueprint* também criou o ADR-14 e as DT-04 a DT-08.
+
+**Situação da *release*:** concluída em 06/10/2026. Os treze itens foram entregues como planejados, sem item movido. O código foi executado em 05/10/2026 (Prompts 26 a 29), e os exemplos do README e o fechamento em 06/10/2026 (Prompts 30 e 31). As horas reais por item não foram medidas pelo assistente e serão preenchidas manualmente pelo autor; até lá, os 6,5 h estimados ficam como referência.
 
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |
-| RT-05 | Modelo ORM `Task` em `app/models/task.py` | 1. Colunas e restrições conforme o modelo de dados de `docs/arquitetura.md` e o escopo (seção 2.1), com `Mapped`/`mapped_column` **[I]**<br>2. `created_at` e `updated_at` preenchidos em UTC; `updated_at` muda a cada alteração **[T]** `test_task_routes.py`<br>3. Datas lidas do SQLite voltam *timezone-aware* em UTC (ADR-10) **[T]** | RNF-11 | 1 h | a fazer |
-| RT-06 | Esquemas Pydantic em `app/models/task_schemas.py` | 1. `TaskStatus` e `TaskPriority` como `Literal` **[I]**<br>2. Esquemas de criação, atualização total, atualização parcial e leitura, com `title` de 1 a 200 e `description` até 1000 caracteres **[T]**<br>3. Leitura a partir do ORM com `ConfigDict(from_attributes=True)`, sem `class Config` **[I]**<br>4. Campos somente leitura (`id`, `created_at`, `updated_at`) ignorados ou rejeitados na entrada, conforme o *blueprint* **[T]** | RNF-05, RNF-08 | 1 h | a fazer |
-| RT-07 | *Repository* em `app/repositories/task_repository.py` | 1. Operações de inserir, buscar por `id`, listar (com filtro opcional), atualizar e excluir **[T]** via rotas<br>2. Só ORM ou `text()` com parâmetros nomeados; nenhuma concatenação de SQL **[I]**<br>3. Sem regra de negócio **[I]**<br>4. Escritas confirmadas com `commit` seguido de `refresh` no *repository*; `get_db` não faz `commit` (ADR-12) **[T]** via rotas | RNF-09 | 0,5 h | a fazer |
-| RT-08 | *Service* em `app/services/task_service.py` | 1. Casos de uso de criar, listar, consultar, atualizar (total e parcial), concluir e excluir **[T]** `test_task_service.py`<br>2. Tarefa inexistente sinalizada por exceção de domínio, sem código HTTP **[T]**<br>3. Testes unitários isolam o *repository* com um dublê simples, sem banco **[I]** | RNF-03, RNF-06 | 1 h | a fazer |
-| RT-09 | Tratamento de erros e exemplos de uso | 1. Exceção de domínio traduzida para **404** na rota **[T]** `test_task_routes.py`<br>2. Falha inesperada do banco responde **500** com mensagem genérica; detalhe no log **[T]**<br>3. README (Endpoints) com a tabela de endpoints, códigos de resposta e exemplos de requisição e resposta para cada um **[I]** | RNF-10, RNF-13 | 1 h | a fazer |
-| RF-01 | Criar tarefa: `POST /tasks` | 1. Corpo válido: **201** com `id`, `created_at`, `updated_at` e *status*/prioridade padrão **[T]** `test_task_routes.py`<br>2. Título vazio ou acima de 200, descrição acima de 1000, *status* ou prioridade fora do conjunto, data/hora mal formada: **422** **[T]** | — | 0,5 h | a fazer |
-| RF-02 | Listar tarefas: `GET /tasks` | 1. Sem tarefas: **200** com lista vazia **[T]**<br>2. Com tarefas: **200** com todas elas **[T]** | — | 0,25 h | a fazer |
-| RF-03 | Filtrar por *status*: `GET /tasks?status=` | 1. Devolve só as tarefas com o *status* pedido **[T]**<br>2. Valor fora do conjunto: **422** **[T]** | — | 0,25 h | a fazer |
-| RF-04 | Consultar tarefa: `GET /tasks/{id}` | 1. Existente: **200** com a tarefa **[T]**<br>2. Inexistente: **404** **[T]** | — | 0,25 h | a fazer |
-| RF-05 | Atualizar (total): `PUT /tasks/{id}` | 1. Corpo completo válido: **200**, campos substituídos e `updated_at` alterado **[T]**<br>2. Inexistente: **404**; corpo inválido ou incompleto: **422** **[T]** | — | 0,25 h | a fazer |
-| RF-06 | Atualizar (parcial): `PATCH /tasks/{id}` | 1. Só os campos enviados mudam; os demais permanecem **[T]**<br>2. Inexistente: **404**; campo inválido: **422** **[T]** | — | 0,25 h | a fazer |
-| RF-07 | Marcar como concluída (rota: D-02) | 1. Existente: **200** com *status* de concluída **[T]**<br>2. Repetir a operação mantém o *status* e responde **200** (idempotente, se aprovada a recomendação de D-02) **[T]**<br>3. Inexistente: **404** **[T]** | — | 0,25 h | a fazer |
-| RF-08 | Excluir tarefa: `DELETE /tasks/{id}` | 1. Existente: **204** sem corpo; consulta posterior responde **404** **[T]**<br>2. Inexistente: **404** **[T]** | — | 0,25 h | a fazer |
+| RT-05 | Modelo ORM `Task` em `app/models/task.py` | 1. Colunas e restrições conforme o modelo de dados de `docs/arquitetura.md` e o escopo (seção 2.1), com `Mapped`/`mapped_column` **[I]**<br>2. `created_at` e `updated_at` preenchidos em UTC; `updated_at` muda a cada alteração **[T]** `test_task_routes.py`<br>3. Datas lidas do SQLite voltam *timezone-aware* em UTC (ADR-10) **[T]** | RNF-11 | 1 h | concluído (06/10/2026) |
+| RT-06 | Esquemas Pydantic em `app/models/task_schemas.py` | 1. `TaskStatus` e `TaskPriority` como `Literal` **[I]**<br>2. Esquemas de criação, atualização total, atualização parcial e leitura, com `title` de 1 a 200 e `description` até 1000 caracteres **[T]**<br>3. Leitura a partir do ORM com `ConfigDict(from_attributes=True)`, sem `class Config` **[I]**<br>4. Campos somente leitura (`id`, `created_at`, `updated_at`) rejeitados na entrada com **422** (`extra="forbid"`, ADR-15) **[T]** | RNF-05, RNF-08 | 1 h | concluído (06/10/2026) |
+| RT-07 | *Repository* em `app/repositories/task_repository.py` | 1. Operações de inserir, buscar por `id`, listar (com filtro opcional), atualizar e excluir **[T]** via rotas<br>2. Só ORM ou `text()` com parâmetros nomeados; nenhuma concatenação de SQL **[I]**<br>3. Sem regra de negócio **[I]**<br>4. Escritas confirmadas com `commit` seguido de `refresh` no *repository*; `get_db` não faz `commit` (ADR-12) **[T]** via rotas | RNF-09 | 0,5 h | concluído (06/10/2026) |
+| RT-08 | *Service* em `app/services/task_service.py` | 1. Casos de uso de criar, listar, consultar, atualizar (total e parcial), concluir e excluir **[T]** `test_task_service.py`<br>2. Tarefa inexistente sinalizada por exceção de domínio, sem código HTTP **[T]**<br>3. Testes unitários isolam o *repository* com um dublê simples, sem banco **[I]** | RNF-03, RNF-06 | 1 h | concluído (06/10/2026) |
+| RT-09 | Tratamento de erros e exemplos de uso | 1. Exceção de domínio traduzida para **404** na rota **[T]** `test_task_routes.py`<br>2. Falha inesperada do banco responde **500** com mensagem genérica; detalhe no log **[T]**<br>3. README (Endpoints) com a tabela de endpoints, códigos de resposta e exemplos de requisição e resposta para cada um **[I]** | RNF-10, RNF-13 | 1 h | concluído (06/10/2026) |
+| RF-01 | Criar tarefa: `POST /tasks` | 1. Corpo válido: **201** com `id`, `created_at`, `updated_at` e *status*/prioridade padrão **[T]** `test_task_routes.py`<br>2. Título vazio ou acima de 200, descrição acima de 1000, *status* ou prioridade fora do conjunto, data/hora mal formada: **422** **[T]** | — | 0,5 h | concluído (06/10/2026) |
+| RF-02 | Listar tarefas: `GET /tasks` | 1. Sem tarefas: **200** com lista vazia **[T]**<br>2. Com tarefas: **200** com todas elas **[T]** | — | 0,25 h | concluído (06/10/2026) |
+| RF-03 | Filtrar por *status*: `GET /tasks?status=` | 1. Devolve só as tarefas com o *status* pedido **[T]**<br>2. Valor fora do conjunto: **422** **[T]** | — | 0,25 h | concluído (06/10/2026) |
+| RF-04 | Consultar tarefa: `GET /tasks/{id}` | 1. Existente: **200** com a tarefa **[T]**<br>2. Inexistente: **404** **[T]** | — | 0,25 h | concluído (06/10/2026) |
+| RF-05 | Atualizar (total): `PUT /tasks/{id}` | 1. Corpo completo válido: **200**, campos substituídos e `updated_at` alterado **[T]**<br>2. Inexistente: **404**; corpo inválido ou incompleto: **422** **[T]** | — | 0,25 h | concluído (06/10/2026) |
+| RF-06 | Atualizar (parcial): `PATCH /tasks/{id}` | 1. Só os campos enviados mudam; os demais permanecem **[T]**<br>2. Inexistente: **404**; campo inválido: **422** **[T]** | — | 0,25 h | concluído (06/10/2026) |
+| RF-07 | Marcar como concluída: `POST /tasks/{id}/complete` (D-02) | 1. Existente: **200** com *status* `done` **[T]**<br>2. Repetir a operação mantém o *status* e `updated_at` e responde **200** (idempotente, D-02) **[T]**<br>3. Inexistente: **404** **[T]** | — | 0,25 h | concluído (06/10/2026) |
+| RF-08 | Excluir tarefa: `DELETE /tasks/{id}` | 1. Existente: **204** sem corpo; consulta posterior responde **404** **[T]**<br>2. Inexistente: **404** **[T]** | — | 0,25 h | concluído (06/10/2026) |
 
 ### 4.3 `v0.4.0`: prioridades e `priority_advisor`
 

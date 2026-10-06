@@ -1,6 +1,6 @@
 # Blueprint da `v0.3.0`: CRUD de tarefas
 
-> **Status:** proposto para aprovação (Prompt 25, 05/10/2026). Depois de aprovado, é executado pelos Prompts 26 (passo 1), 27 (passo 2), 28 (passo 3), 29 (passo 4), 30 (passo 5) e 31 (passo 6, fechamento). Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
+> **Status:** aprovado em 05/10/2026 (Prompt 25) e executado pelos Prompts 26 (passo 1), 27 (passo 2), 28 (passo 3), 29 (passo 4), 30 (passo 5) e 31 (passo 6, fechamento), concluído em 06/10/2026. As divergências da execução estão registradas em `docs/HISTORY-IA.md` (consolidação da `v0.3.0`). Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
 
 ## 1. Escopo da *release*
 

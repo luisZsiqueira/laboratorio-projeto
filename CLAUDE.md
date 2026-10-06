@@ -228,7 +228,7 @@ Padrões suspeitos a checar primeiro, por serem os que assistentes de IA costuma
 | `status.HTTP_422_UNPROCESSABLE_ENTITY` | o inteiro `422` nos testes; o código não precisa da constante | proibido (Starlette 1.7.0, 05/10/2026): `StarletteDeprecationWarning`; o inteiro `422` permitido |
 | `session.query(...)` | `session.get(Task, task_id)` e `session.scalars(select(Task)...)` | estilo legado, evitar (SQLAlchemy 2.1.3, 05/10/2026): sem aviso; `session.get` e `scalars` permitidos |
 
-Situação possível: "proibido (vX.Y, dd/mm/aaaa)", "permitido (vX.Y, dd/mm/aaaa)" ou "estilo legado, evitar". Os testes mínimos da rodada de 04/10/2026 estão em `docs/release-review-010.md`.
+Situação possível: "proibido (vX.Y, dd/mm/aaaa)", "permitido (vX.Y, dd/mm/aaaa)" ou "estilo legado, evitar". Os testes mínimos da rodada de 04/10/2026 estão em `docs/release-review-010.md`; a rodada de 05/10/2026 está em `docs/blueprint-v030.md` (seção 5.2) e em `docs/HISTORY-IA.md` (Prompt 25).
 
 ## Testes
 
@@ -261,10 +261,11 @@ laboratorio-projeto/
 │   ├── api/                   # controller
 │   │   ├── __init__.py
 │   │   ├── task_routes.py     # endpoints de tarefas
-│   │   └── health_routes.py   # endpoint /health
+│   │   ├── health_routes.py   # endpoint /health
+│   │   └── error_handlers.py  # tradutores de exceção (404 e 500), registrados na aplicação
 │   ├── models/                # estruturas de dados, sem lógica
 │   │   ├── __init__.py
-│   │   ├── base.py            # Base declarativo do SQLAlchemy
+│   │   ├── base.py            # Base declarativo, tipo de coluna UTCDateTime e utc_now()
 │   │   ├── task.py            # modelo ORM da tarefa
 │   │   ├── task_schemas.py    # esquemas Pydantic e tipos TaskStatus, TaskPriority
 │   │   ├── health_schemas.py  # esquema HealthRead e tipo HealthStatus da resposta de /health

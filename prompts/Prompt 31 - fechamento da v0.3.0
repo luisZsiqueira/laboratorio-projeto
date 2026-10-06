@@ -1,0 +1,24 @@
+Contexto: Todos os passos de docs/blueprint-v030.md executados e README (Endpoints) escrito, com a definição de pronto verde.
+Objetivo: Aplicar "Fechamento de release" do CLAUDE.md: README por inteiro (status, roadmap com a v0.3.0 concluída, Endpoints, Uso de IA generativa); docs/escopo-mvp.md com D-01 a D-04 migradas da seção 6 para os requisitos ou ADRs; docs/arquitetura.md com o modelo de dados sem "padrão em aberto", ADRs novos e ajustes do que divergiu, com docs/mermaid.md atualizado se um diagrama mudar; docs/decisoes.md com as DTs; docs/backlog.md com RT-05 a RT-09 e RF-01 a RF-08 concluídos e horas reais; CHANGELOG.md com a seção 0.3.0; docs/HISTORY-IA.md com os Prompts 25 a 31 e a consolidação da release.
+Estilo: README como o projeto está; divergências do blueprint listadas.
+Resposta: Lista dos arquivos alterados e das divergências. Git, após minha aprovação: commits, merge --no-ff em main, tag anotada v0.3.0 e push; definição de pronto em clone limpo.
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 06/10/2026
+
+Resumo da execução:
+
+1. Definição de pronto conferida antes de começar: 69 testes passando com -W error; mypy sem erros em 17 arquivos.
+2. README.md: status com a v0.3.0 concluída; prioridade padrão 3; data dos exemplos da seção Endpoints (escrita no Prompt 30); roadmap; Uso de IA generativa com os Prompts 25 a 31; link para os dois blueprints. Limitações sem mudança.
+3. docs/arquitetura.md: diagramas de módulos (error_handlers.py; task_service → base; task_repository → task_schemas; task → task_schemas; priority_advisor marcado como v0.4.0), POST /tasks (sem session, DT-06, TaskRead.model_validate, 422 Unprocessable Content), erros em /tasks/{id} (complete e error_handlers), modelo de dados sem "padrão em aberto" e testes (dublê injetado, Session direta); observações sobre UTCDateTime. As arestas foram conferidas contra as importações reais de app/.
+4. docs/mermaid.md: seção da revisão de 06/10/2026 com o antes (commit d4c41bb) e o depois dos cinco diagramas alterados, gerada por script que confere se o depois destacado é igual à versão oficial.
+5. docs/escopo-mvp.md: D-01 a D-04 marcadas como decididas e incorporadas à seção 2 e ao RF-07; rastreabilidade do curso (exemplos de uso atendidos; testes em andamento).
+6. docs/decisoes.md: DT-04 a DT-08 conferidas com o blueprint; DT-01 movida para antes da DT-02.
+7. docs/backlog.md: RT-05 a RT-09 e RF-01 a RF-08 concluídos (06/10/2026); RT-06 e RF-07 com os critérios ajustados à decisão tomada.
+8. CHANGELOG.md: seção 0.3.0 (feat e docs), incluindo os itens que estavam em [Não publicado]; links de comparação.
+9. docs/HISTORY-IA.md: Prompts 25 a 31 no resumo e nas entradas; consolidação da v0.3.0 com as divergências do blueprint.
+10. CLAUDE.md: error_handlers.py e a descrição de base.py na estrutura; referência à rodada de checagem de 05/10/2026. docs/blueprint-v030.md: status de executado.
+11. Divergências e limitações: a validação de sintaxe dos diagramas pelo mermaid.ink foi bloqueada pelo modo automático do Claude Code (envio a serviço externo) e não foi contornada; fica a conferência no GitHub depois do push. Horas reais não medidas; ficam para o autor.
+12. Git: aguardando aprovação do autor para commits, merge, tag, push e clone limpo.

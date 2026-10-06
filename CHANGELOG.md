@@ -6,8 +6,29 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+## [0.3.0] - 2026-10-06
+
+CRUD de tarefas: criar, listar com filtro por *status*, consultar, atualizar (total e parcial), concluir e excluir, com datas em UTC e erros sem detalhes internos. Código executado a partir de [`docs/blueprint-v030.md`](docs/blueprint-v030.md). Inclui também as mudanças de documentação feitas em `main` depois da `v0.2.0`.
+
+### feat
+
+- Adiciona o modelo ORM `Task` em `app/models/task.py` e, em `app/models/base.py`, o tipo de coluna `UTCDateTime` e a função `utc_now()`: datas gravadas em UTC e lidas *timezone-aware*, com recusa de data/hora sem fuso (RT-05, DT-04).
+- Adiciona os esquemas `TaskCreate`, `TaskUpdate`, `TaskPatch` e `TaskRead` e os tipos `TaskStatus` (`pending`, `done`) e `TaskPriority` (1 a 4) em `app/models/task_schemas.py`; campos desconhecidos ou somente leitura respondem `422`, e `PATCH` rejeita `null` em `title`, `status` e `priority` (RT-06, D-01, D-04, DT-05).
+- Adiciona `app/repositories/task_repository.py`, só com ORM e escritas confirmadas com `commit` e `refresh` (RT-07, ADR-12).
+- Adiciona `app/services/task_service.py` com os casos de uso, a exceção `TaskNotFoundError` e o *repository* injetado pelo protocolo `TaskStore`; a conclusão é idempotente (RT-08, D-02, ADR-14, DT-06).
+- Adiciona as rotas de `/tasks` em `app/api/task_routes.py` e os tradutores de `404` e `500` em `app/api/error_handlers.py`, registrados em `app/main.py` (RF-01 a RF-08, RT-09, ADR-15).
+- Adiciona `tests/test_task_service.py` (14 testes unitários com o dublê `InMemoryTaskRepository`, DT-07) e 42 casos de teste em `tests/test_task_routes.py` (modelo, *repository* e integração dos endpoints, incluindo `404`, `422` e `500`, DT-08); são 69 testes no total.
+
 ### docs
 
+- Adiciona `docs/blueprint-v030.md`, o *blueprint* executável da *release*, com D-01 a D-04, os ADR-14 e ADR-15 e as DT-04 a DT-08.
+- Adiciona os ADR-14 e ADR-15 em `docs/arquitetura.md` e as DT-04 a DT-08 em `docs/decisoes.md`; ordena as DTs pelo número.
+- Registra no roteiro de checagem do `CLAUDE.md` `status.HTTP_422_UNPROCESSABLE_ENTITY` (proibido) e `session.query` (estilo legado); inclui `error_handlers.py` na estrutura de diretórios.
+- Ajusta à implementação os diagramas de módulos, de `POST /tasks`, de erros em `/tasks/{id}`, do modelo de dados e dos testes, e registra o antes e o depois em `docs/mermaid.md`.
+- Incorpora as decisões D-01 a D-04 aos requisitos de `docs/escopo-mvp.md` e atualiza a rastreabilidade com os requisitos do curso.
+- Reescreve a seção Endpoints do README, com a tabela de endpoints, os campos da tarefa, os erros e exemplos executados na API em PowerShell e Bash; revisa o status, o roadmap e o Uso de IA generativa.
+- Marca RT-05 a RT-09 e RF-01 a RF-08 como concluídos em `docs/backlog.md`.
+- Registra os Prompts 25 a 31 em `prompts/` e em `docs/HISTORY-IA.md`, com a consolidação da *release*.
 - Registra o resultado do fechamento da `v0.2.0` (*commits*, *merge*, *tag*, *push* e clone limpo) no Prompt 24 e em `docs/HISTORY-IA.md`.
 - Identifica o modelo do Prompt 21 (Claude Opus 5.5) no arquivo do *prompt*, no histórico e no README.
 - Registra a validação de sintaxe dos diagramas alterados pelo serviço mermaid.ink e deixa as horas reais da `v0.2.0` para preenchimento do autor no backlog.
@@ -74,6 +95,7 @@ Fundação do projeto: regras de trabalho com a IA, documentação, dependência
 - Inicializa o repositório com `.gitignore`, `CLAUDE.md` (regras de trabalho com a IA) e o primeiro *prompt*; os diretórios de `app/` e `tests/` entram no repositório com seus primeiros arquivos (`94f30f2`).
 - Amplia o `.gitignore` com seções por tecnologia e corrige o padrão que ignorava o `.env.example` (`c6ca4dd`).
 
-[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.2.0...HEAD
+[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/luisZsiqueira/laboratorio-projeto/releases/tag/v0.1.0

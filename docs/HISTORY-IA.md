@@ -15,7 +15,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | Item | Valor |
 | --- | --- |
 | Assistente | Claude Code (CLI), no VS Code, em Windows 11 com PowerShell |
-| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) por padrão, inclusive nos Prompts 21 e 24; outros modelos indicados na entrada (Fable 5.1 no Prompt 20, Sonnet 5.5 nos Prompts 22 e 23) |
+| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) por padrão, inclusive nos Prompts 21, 24, 25 e 31; outros modelos indicados na entrada (Fable 5.1 no Prompt 20, Sonnet 5.5 nos Prompts 22, 23 e 26 a 30) |
 | Regras de trabalho com a IA | [`CLAUDE.md`](../CLAUDE.md) |
 | Formato dos *prompts* | Contexto, Objetivo, Estilo, Resposta (e Observações, a partir do Prompt 04) |
 
@@ -41,6 +41,13 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 22 | 05/10/2026 | Código / testes | `settings.py`, `base.py`, `database.py`, DT-02 e DT-03, 8 testes | ~1 h |
 | 23 | 05/10/2026 | Código / testes / execução | `/health` em camadas, `main.py`, 13 testes, ADR-13, DT-01, execução manual | ~1,5 h |
 | 24 | 05/10/2026 | Documentação / fechamento de *release* | README, diagramas, backlog, `CHANGELOG.md`, este histórico, `CLAUDE.md` | ~1,5 h |
+| 25 | 05/10/2026 | Planejamento / *blueprint* | `docs/blueprint-v030.md`, com protótipo verificado e rodada do roteiro de APIs | ~2,5 h |
+| 26 | 05/10/2026 | Código / testes | `UTCDateTime`, esquemas e modelo `Task`, DT-04 e DT-05, 2 testes | ~1 h |
+| 27 | 05/10/2026 | Código / testes | `TaskRepository`, 2 testes | ~0,5 h |
+| 28 | 05/10/2026 | Código / testes | `TaskService`, ADR-14, DT-06 e DT-07, 14 testes unitários | ~1 h |
+| 29 | 05/10/2026 | Código / testes | rotas de `/tasks`, tradutores de erro, ADR-15, DT-08, 38 casos de integração | ~2 h |
+| 30 | 06/10/2026 | Documentação / execução | seção Endpoints do README, com exemplos executados na API | ~1 h |
+| 31 | 06/10/2026 | Documentação / fechamento de *release* | README, diagramas, escopo, backlog, `CHANGELOG.md`, este histórico, `CLAUDE.md` | ~1,5 h |
 
 ## Entradas
 
@@ -371,6 +378,118 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - a execução seguiu o *blueprint* sem divergência de código, o que valida a regra de *blueprint* executável do `CLAUDE.md`.
 - **Ganho percebido acumulado:** ~6 h (soma das estimativas dos Prompts 21 a 24).
 - **Lição principal:** o protótipo executado antes do *blueprint* evitou os erros típicos de primeira execução: `ResourceWarning`, `tasks.db` criado pelos testes e configuração lida na importação. Com isso, o modelo de execução chegou ao verde em cada passo sem improvisar. As interrupções de API mostraram outro valor do *blueprint* persistido: ele permite retomar o trabalho a partir do disco.
+
+## Entradas da release v0.3.0
+
+### Prompt 25: *blueprint* da `v0.3.0`
+
+- **Data:** 05/10/2026
+- **Fase:** planejamento da *release* `v0.3.0`
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - leitura do backlog (RT-05 a RT-09, RF-01 a RF-08), do escopo (D-01 a D-04), dos fluxos e do modelo de dados de `docs/arquitetura.md` e dos Prompts 26 a 31 planejados;
+  - protótipo completo fora do repositório, no `.venv` do projeto: 69 testes com `-W error`, mypy sem erros em 17 arquivos e CRUD respondendo no uvicorn;
+  - rodada do roteiro de checagem de APIs: `status.HTTP_422_UNPROCESSABLE_ENTITY` emite `StarletteDeprecationWarning` (Starlette 1.7.0) e passou a proibido; `session.query` não emite aviso, mas é estilo legado do SQLAlchemy 2.1.3; `.dict()`, `.from_orm()` e `@validator` emitem `PydanticDeprecatedSince20` (Pydantic 2.13.5);
+  - geração de [`docs/blueprint-v030.md`](blueprint-v030.md): D-01 a D-04 com a recomendação do escopo, ADR-14 e ADR-15, DT-04 a DT-08, contrato da API, importações por arquivo, padrões proibidos, seis passos com testes nomeados e contagem esperada por passo.
+- **Prompt:** [`prompts/Prompt 25 - blueprint da v0.3.0`](../prompts/Prompt%2025%20-%20blueprint%20da%20v0.3.0)
+- **Refinamentos:** aprovado pelo autor sem alteração registrada, incluindo as decisões propostas pelo assistente além de D-01 a D-04 (`extra="forbid"`, `due_at` com fuso obrigatório, título sem espaços nas pontas, `PATCH {}` com `200` e o novo `app/api/error_handlers.py`).
+- **Ganho percebido:** ~2,5 h (desenho verificado de treze itens, dois ADRs e cinco DTs)
+- **Desafios:**
+  - **Erros que só o protótipo mostrou.** `created_at` e `updated_at` diferiam em 1 µs na criação (resolvido pela DT-06), e o mypy recusava o parâmetro `responses` das rotas sem anotação explícita.
+  - **Arquivo fora da estrutura.** Os tradutores de exceção não cabiam em nenhum arquivo previsto; o *blueprint* criou `error_handlers.py` dentro de `app/api/`, sem diretório novo, e deixou a atualização da estrutura do `CLAUDE.md` para o fechamento.
+
+### Prompt 26: modelo ORM e esquemas Pydantic
+
+- **Data:** 05/10/2026
+- **Fase:** código e testes (`v0.3.0`, passo 1 do *blueprint*)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code, como modelo de execução que não participou do desenho
+- **Uso da IA:** `utc_now()` e `UTCDateTime` em `base.py`, `task_schemas.py` e `task.py`; DT-04 e DT-05; duas linhas novas no roteiro de checagem do `CLAUDE.md`; 2 testes de persistência (15 no total). Verificou também, fora dos testes previstos, título só com espaços, `id` na entrada, `due_at` sem fuso e `null` no `PATCH`.
+- **Prompt:** [`prompts/Prompt 26 - modelo ORM e esquemas Pydantic`](../prompts/Prompt%2026%20-%20modelo%20ORM%20e%20esquemas%20Pydantic)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~1 h
+- **Desafios:** o trecho do *blueprint* omitia as *docstrings* dos métodos do `TypeDecorator`; a IA as acrescentou por exigência do `CLAUDE.md` e registrou o acréscimo.
+
+### Prompt 27: *repository* de tarefas
+
+- **Data:** 05/10/2026
+- **Fase:** código e testes (`v0.3.0`, passo 2)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code
+- **Uso da IA:** `TaskRepository` só com ORM, `commit` seguido de `refresh` nas escritas; 2 testes (17 no total).
+- **Prompt:** [`prompts/Prompt 27 - repository de tarefas`](../prompts/Prompt%2027%20-%20repository%20de%20tarefas)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~0,5 h
+- **Desafios:** o *prompt* pedia funções que recebem a sessão como parâmetro, enquanto o *blueprint* define uma classe com a sessão no construtor, e o mesmo *prompt* mandava seguir o *blueprint*. A IA seguiu o *blueprint*, de que dependiam o `TaskStore` e o ADR-14, e registrou a divergência.
+
+### Prompt 28: *service* de tarefas e testes unitários
+
+- **Data:** 05/10/2026
+- **Fase:** código e testes (`v0.3.0`, passo 3)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code
+- **Uso da IA:** `TaskService`, `TaskStore` e `TaskNotFoundError`; dublê `InMemoryTaskRepository` e 14 testes unitários (31 no total); ADR-14, DT-06 e DT-07.
+- **Prompt:** [`prompts/Prompt 28 - service de tarefas e testes unitários`](../prompts/Prompt%2028%20-%20service%20de%20tarefas%20e%20testes%20unit%C3%A1rios)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~1 h
+- **Desafios:** nenhum relevante; a IA acrescentou o auxiliar `build_update_body` para não repetir o corpo do `PUT` em dois testes.
+
+### Prompt 29: rotas CRUD e tratamento de erros
+
+- **Data:** 05/10/2026
+- **Fase:** código e testes (`v0.3.0`, passo 4)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code
+- **Uso da IA:** `task_routes.py`, `error_handlers.py` e o registro em `main.py`; 19 funções de teste de integração (38 casos com os parâmetros, 69 no total); ADR-15 e DT-08.
+- **Prompt:** [`prompts/Prompt 29 - rotas CRUD e tratamento de erros`](../prompts/Prompt%2029%20-%20rotas%20CRUD%20e%20tratamento%20de%20erros)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~2 h
+- **Desafios:** a primeira tentativa de gravar os testes por *heredoc* extenso foi recusada pelo *shell*, sem efeito; o bloco foi gravado com a ferramenta de escrita.
+
+### Prompt 30: documentação dos endpoints
+
+- **Data:** 06/10/2026
+- **Fase:** documentação e execução manual (`v0.3.0`, passo 5)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code
+- **Uso da IA:**
+  - execução da API com banco temporário e chamada de todos os endpoints em Bash (`curl -i`) e em Windows PowerShell 5.1 (`Invoke-RestMethod`), incluindo `404`, `422` e a idempotência da conclusão;
+  - verificação, por `TestClient`, do `422` para `id` não numérico nos métodos que o teste não cobria;
+  - reescrita da seção Endpoints do README com a tabela de endpoints, os campos da tarefa, os erros e os JSON reais das respostas.
+- **Prompt:** [`prompts/Prompt 30 - documentação dos endpoints`](../prompts/Prompt%2030%20-%20documenta%C3%A7%C3%A3o%20dos%20endpoints)
+- **Refinamentos:** uma interrupção por erro de API; a retomada corrigiu o script temporário, que estava fora da raiz e não importava `app`.
+- **Ganho percebido:** ~1 h
+- **Desafios:**
+  - **Acentos no Git Bash.** `curl -d` com "relatório" na linha de comando respondeu `400`, e o mesmo corpo por arquivo UTF-8 respondeu `201`. A IA isolou a causa no *shell* (página de código 850), não na API, usou títulos sem acento nos exemplos e registrou a ressalva no README. Uma variante com escape `ó` também falhou e ficou sem explicação.
+  - **`503` não reproduzível na API real.** Com a API ligada, o Windows mantém o arquivo do banco bloqueado. O exemplo vem do contrato verificado nos testes, e o README diz isso.
+  - **Erro em PowerShell.** `Invoke-RestMethod` lança exceção em `404` e `422`; os exemplos usam `try`/`catch` para mostrar código e corpo.
+
+### Prompt 31: fechamento da `v0.3.0`
+
+- **Data:** 06/10/2026
+- **Fase:** documentação e fechamento de *release*
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - README: status, prioridade padrão, data dos exemplos, roadmap com a `v0.3.0` concluída e Uso de IA generativa;
+  - `docs/arquitetura.md`: diagramas de módulos, `POST /tasks`, erros em `/tasks/{id}`, modelo de dados e testes ajustados ao código, conferidos contra as importações reais de `app/`; antes e depois em `docs/mermaid.md`;
+  - `docs/escopo-mvp.md` com D-01 a D-04 incorporadas aos requisitos; backlog, `CHANGELOG.md`, este histórico, estrutura do `CLAUDE.md`, status do *blueprint* e ordem das DTs em `docs/decisoes.md`.
+- **Prompt:** [`prompts/Prompt 31 - fechamento da v0.3.0`](../prompts/Prompt%2031%20-%20fechamento%20da%20v0.3.0)
+- **Refinamentos:** uma interrupção por erro de conexão; retomada a partir do estado em disco.
+- **Ganho percebido:** ~1,5 h
+- **Desafios:**
+  - **Validação dos diagramas.** A validação de sintaxe pelo mermaid.ink, usada na `v0.2.0`, foi bloqueada pelo modo automático do Claude Code, por enviar conteúdo a um serviço externo. A conferência ficou para a renderização no GitHub, depois do *push*.
+  - **Horas reais.** Não medidas pelo assistente; ficam para o autor, como na `v0.2.0`.
+  - **Separação dos *commits*.** `docs/arquitetura.md` e `CLAUDE.md` tinham mudanças do código (ADR-14, ADR-15, roteiro de checagem) e do fechamento. As versões anteriores ao fechamento foram guardadas antes das edições, para que cada mudança entre no *commit* a que pertence.
+
+## Release v0.3.0: consolidação
+
+- **Período:** 05 e 06/10/2026 (Prompts 25 a 31)
+- **Entregas:** CRUD de tarefas completo. São 6 arquivos novos em `app/` (modelo, esquemas, *repository*, *service*, rotas e tradutores de erro), mais `base.py` e `main.py` alterados. Os testes passam de 13 para 69, com `tests/test_task_service.py` novo. Somam-se o *blueprint* executável, os ADR-14 e ADR-15, cinco DTs, a seção Endpoints com exemplos executados e a *tag* `v0.3.0`.
+- **Uso da IA:**
+  - repetiu-se a divisão de papéis da `v0.2.0`: o Opus 5.5 desenhou (Prompt 25) e fechou (Prompt 31), e o Sonnet 5.5 executou (Prompts 26 a 30);
+  - a execução chegou à contagem de testes prevista em cada passo (15, 17, 31 e 69).
+- **Divergências do *blueprint*:**
+  - passos 1 a 4: nenhuma de código. Acréscimos registrados: *docstrings* nos métodos do `TypeDecorator`, o auxiliar `build_update_body` e o nome `OLD_TIMESTAMP_TEXT` nos testes;
+  - passo 2: o texto do Prompt 27 conflitava com o *blueprint* (funções com sessão × classe); prevaleceu o *blueprint*;
+  - passo 5: a API rodou com banco temporário e sem `--reload`, em vez do `DATABASE_URL` padrão; o `404` usa `GET /tasks/999` (e o `DELETE` repetido) em vez do `GET` depois do `DELETE`; o `422` usa título só com espaços e prioridade 9 em vez de `{"title": ""}`; o filtro mostra `?status=done`; os títulos são sem acento; o `503` vem dos testes, não da API real; a seção ganhou as tabelas de campos e de erros;
+  - passo 6: a sintaxe dos diagramas não foi validada antes do *push*; as DTs foram reordenadas; o `CLAUDE.md` passou a apontar onde está a rodada de checagem de 05/10/2026.
+- **Ganho percebido acumulado:** ~9,5 h (soma das estimativas dos Prompts 25 a 31).
+- **Lição principal:** a execução em ambiente real encontrou o que testes e protótipo não mostram: a página de código do Git Bash, o comportamento do `Invoke-RestMethod` em erro e o bloqueio de arquivo no Windows. Documentar exemplos executados, e não inventados, transformou esses atritos em ressalvas úteis para o avaliador.
 
 ## Observações transversais
 

@@ -1,6 +1,6 @@
 # Diagramas Mermaid
 
-> **Status:** catálogo criado na revisão dos diagramas de 04/10/2026 (Prompt 12) e atualizado no fechamento da `v0.2.0` (05/10/2026, Prompt 24). A cada nova revisão, acrescentar uma seção com o antes e o depois.
+> **Status:** catálogo criado na revisão dos diagramas de 04/10/2026 (Prompt 12) e atualizado nos fechamentos da `v0.2.0` (05/10/2026, Prompt 24) e da `v0.3.0` (06/10/2026, Prompt 31). A cada nova revisão, acrescentar uma seção com o antes e o depois.
 
 Este arquivo é o histórico visual dos diagramas do projeto: mostra cada diagrama **antes** e **depois** de uma revisão, com o que mudou e por quê. A versão oficial de cada diagrama continua no arquivo de origem, indicado em cada item: [`docs/arquitetura.md`](arquitetura.md) ou o [`README.md`](../README.md). Quem altera um diagrama atualiza os dois lugares (regra do [`CLAUDE.md`](../CLAUDE.md)).
 
@@ -576,4 +576,401 @@ sequenceDiagram
             H-->>C: 503 {"status": "unavailable", "database": "unavailable"}
         end
     end
+```
+
+## Revisão de 06/10/2026 (Prompt 31, fechamento da `v0.3.0`)
+
+Os diagramas foram ajustados ao código da `v0.3.0` (CRUD de tarefas). **Antes** é a versão do *commit* `d4c41bb` (`main` depois da `v0.2.0`); **depois** é a versão oficial atual de [`docs/arquitetura.md`](arquitetura.md), com o destaque em laranja.
+
+| # | Diagrama | Origem | Resultado | Motivo |
+| --- | --- | --- | --- | --- |
+| 1 | Módulos e dependências | `arquitetura.md`, seção 2 | **alterado** | novo `error_handlers.py` (ADR-15), registrado por `main`; importações reais `task_service → base` (`utc_now`, DT-06), `task_repository → task_schemas` e `task → task_schemas`; `priority_advisor` marcado como `v0.4.0`, com seta pontilhada |
+| 2 | Fluxo de `POST /tasks` | `arquitetura.md`, seção 3 | **alterado** | `create_task(TaskCreate)` e `add(Task)` sem `session` (ADR-14); instante único de criação (DT-06); conversão por `TaskRead.model_validate`; `422 Unprocessable Content`, a frase de *status* atual do Starlette; `priority_advisor` marcado como `v0.4.0` |
+| 3 | Erros em `/tasks/{id}` | `arquitetura.md`, seção 3 | **alterado** | inclui `POST /tasks/{id}/complete`; chamadas sem `session` (ADR-14); o `404` e o `500` passam pelo tradutor `error_handlers`, com os corpos do ADR-15 |
+| 4 | Modelo de dados | `arquitetura.md`, seção 4 | **alterado** | `status` e `priority` sem "padrão em aberto": `pending` (D-01) e `3` (D-04) |
+| 5 | Testes | `arquitetura.md`, seção 5 | **alterado** | dublê nomeado (`InMemoryTaskRepository`, DT-07) e injetado (ADR-14); `test_task_routes.py` também testa `Task` e `TaskRepository` com `Session` direta (DT-08) |
+
+Os demais diagramas (visão em camadas, no README, e `GET /health`) não mudaram: continuam corretos.
+
+### 1. Módulos e dependências: alterado
+
+**O que mudou:** nó `error_handlers.py` em `app/api`, com as arestas `main → error_handlers` e `error_handlers → task_service`; arestas `task_service → base`, `task_repository → task_schemas` e `task → task_schemas`; a aresta `task_service → priority_advisor` passa a pontilhada, e o nó indica `v0.4.0`. O nó `base.py` passa a listar `UTCDateTime` e `utc_now` (DT-04).
+
+**Antes**
+
+```mermaid
+flowchart TD
+    main["main.py"]
+
+    subgraph api["app/api (controller)"]
+        task_routes["task_routes.py"]
+        health_routes["health_routes.py"]
+    end
+
+    subgraph services["app/services (regras de negócio)"]
+        task_service["task_service.py"]
+        priority_advisor["priority_advisor.py"]
+        health_service["health_service.py"]
+    end
+
+    subgraph repositories["app/repositories (acesso ao banco)"]
+        task_repository["task_repository.py"]
+        database["database.py<br/>engine, get_db, ping"]
+    end
+
+    subgraph models["app/models (estruturas, sem lógica)"]
+        task_schemas["task_schemas.py"]
+        health_schemas["health_schemas.py"]
+        task["task.py"]
+        base["base.py"]
+        settings["settings.py"]
+    end
+
+    db[("SQLite3")]
+
+    main --> task_routes
+    main --> health_routes
+    main -->|"create_tables, engine"| database
+    main --> settings
+
+    task_routes --> task_service
+    task_routes --> task_schemas
+    health_routes --> health_service
+    health_routes --> health_schemas
+    task_routes -.->|"Depends(get_db)"| database
+    health_routes -.->|"Depends(get_db)"| database
+
+    task_service --> priority_advisor
+    task_service --> task_repository
+    task_service --> task_schemas
+    task_service --> task
+    health_service --> database
+    health_service --> health_schemas
+
+    task_repository --> task
+    database --> base
+    database --> settings
+    task --> base
+
+    database --> db
+```
+
+**Depois**
+
+```mermaid
+flowchart TD
+    main["main.py"]
+
+    subgraph api["app/api (controller)"]
+        task_routes["task_routes.py"]
+        health_routes["health_routes.py"]
+        error_handlers["error_handlers.py<br/>404 e 500"]
+    end
+
+    subgraph services["app/services (regras de negócio)"]
+        task_service["task_service.py"]
+        priority_advisor["priority_advisor.py<br/>(v0.4.0)"]
+        health_service["health_service.py"]
+    end
+
+    subgraph repositories["app/repositories (acesso ao banco)"]
+        task_repository["task_repository.py"]
+        database["database.py<br/>engine, get_db, ping"]
+    end
+
+    subgraph models["app/models (estruturas, sem lógica)"]
+        task_schemas["task_schemas.py"]
+        health_schemas["health_schemas.py"]
+        task["task.py"]
+        base["base.py<br/>Base, UTCDateTime, utc_now"]
+        settings["settings.py"]
+    end
+
+    db[("SQLite3")]
+
+    main --> task_routes
+    main --> health_routes
+    main -->|"create_tables, engine"| database
+    main --> settings
+    main -->|"register_error_handlers"| error_handlers
+
+    task_routes --> task_service
+    task_routes --> task_schemas
+    health_routes --> health_service
+    health_routes --> health_schemas
+    task_routes -.->|"Depends(get_db)"| database
+    health_routes -.->|"Depends(get_db)"| database
+    error_handlers -->|"TaskNotFoundError"| task_service
+
+    task_service -.-> priority_advisor
+    task_service --> task_repository
+    task_service --> task_schemas
+    task_service --> task
+    task_service -->|"utc_now"| base
+    health_service --> database
+    health_service --> health_schemas
+
+    task_repository --> task
+    task_repository -->|"TaskStatus"| task_schemas
+    database --> base
+    database --> settings
+    task --> base
+    task -->|"TaskStatus, TaskPriority"| task_schemas
+
+    database --> db
+
+    linkStyle 4,11,12,16,20,24 stroke:#d97706,stroke-width:3px
+```
+
+### 2. Fluxo de `POST /tasks`: alterado
+
+**O que mudou:** o participante `priority_advisor` indica `v0.4.0`; dentro da faixa, a validação lista data/hora sem fuso e campo extra, o `422` usa a frase atual, as chamadas não levam `session`, o *service* define o instante da criação, e a rota converte com `TaskRead.model_validate`.
+
+**Antes**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant R as task_routes
+    participant S as task_service
+    participant A as priority_advisor
+    participant Rep as task_repository
+    participant DB as SQLite3
+
+    C->>R: POST /tasks (JSON)
+    Note over C,R: FastAPI converte JSON → TaskCreate (Pydantic)
+    alt JSON inválido (título vazio, tamanho, Literal, data/hora)
+        R-->>C: 422 Unprocessable Entity
+    else válido
+        R->>S: create_task(session, TaskCreate)
+        S->>A: valida coerência prioridade × due_at
+        alt regra violada
+            S-->>R: erro de validação de negócio
+            R-->>C: 422 Unprocessable Entity
+        else coerente
+            S->>Rep: add(session, Task ORM)
+            Rep->>DB: INSERT (parametrizado pelo ORM) + COMMIT
+            Rep->>DB: refresh (SELECT da linha gravada)
+            DB-->>Rep: id, created_at, updated_at
+            Rep-->>S: Task (ORM)
+            S-->>R: Task (ORM)
+            Note over R: response_model converte ORM → TaskRead (Pydantic)
+            R-->>C: 201 Created (JSON)
+        end
+    end
+```
+
+**Depois**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant R as task_routes
+    participant S as task_service
+    participant A as priority_advisor (v0.4.0)
+    participant Rep as task_repository
+    participant DB as SQLite3
+
+    C->>R: POST /tasks (JSON)
+    Note over C,R: FastAPI converte JSON → TaskCreate (Pydantic)
+    rect rgba(217, 119, 6, 0.18)
+        alt JSON inválido (título vazio, tamanho, Literal, data/hora sem fuso, campo extra)
+            R-->>C: 422 Unprocessable Content
+        else válido
+            R->>S: create_task(TaskCreate)
+            S->>A: valida coerência prioridade × due_at
+            alt regra violada
+                S-->>R: erro de validação de negócio
+                R-->>C: 422 Unprocessable Content
+            else coerente
+                Note over S: Task(...) com created_at = updated_at = utc_now()
+                S->>Rep: add(Task)
+                Rep->>DB: INSERT (parametrizado pelo ORM) + COMMIT
+                Rep->>DB: refresh (SELECT da linha gravada)
+                DB-->>Rep: id e demais colunas
+                Rep-->>S: Task (ORM)
+                S-->>R: Task (ORM)
+                Note over R: TaskRead.model_validate(Task)
+                R-->>C: 201 Created (JSON, datas em UTC)
+            end
+        end
+    end
+```
+
+### 3. Erros em `/tasks/{id}`: alterado
+
+**O que mudou:** novo participante `error_handlers`; a requisição inclui `POST /tasks/{id}/complete`; as chamadas não levam `session`; o `404` e o `500` são respondidos pelo tradutor, com os corpos fixos.
+
+**Antes**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant R as task_routes
+    participant S as task_service
+    participant Rep as task_repository
+    participant DB as SQLite3
+
+    C->>R: GET, PUT, PATCH ou DELETE /tasks/{id}
+    R->>S: operação(session, id, ...)
+    S->>Rep: get(session, id)
+    Rep->>DB: SELECT por id (parametrizado pelo ORM)
+    alt tarefa existe
+        DB-->>Rep: linha
+        Rep-->>S: Task (ORM)
+        Note over S,Rep: segue a operação pedida
+        S-->>R: resultado
+        R-->>C: 200 OK ou 204 No Content
+    else tarefa inexistente
+        DB-->>Rep: nenhuma linha
+        Rep-->>S: None
+        S-->>R: exceção de domínio (tarefa não encontrada)
+        R-->>C: 404 Not Found (JSON)
+    else falha inesperada do banco
+        DB-->>Rep: SQLAlchemyError
+        Rep-->>S: exceção propagada
+        S-->>R: exceção propagada
+        Note over R: detalhe registrado no log
+        R-->>C: 500 Internal Server Error (mensagem genérica)
+    end
+```
+
+**Depois**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant R as task_routes
+    participant E as error_handlers
+    participant S as task_service
+    participant Rep as task_repository
+    participant DB as SQLite3
+
+    rect rgba(217, 119, 6, 0.18)
+        C->>R: GET, PUT, PATCH, DELETE /tasks/{id} ou POST /tasks/{id}/complete
+        R->>S: operação(id, ...)
+        S->>Rep: get(id)
+    end
+    Rep->>DB: SELECT por id (parametrizado pelo ORM)
+    alt tarefa existe
+        DB-->>Rep: linha
+        Rep-->>S: Task (ORM)
+        Note over S,Rep: segue a operação pedida
+        S-->>R: resultado
+        R-->>C: 200 OK ou 204 No Content
+    else tarefa inexistente
+        DB-->>Rep: nenhuma linha
+        Rep-->>S: None
+        rect rgba(217, 119, 6, 0.18)
+            S-->>E: TaskNotFoundError(id)
+            E-->>C: 404 {"detail": "Tarefa não encontrada"}
+        end
+    else falha inesperada do banco
+        DB-->>Rep: SQLAlchemyError
+        Rep-->>S: exceção propagada
+        rect rgba(217, 119, 6, 0.18)
+            S-->>E: exceção propagada
+            Note over E: detalhe registrado no log
+            E-->>C: 500 {"detail": "Erro interno do servidor"}
+        end
+    end
+```
+
+### 4. Modelo de dados: alterado
+
+**O que mudou:** os comentários de `status` (`pending` ou `done`, padrão `pending`) e de `priority` (1 a 4, padrão 3). Diagramas de entidade não aceitam destaque de linha; a mudança está só nesses dois atributos.
+
+**Antes**
+
+```mermaid
+erDiagram
+    TASK {
+        int id PK "autoincremento"
+        string title "obrigatório, 1 a 200 caracteres"
+        string description "opcional, até 1000 caracteres"
+        string status "TaskStatus (Literal), padrão em aberto (D-01)"
+        int priority "TaskPriority (Literal 1 a 4), padrão em aberto (D-04)"
+        datetime due_at "opcional, UTC, vazio = tarefa aberta"
+        datetime created_at "UTC, definido na criação"
+        datetime updated_at "UTC, atualizado a cada alteração"
+    }
+```
+
+**Depois**
+
+```mermaid
+erDiagram
+    TASK {
+        int id PK "autoincremento"
+        string title "obrigatório, 1 a 200 caracteres"
+        string description "opcional, até 1000 caracteres"
+        string status "TaskStatus: pending ou done, padrão pending (D-01)"
+        int priority "TaskPriority: 1 a 4, padrão 3 (D-03, D-04)"
+        datetime due_at "opcional, UTC, vazio = tarefa aberta"
+        datetime created_at "UTC, definido na criação"
+        datetime updated_at "UTC, atualizado a cada alteração"
+    }
+```
+
+### 5. Testes: alterado
+
+**O que mudou:** o nó do dublê passa a `InMemoryTaskRepository`, e a aresta a "repository injetado"; novo nó `Task e TaskRepository com Session direta`, ligado a `test_task_routes.py` e ao banco em memória.
+
+**Antes**
+
+```mermaid
+flowchart LR
+    subgraph tests["tests/"]
+        t_service["test_task_service.py<br/>unitários"]
+        t_advisor["test_priority_advisor.py<br/>unitários"]
+        t_routes["test_task_routes.py<br/>integração"]
+    end
+
+    task_service["task_service.py"]
+    double["dublê simples do<br/>task_repository"]
+    priority_advisor["priority_advisor.py<br/>funções puras"]
+    client["TestClient<br/>(httpx2)"]
+    app["aplicação completa<br/>main.py, rotas, services, repositories"]
+    mem[("SQLite em memória<br/>sqlite:// + StaticPool")]
+
+    t_service --> task_service
+    task_service -->|"repository substituído"| double
+    t_advisor --> priority_advisor
+    t_routes --> client
+    client --> app
+    app -->|"get_db substituído<br/>(dependency_overrides)"| mem
+```
+
+**Depois**
+
+```mermaid
+flowchart LR
+    subgraph tests["tests/"]
+        t_service["test_task_service.py<br/>unitários"]
+        t_advisor["test_priority_advisor.py<br/>unitários"]
+        t_routes["test_task_routes.py<br/>integração"]
+    end
+
+    task_service["task_service.py"]
+    double["InMemoryTaskRepository<br/>dublê do TaskStore"]
+    priority_advisor["priority_advisor.py<br/>funções puras"]
+    client["TestClient<br/>(httpx2)"]
+    app["aplicação completa<br/>main.py, rotas, services, repositories"]
+    persistence["Task e TaskRepository<br/>com Session direta"]
+    mem[("SQLite em memória<br/>sqlite:// + StaticPool")]
+
+    t_service --> task_service
+    task_service -->|"repository injetado"| double
+    t_advisor --> priority_advisor
+    t_routes --> client
+    client --> app
+    app -->|"get_db substituído<br/>(dependency_overrides)"| mem
+    t_routes --> persistence
+    persistence --> mem
+
+    linkStyle 1,6,7 stroke:#d97706,stroke-width:3px
 ```
