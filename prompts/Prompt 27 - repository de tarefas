@@ -1,0 +1,19 @@
+Contexto: Modelo e esquemas prontos. Item RT-07; ADR-12.
+Objetivo: Executar o passo do blueprint que cria app/repositories/task_repository.py com as funções de inserir, buscar por id, listar com filtro opcional por status, atualizar e excluir, todas recebendo a sessão como parâmetro; escritas confirmadas com commit seguido de refresh; buscar devolve None quando não há linha; get_db não faz commit.
+Estilo: Só ORM ou text() com parâmetros nomeados; nenhuma concatenação de SQL; sem regra de negócio; assinaturas exatamente como no blueprint.
+Resposta: Código do arquivo, testes previstos para o passo e saída da definição de pronto.
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Passo 2 do docs/blueprint-v030.md executado na branch feat/crud-tarefas (RT-07), com a definição de pronto ao final.
+2. app/repositories/task_repository.py (novo): class TaskRepository com __init__(session), add, get, find_all, save e delete, só com ORM (session.get e select); add e save fazem commit seguido de refresh (ADR-12); get devolve None sem linha; nenhuma exceção do SQLAlchemy é capturada.
+3. tests/test_task_routes.py: importação de TaskRepository e 2 testes (test_repository_add_commits_and_refreshes e test_repository_find_all_filters_by_status_in_id_order).
+4. Resultado: python -m pytest -W error com 17 testes passando; python -m mypy --explicit-package-bases app sem erros em 14 arquivos. Verificação adicional fora dos testes previstos: get de id inexistente devolve None; save persiste a alteração e renova updated_at; delete remove a linha. get_db não foi alterado e não faz commit (ADR-12).
+5. Divergência de redação entre o prompt e o blueprint: o prompt pede funções que recebem a sessão como parâmetro; o blueprint define a classe TaskRepository com a sessão no __init__, e o mesmo prompt pede "assinaturas exatamente como no blueprint". Seguiu-se o blueprint, de que dependem o TaskStore e a injeção do ADR-14 no passo 3.
+6. Fora desta execução (Prompts 28 a 31): service, rotas, tradutores de erro, README e fechamento. Nenhum tasks.db criado.
+7. Git: sem commit; arquivos novos e alterados sem stage, além do blueprint já adicionado.

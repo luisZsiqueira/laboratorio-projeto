@@ -4,7 +4,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy import Engine
 
+from app.api.error_handlers import register_error_handlers
 from app.api.health_routes import router as health_router
+from app.api.task_routes import router as task_router
 from app.models.settings import Settings, get_settings
 from app.repositories.database import create_tables, engine
 
@@ -37,6 +39,8 @@ def create_app(settings: Settings, db_engine: Engine) -> FastAPI:
         openapi_url=None if is_production else "/openapi.json",
     )
     application.include_router(health_router)
+    application.include_router(task_router)
+    register_error_handlers(application)
     return application
 
 

@@ -1,0 +1,23 @@
+Contexto: Service pronto. Itens RT-09 e RF-01 a RF-08; D-02; fluxos da seção 3 de docs/arquitetura.md.
+Objetivo: Executar os passos do blueprint que criam app/api/task_routes.py (POST /tasks 201; GET /tasks com status opcional; GET, PUT, PATCH e DELETE /tasks/{id}; POST /tasks/{id}/complete; response_model com o esquema de leitura; sessão por Depends(get_db) apenas repassada ao service), registram o router em app/main.py, traduzem a exceção de domínio para 404 e a falha inesperada do banco para 500 com mensagem genérica e detalhe no log, e acrescentam a tests/test_task_routes.py os testes de sucesso e erro de cada endpoint: 201 com id, created_at, updated_at, status e prioridade padrão; 422 para título vazio ou acima de 200, descrição acima de 1000, status ou prioridade fora do conjunto e data/hora mal formada; lista vazia, completa e filtrada por status, com 422 para status inválido; 404 em todos os /tasks/{id}; PUT substitui os campos e altera updated_at, 422 para corpo incompleto; PATCH preserva os campos não enviados; complete idempotente; DELETE 204 e 404 na consulta seguinte; 500 com corpo genérico.
+Estilo: Rotas sem acesso ao banco nem regra de negócio; códigos de resposta declarados nas rotas; mensagens de erro sem detalhes internos.
+Resposta: Código dos arquivos, testes e saída da definição de pronto.
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 05/10/2026
+
+Resumo da execução:
+
+1. Passo 4 do docs/blueprint-v030.md executado na branch feat/crud-tarefas (RT-09 critérios 1 e 2, RF-01 a RF-08), com a definição de pronto ao final.
+2. app/api/error_handlers.py (novo): handle_task_not_found (404, {"detail": "Tarefa não encontrada"}), handle_database_error (500, {"detail": "Erro interno do servidor"}, detalhe no log do logger app.api.error_handlers) e register_error_handlers.
+3. app/api/task_routes.py (novo): router /tasks com POST (201), GET com status opcional (parâmetro task_status com alias "status"), GET, PUT, PATCH e DELETE (204) de /tasks/{task_id} e POST /tasks/{task_id}/complete; get_task_service com Depends(get_db) apenas repassando a sessão; cada rota chama um método do service e converte com TaskRead.model_validate; 404 declarado em NOT_FOUND_RESPONSE.
+4. app/main.py: include_router(task_router) e register_error_handlers(application) em create_app, e as duas importações. Nada mais mudou.
+5. tests/test_task_routes.py: importação de update, fixture broken_db_client, auxiliares create_task_through_api e age_updated_at e 19 funções de teste (38 casos, contando os parâmetros).
+6. docs/decisoes.md: DT-08. docs/arquitetura.md: ADR-15 na tabela da seção 6.
+7. Resultado: python -m pytest -W error com 69 testes passando (31 + 38); python -m mypy --explicit-package-bases app sem erros em 17 arquivos. Nenhum arquivo novo do banco: o tasks.db da raiz é anterior à execução (servidor do autor) e é ignorado pelo .gitignore.
+8. Divergências: nenhuma em relação ao blueprint. Em tests/test_task_routes.py, o nome OLD_TIMESTAMP_TEXT foi acrescentado para a data antiga em texto, no lugar de repetir o literal.
+9. Fora desta execução (Prompts 30 e 31): exemplos de uso no README e fechamento. docs/HISTORY-IA.md não foi alterado, por ser do fechamento.
+10. Git: sem commit; arquivos novos e alterados sem stage, além do blueprint já adicionado.
+11. Incidente: a primeira tentativa de gravar os testes por um comando de shell com heredoc extenso foi recusada pelo shell e nada foi executado; o bloco foi gravado com a ferramenta de escrita e anexado ao arquivo. Sem impacto no resultado.

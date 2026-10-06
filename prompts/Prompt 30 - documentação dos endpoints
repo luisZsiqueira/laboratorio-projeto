@@ -1,0 +1,22 @@
+Contexto: CRUD implementado e testado na branch feat/crud-tarefas; o README ainda não tem a seção Endpoints (RT-09, critério 3; requisito do curso: exemplos de uso da API).
+Objetivo: Escrever no README a seção Endpoints: tabela com método, rota, códigos de resposta e descrição; um exemplo de requisição e resposta por endpoint, obtido da API em execução, no mesmo padrão de Como rodar (PowerShell e Bash), incluindo um caso 404 e um 422; a tabela de /health da v0.2.0 integrada à mesma seção.
+Estilo: Exemplos executados, não inventados; JSON real das respostas; sem alterar código.
+Resposta: Seção Endpoints do README e a lista dos comandos executados para obtê-la.
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 06/10/2026
+
+Resumo da execução:
+
+1. Seção Endpoints do README.md reescrita na branch feat/crud-tarefas (RT-09, critério 3): tabela com método, rota, códigos e descrição dos sete endpoints de tarefas, de /health e da documentação; tabelas dos campos da tarefa e dos erros (404, 422, 500); um exemplo por endpoint em PowerShell e Bash, com a resposta real; casos 404 (GET /tasks/999) e 422 (POST com título em branco e prioridade 9; também status inválido no filtro, PUT incompleto e PATCH com title nulo). A seção de /health da v0.2.0 foi integrada à mesma estrutura, e o link de "Como rodar" passou a apontar para o novo título.
+2. Nenhum código foi alterado. O README mantém o CRLF original.
+3. Comandos executados (API iniciada com `python -m uvicorn app.main:app --port 8000`, com DATABASE_URL apontando para um .db no diretório temporário da sessão e ENVIRONMENT=development; o tasks.db da raiz não foi usado):
+   - Bash, na ordem: GET /health; POST /tasks (completo, mínimo e inválido); GET /tasks, GET /tasks?status=done, GET /tasks?status=archived; GET /tasks/1, GET /tasks/999; PUT /tasks/2 (completo e incompleto); PATCH /tasks/1 (válido e com title nulo); POST /tasks/1/complete (duas vezes); GET /tasks?status=done; DELETE /tasks/2 (duas vezes). Todos com `curl -s -i`.
+   - PowerShell 5.1, com banco novo, a mesma sequência com Invoke-RestMethod (-Method, -ContentType, -Body); erros com `try { ... } catch { [int]$_.Exception.Response.StatusCode; $_.ErrorDetails.Message }`; DELETE conferido também com Invoke-WebRequest (204, corpo vazio).
+   - Verificação de 422 para id não numérico em PUT, PATCH, complete e DELETE, com TestClient em script temporário (removido).
+4. Achados: (a) no Git Bash do Windows, `curl -d` com acento na linha de comando retornou 400 "There was an error parsing the body" (página de código 850); o mesmo corpo por arquivo UTF-8 com --data-binary retornou 201. Não investiguei a causa de uma variante com escape ó também ter retornado 400. Os exemplos usam títulos sem acento e o README registra a ressalva. (b) a API converte due_at para UTC (-03:00 de entrada, Z na saída). (c) Invoke-RestMethod lança exceção em 404 e 422, daí o try/catch.
+5. Limitação: o exemplo do 503 de /health não veio da API em execução. A tentativa de corromper o arquivo do banco com a API ligada falhou porque o Windows mantém o arquivo bloqueado. O corpo vem do contrato verificado em tests/test_task_routes.py e o README informa isso. Também não foi verificado como o GitHub renderiza o âncora do link para /health (título com acentos).
+6. Não executado: definição de pronto (pytest e mypy), por não haver mudança de código. docs/HISTORY-IA.md não foi alterado, por ser do fechamento da release (Prompt 31). A frase de status no topo do README ("Os endpoints de tarefas chegam na v0.3.0") e o Roadmap ficam para o fechamento.
+7. Git: sem commit; README.md e este arquivo sem stage.
