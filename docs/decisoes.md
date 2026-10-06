@@ -73,3 +73,66 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `FailingSession` nas rotas de tarefa, porque o *service* chama métodos da sessão que o dublê não implementa e o teste deixaria de exercitar o caminho real; `time.sleep` entre a criação e a alteração, porque deixa o teste lento e ainda dependente do relógio.
 - **Consequências:** o teste do `500` depende da mensagem `no such table` do SQLite; se o SQLAlchemy ou o SQLite mudarem o texto, o teste precisa ser ajustado. A *fixture* `broken_db_client` descarta o próprio *engine* em `engine.dispose()`.
 - **IDs relacionados:** RT-09, RNF-10, ADR-06, DT-03.
+
+## DT-09: faixas da sugestão de prioridade como constantes `timedelta`
+
+- **Data e *release*:** 06/10/2026, `v0.4.0`.
+- **Contexto:** a sugestão de prioridade pela proximidade do prazo (RF-11) precisa de limites de tempo, e é preciso decidir onde ficam e a quem pertence cada limite exato.
+- **Decisão:** `MANDATORY_WINDOW = timedelta(hours=4)`, `IMPORTANT_WINDOW = timedelta(hours=24)` e `REGULAR_WINDOW = timedelta(days=7)`, constantes de `app/services/priority_advisor.py`, com limites inclusivos na faixa mais urgente (exatamente 4 h sugere 1; 24 h, 2; 7 dias, 3). `suggest_priority` levanta `ValueError` se `reference_time` ou `due_at` não tiver fuso horário.
+- **Alternativas descartadas:** variáveis de ambiente, porque são regra de negócio e não configuração de implantação; limites exclusivos, porque deixariam um prazo de exatamente 4 h fora da faixa mandatória.
+- **Consequências:** mudar uma faixa é mudar o código e os testes de limite de `tests/test_priority_advisor.py`. Quem chama o *advisor* precisa fornecer datas com fuso, o que o `UTCDateTime` do modelo (leitura em UTC) e o *service* (fuso local acrescentado às datas digitadas sem fuso, DT-13 e ADR-18) garantem.
+- **IDs relacionados:** RF-11, D-07, ADR-16.
+
+## DT-10: coerência do `PATCH` conferida no estado resultante, antes de alterar a tarefa
+
+- **Data e *release*:** 06/10/2026, `v0.4.0`.
+- **Contexto:** no `PATCH`, a regra "prioridade 4 exige `due_at`" (D-05) depende dos campos enviados e dos já gravados: `{"priority": 4}` numa tarefa sem prazo e `{"due_at": null}` numa tarefa de prioridade 4 são incoerentes.
+- **Decisão:** `patch_task` calcula o estado resultante antes de `apply_changes`: `priority` vem do corpo se não for `None` (o `PATCH` já recusa `null` nesse campo, DT-05), senão da tarefa; `due_at` vem do corpo se `"due_at" in task_data.model_fields_set` (inclui `null` explícito), senão da tarefa. Só então chama `ensure_priority_is_coherent`.
+- **Alternativas descartadas:** aplicar as mudanças e validar depois, porque deixaria o objeto ORM alterado na sessão em caso de erro e confundiria o dublê dos testes unitários.
+- **Consequências:** em caso de incoerência a tarefa não é alterada nem gravada (os testes conferem `save_count == 0`).
+- **IDs relacionados:** RF-10, D-05, DT-05, ADR-16.
+
+## DT-11: resposta montada no *service* por `build_task_read`
+
+- **Data e *release*:** 06/10/2026, `v0.4.0`.
+- **Contexto:** a resposta passa a trazer `suggested_priority`, calculada com o relógio do *service* e sem gravação (D-07). É preciso decidir onde o campo é montado.
+- **Decisão:** `TaskService.build_task_read(task) -> TaskRead` faz `TaskRead.model_validate(task).model_copy(update=...)`; em `TaskRead`, `suggested_priority` tem padrão `None` para que o `model_validate` a partir do ORM funcione. As rotas trocam `TaskRead.model_validate(...)` por `service.build_task_read(...)`.
+- **Alternativas descartadas:** `@computed_field` no esquema, porque daria lógica aos modelos e faria `app/models/` importar `app/services/`; calcular na rota, porque poria regra de negócio no *controller*; os casos de uso devolverem `TaskRead`, porque mudaria os testes unitários da `v0.3.0`, que conferem o objeto `Task`.
+- **Consequências:** os casos de uso continuam devolvendo `Task`; a montagem da resposta é um passo explícito da rota.
+- **IDs relacionados:** RF-11, D-07, ADR-16, ADR-17.
+
+## DT-12: parâmetro de consulta `priority` com `TaskPriorityQuery`
+
+- **Data e *release*:** 06/10/2026, `v0.4.0`.
+- **Contexto:** o `Literal[1, 2, 3, 4]` não converte o texto `"1"` da *query string* e responde `422` para `?priority=1` (verificado em protótipo, FastAPI 0.142.2 e Pydantic 2.13.5).
+- **Decisão:** `TaskPriorityQuery = Annotated[TaskPriority, BeforeValidator(convert_priority_text)]` em `task_schemas.py`, usado só no parâmetro de consulta. `convert_priority_text` converte só texto com dígitos decimais (`str.isdecimal()`); o resto segue para o `Literal`, que recusa com a mensagem padrão.
+- **Alternativas descartadas:** `int` com `Query(ge=1, le=4)`, porque o `CLAUDE.md` exige `Literal` para conjuntos fechados; `BeforeValidator(int)`, porque a mensagem de `?priority=alta` exporia o texto interno do `int()`.
+- **Consequências:** os corpos JSON continuam com `TaskPriority`: `{"priority": "1"}` segue respondendo `422`.
+- **IDs relacionados:** RF-14, D-06, ADR-17.
+
+## DT-13: `due_at` na entrada aceita três formatos (`TaskDueAt`)
+
+- **Data e *release*:** 06/10/2026, `v0.4.0`.
+- **Contexto:** o ISO 8601 com fuso é difícil de digitar (D-09). O Pydantic não aceita `DD/MM/AAAA` e converte ISO só com a data para 00:00.
+- **Decisão:** `TaskDueAt = AwareDatetime | LocalDueAt`, com `LocalDueAt = Annotated[NaiveDatetime, BeforeValidator(parse_local_due_at)]`. `parse_local_due_at` tenta `datetime.strptime` com `"%d/%m/%Y %H:%M"` e, depois, com `"%d/%m/%Y"` combinado com `END_OF_DAY = time(23, 59)`; texto em outro formato levanta `ValueError` com a mensagem "use DD/MM/AAAA HH:MM, DD/MM/AAAA ou ISO 8601 com fuso horário". O ISO com fuso é aceito pelo primeiro ramo da união; o ISO sem fuso falha nos dois (`422`).
+- **Alternativas descartadas:** aceitar ISO só com a data, porque o Pydantic o converte para 00:00 (o oposto de "até o fim do dia"); 23:59:59, porque 23:59 é mais legível e não muda a sugestão.
+- **Consequências:** o esquema devolve datas sem fuso para os formatos locais; quem acrescenta o fuso é o *service* (`attach_timezone`, ADR-18). Não fica registrado que o usuário informou só o dia.
+- **IDs relacionados:** RF-09, D-09, ADR-18.
+
+## DT-14: `LOCAL_UTC_OFFSET` como texto `±HH:MM` e deslocamento fixo
+
+- **Data e *release*:** 06/10/2026, `v0.4.0`.
+- **Contexto:** as datas da API passam a usar o horário local (D-09), e é preciso configurar o fuso.
+- **Decisão:** `UtcOffset = Annotated[str, StringConstraints(pattern=r"^[+-](0\d|1[0-4]):[0-5]\d$")]` em `settings.py`, padrão `-03:00`; `parse_utc_offset` no *service* converte o texto em `datetime.timezone`.
+- **Alternativas descartadas:** `ZoneInfo("America/Sao_Paulo")`, porque falha nesta máquina com `ZoneInfoNotFoundError` (o Windows não traz a base IANA e o pacote `tzdata` não está no `requirements.txt`); campo `timedelta`, porque o Pydantic aceita `-3` como 3 segundos negativos.
+- **Consequências:** o deslocamento é fixo e não acompanha horário de verão (limitação a registrar no README).
+- **IDs relacionados:** RF-09, D-09, ADR-18.
+
+## DT-15: `Settings` em `application.state.settings`
+
+- **Data e *release*:** 06/10/2026, `v0.4.0`.
+- **Contexto:** a rota precisa do `LOCAL_UTC_OFFSET` para compor o *service*, e os testes passam `Settings` próprias a `create_app` (DT-01, DT-02).
+- **Decisão:** `create_app` grava as `Settings` em `application.state.settings`, e `get_task_service` as lê de `request.app.state.settings` (anotada como `Settings`).
+- **Alternativas descartadas:** `Depends(get_settings)` na rota, porque leria o ambiente e o `.env` da máquina, e não as `Settings` passadas a `create_app`.
+- **Consequências:** cada aplicação usa as suas configurações; a anotação `Settings` na leitura de `app.state` é o único ponto sem verificação estática de tipo.
+- **IDs relacionados:** RF-09, D-09, ADR-18, DT-01, DT-02.

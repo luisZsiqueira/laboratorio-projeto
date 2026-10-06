@@ -1,0 +1,19 @@
+Contexto: docs/blueprint-v040.md aprovado. Item RT-10; regras de RF-10 e RF-11 conforme o blueprint.
+Objetivo: Executar os passos do blueprint que criam app/services/priority_advisor.py (funções puras: validar a coerência entre prioridade e due_at conforme D-05, levantando a exceção de domínio do blueprint; sugerir prioridade pela proximidade do prazo a partir de uma data/hora de referência recebida como parâmetro, pela tabela do blueprint) e tests/test_priority_advisor.py (cada regra e seus limites exatos; tarefa aberta sem prazo; prazo no passado; due_at com fuso diferente de UTC; combinações coerentes e incoerentes).
+Estilo: Sem importar banco, repository, FastAPI, nem chamar datetime.now() dentro das regras; tipos TaskPriority de task_schemas; docstrings com a regra em português.
+Resposta: Código dos arquivos e saída da definição de pronto.
+
+
+---
+
+Execução: Claude Sonnet 5.5 (claude-sonnet-5-5), via Claude Code
+Data de execução: 06/10/2026
+
+Resumo da execução:
+
+1. Lidos o prompt, docs/blueprint-v040.md (passo 1, seções 2.2, 5.1 e 5.2) e o CLAUDE.md; conferidos o estilo do service e das DTs existentes.
+2. Criado app/services/priority_advisor.py conforme o blueprint: constantes MANDATORY_WINDOW, IMPORTANT_WINDOW e REGULAR_WINDOW; exceção IncoherentPriorityError; ensure_priority_is_coherent e suggest_priority, com docstrings em português. Só importa datetime e task_schemas; não lê o relógio.
+3. Criado tests/test_priority_advisor.py com os 8 testes do blueprint (22 casos): REFERENCE_TIME no topo, sem fixture; limites exatos de cada faixa, tarefa aberta, tarefa concluída, prazo vencido, fuso -03:00 e datas sem fuso.
+4. Registrada a DT-09 em docs/decisoes.md.
+5. Definição de pronto: python -m pytest -W error: 91 passed (69 + 22); python -m mypy --explicit-package-bases app: Success, no issues found in 18 source files.
+6. Sem divergência do blueprint. Sem commit.
