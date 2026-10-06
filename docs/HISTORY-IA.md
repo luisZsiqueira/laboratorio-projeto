@@ -377,6 +377,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - divisão de papéis entre modelos: o Opus 5.5 desenhou (Prompt 21) e fechou (Prompt 24) a *release*, e o Sonnet 5.5 executou o *blueprint* (Prompts 22 e 23) sem participar do desenho;
   - a execução seguiu o *blueprint* sem divergência de código, o que valida a regra de *blueprint* executável do `CLAUDE.md`.
 - **Ganho percebido acumulado:** ~6 h (soma das estimativas dos Prompts 21 a 24).
+- **Horas reais:** 4 h, informadas pelo autor em 06/10/2026, contra 4 h estimadas no backlog.
 - **Lição principal:** o protótipo executado antes do *blueprint* evitou os erros típicos de primeira execução: `ResourceWarning`, `tasks.db` criado pelos testes e configuração lida na importação. Com isso, o modelo de execução chegou ao verde em cada passo sem improvisar. As interrupções de API mostraram outro valor do *blueprint* persistido: ele permite retomar o trabalho a partir do disco.
 
 ## Entradas da release v0.3.0
@@ -469,11 +470,15 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - `docs/arquitetura.md`: diagramas de módulos, `POST /tasks`, erros em `/tasks/{id}`, modelo de dados e testes ajustados ao código, conferidos contra as importações reais de `app/`; antes e depois em `docs/mermaid.md`;
   - `docs/escopo-mvp.md` com D-01 a D-04 incorporadas aos requisitos; backlog, `CHANGELOG.md`, este histórico, estrutura do `CLAUDE.md`, status do *blueprint* e ordem das DTs em `docs/decisoes.md`.
 - **Prompt:** [`prompts/Prompt 31 - fechamento da v0.3.0`](../prompts/Prompt%2031%20-%20fechamento%20da%20v0.3.0)
-- **Refinamentos:** uma interrupção por erro de conexão; retomada a partir do estado em disco.
+- **Refinamentos:**
+  - uma interrupção por erro de conexão durante o fechamento; retomada a partir do estado em disco;
+  - outra queda de conexão logo depois do *push* impediu o relatório final. Numa sessão nova, a IA conferiu o estado publicado, rodou a definição de pronto em clone limpo, validou os diagramas no GitHub e registrou as horas reais informadas pelo autor.
 - **Ganho percebido:** ~1,5 h
 - **Desafios:**
-  - **Validação dos diagramas.** A validação de sintaxe pelo mermaid.ink, usada na `v0.2.0`, foi bloqueada pelo modo automático do Claude Code, por enviar conteúdo a um serviço externo. A conferência ficou para a renderização no GitHub, depois do *push*.
-  - **Horas reais.** Não medidas pelo assistente; ficam para o autor, como na `v0.2.0`.
+  - **Validação dos diagramas.** A validação de sintaxe pelo mermaid.ink, usada na `v0.2.0`, foi bloqueada pelo modo automático do Claude Code, por enviar conteúdo a um serviço externo. Depois do *push*, a IA abriu `docs/arquitetura.md` da *tag* `v0.3.0` no GitHub pelo Claude in Chrome. Os seis diagramas renderizaram, sem mensagem de erro de sintaxe.
+  - **Horas reais.** O assistente não as mede. O autor informou 4 h para a `v0.2.0` e 8 h para a `v0.3.0`, registradas no backlog. Na `v0.3.0`, cerca de metade do tempo se perdeu com falhas de conexão com a API do Claude, numa internet por *hotspot* compartilhado do celular.
+  - **Estado incerto depois de uma queda.** Com a conexão interrompida logo após o *push*, não dava para saber o que tinha sido concluído. A conferência foi feita por fatos verificáveis: *commits*, *branches* e *tag* no `origin` comparados com os locais, clone limpo e renderização no GitHub. O relato da sessão interrompida não serviu de base.
+- **Resultado do git:** *commits* `3bff3cb` (*blueprint*), `bf0d6c7` (código) e `f068e6e` (fechamento) na *branch* `feat/crud-tarefas`; *merge* `f1aae05` em `main`; *tag* anotada `v0.3.0` e *push* de `main`, da *tag* e da *branch*. A definição de pronto passou em clone limpo da *tag*: 69 testes, mypy sem erros em 17 arquivos e `git status` limpo. O registro foi feito na *branch* `docs/registro-fechamento-v030`.
   - **Separação dos *commits*.** `docs/arquitetura.md` e `CLAUDE.md` tinham mudanças do código (ADR-14, ADR-15, roteiro de checagem) e do fechamento. As versões anteriores ao fechamento foram guardadas antes das edições, para que cada mudança entre no *commit* a que pertence.
 
 ## Release v0.3.0: consolidação
@@ -489,6 +494,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - passo 5: a API rodou com banco temporário e sem `--reload`, em vez do `DATABASE_URL` padrão; o `404` usa `GET /tasks/999` (e o `DELETE` repetido) em vez do `GET` depois do `DELETE`; o `422` usa título só com espaços e prioridade 9 em vez de `{"title": ""}`; o filtro mostra `?status=done`; os títulos são sem acento; o `503` vem dos testes, não da API real; a seção ganhou as tabelas de campos e de erros;
   - passo 6: a sintaxe dos diagramas não foi validada antes do *push*; as DTs foram reordenadas; o `CLAUDE.md` passou a apontar onde está a rodada de checagem de 05/10/2026.
 - **Ganho percebido acumulado:** ~9,5 h (soma das estimativas dos Prompts 25 a 31).
+- **Horas reais:** 8 h, informadas pelo autor, contra 6,5 h estimadas no backlog. Segundo o autor, o trabalho caberia em 3 a 4 h. O excedente veio de falhas de conexão com a API do Claude numa internet por *hotspot* compartilhado do celular, que forçaram retomadas de execução.
 - **Lição principal:** a execução em ambiente real encontrou o que testes e protótipo não mostram: a página de código do Git Bash, o comportamento do `Invoke-RestMethod` em erro e o bloqueio de arquivo no Windows. Documentar exemplos executados, e não inventados, transformou esses atritos em ressalvas úteis para o avaliador.
 
 ## Observações transversais
