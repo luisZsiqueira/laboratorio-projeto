@@ -22,7 +22,14 @@ Resumo da execução:
 8. CHANGELOG.md: seção 0.4.0 (feat e docs), com a mudança de contrato das datas e os itens que estavam em [Não publicado].
 9. docs/HISTORY-IA.md: entradas dos Prompts 32 e 35 (a do 33 e a do 34 já existiam) e consolidação da release; docs/blueprint-v040.md com status de executado.
 
-Divergências do blueprint: listadas na consolidação da v0.4.0 em docs/HISTORY-IA.md.
+10. Também alterados: docs/blueprint-v040.md (status de executado) e este arquivo (texto do prompt e registro da execução); fins de linha dos Prompts 33 e 34 normalizados para CRLF.
+
+Divergências do blueprint (também na consolidação da v0.4.0 em docs/HISTORY-IA.md):
+
+- Passos 1 a 4: nenhuma de código.
+- Passo 5: o exemplo de filtro combinado do README usa ?status=done&priority=1 (lista não vazia), em vez de só ?status=pending&priority=2 (lista vazia, citado no texto); os exemplos de prioridade 4, de 422 e de filtro foram executados no fim da sequência, o que o README informa.
+- Passo 6: o README ganhou duas limitações além das previstas (sugestão que muda com o tempo; 422 de formato de due_at com duas entradas, uma delas com o nome interno parse_local_due_at no loc); os diagramas de erros em /tasks/{id} e de testes não mudaram, só o texto das seções; a sintaxe dos três diagramas alterados não foi validada antes do push e foi conferida depois, no GitHub, sem erro.
+- Fora do blueprint: o arquivo deste prompt estava vazio, e o texto foi copiado de prompts/prompts-desenvolvimento.md.
 
 Interações seguintes (06/10/2026, Claude Opus 5.5):
 
