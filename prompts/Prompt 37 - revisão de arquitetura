@@ -1,0 +1,44 @@
+Contexto: docs/blueprint-v050.md aprovado. Item RT-11; diagrama de módulos de docs/arquitetura.md (seção 2) e DTs de docs/decisoes.md.
+Objetivo: Conferir cada import de app/ contra o diagrama de módulos: nenhuma dependência para cima (rotas sem repository nem banco; services sem FastAPI ou Starlette; repositories sem services; models sem lógica; main.py só composição); funções com mais de uma responsabilidade ou acima de cerca de 30 linhas; conjuntos fechados sem Literal; nomes fora da nomenclatura semântica. Corrigir no código o que for desvio; registrar em docs/arquitetura.md (ajuste pontual ou novo ADR) o que for decisão; promover a ADR as DTs estruturais; atualizar docs/mermaid.md se um diagrama mudar.
+Estilo: Checklist com arquivo, linha, desvio e ação tomada; sem refatoração além dos desvios encontrados; testes existentes continuam passando sem alteração de comportamento.
+Resposta: Checklist, diffs aplicados e saída da definição de pronto.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 06/10/2026
+
+Resumo da execução (passo 1 do docs/blueprint-v050.md, RT-11):
+
+1. Status do blueprint atualizado para aprovado, conforme o contexto deste prompt.
+2. Levantamento automático por script (ast) de todas as importações de app/, comparadas com as arestas do diagrama de módulos de docs/arquitetura.md (seção 2): 28 importações internas, todas presentes no diagrama, e nenhuma aresta do diagrama sem importação correspondente.
+3. Contagem de linhas de código por função (sem docstring) e de docstrings por classe e função.
+4. Nenhum desvio de código encontrado; nenhuma alteração em app/ ou tests/.
+5. Ações de documentação previstas no blueprint (seção 5): ADR-19 e ADR-20 em docs/arquitetura.md; citação da DT-05 no ADR-15 e da DT-11 no ADR-17; linha "Promovida ao ADR-NN" nas DT-01, DT-04, DT-12, DT-13 e DT-15; tabela da seção 1 e subgrafo app/models do diagrama de módulos ajustados ao ADR-20; antes e depois em docs/mermaid.md.
+6. Definição de pronto: python -m pytest -W error: 134 passed; python -m mypy --explicit-package-bases app: Success, no issues found in 18 source files.
+
+Checklist:
+
+| # | Arquivo e linha | Regra conferida (fonte) | Desvio | Evidência | Ação |
+| --- | --- | --- | --- | --- | --- |
+| 1 | todos (app/) | importações internas iguais ao diagrama de módulos (arquitetura.md, seção 2) | nenhum | script ast: 28 importações internas, todas com aresta no diagrama; nenhuma aresta sem importação | sem ação |
+| 2 | app/api/task_routes.py:15, app/api/health_routes.py:7 | rotas sem repository nem consulta ao banco (CLAUDE.md, ADR-01) | nenhum | só get_db, usado em Depends; nenhuma chamada a session nas rotas; nenhuma importação de task_repository | sem ação |
+| 3 | app/api/task_routes.py:4, app/api/health_routes.py:4 | idem | nenhum | from sqlalchemy.orm import Session só para anotar o parâmetro de Depends(get_db) (seta pontilhada do diagrama) | sem ação |
+| 4 | app/api/error_handlers.py:5 | idem | nenhum | importa SQLAlchemyError só para traduzi-la em 500 (ADR-15); não acessa o banco | sem ação |
+| 5 | app/services/*.py | services sem FastAPI nem Starlette (CLAUDE.md, ADR-01, ADR-16) | nenhum | importações externas dos services: só sqlalchemy.orm.Session (task_service.py:5, health_service.py:1) | sem ação |
+| 6 | app/services/task_service.py:17 | services usam o repository por injeção (ADR-14) | nenhum | TaskRepository usado só em build_task_service; casos de uso dependem de TaskStore | sem ação |
+| 7 | app/repositories/*.py | repositories sem services (CLAUDE.md) | nenhum | importações internas: models (base, settings, task, task_schemas) | sem ação |
+| 8 | app/models/*.py | models sem importar camadas acima (CLAUDE.md) | nenhum | importações internas só entre models (task → base, task_schemas) | sem ação |
+| 9 | app/models/base.py:25, app/models/task_schemas.py:23 e :48 | models sem lógica (CLAUDE.md, ADR-01) | conversões de tipo (UTCDateTime) e de formato (convert_priority_text, parse_local_due_at) nos models | leitura dos três trechos: só conversão, sem regra de negócio | registrado em docs/arquitetura.md (ADR-20, tabela da seção 1, diagrama de módulos); CLAUDE.md corrigido no passo 5 |
+| 10 | app/models/task_schemas.py:153 | idem | nenhum | reject_null é validação de entrada do esquema (DT-05) | sem ação |
+| 11 | app/main.py:14 | main.py só composição (CLAUDE.md) | nenhum | create_app cria a aplicação, define a documentação por ambiente (ADR-08), grava settings em app.state, registra rotas e tradutores; lifespan cria tabelas (ADR-05) | sem ação; composição registrada no ADR-19 |
+| 12 | todos (app/) | funções com uma responsabilidade e até cerca de 30 linhas (CLAUDE.md) | nenhum | maior função: create_app com 17 linhas de código; build_task_read com 15 e patch_task com 13 orquestram um único caso de uso | sem ação |
+| 13 | todos (app/) | conjuntos fechados com Literal (CLAUDE.md) | nenhum | TaskStatus, TaskPriority (task_schemas.py:14-15), Environment (settings.py:7), HealthStatus (health_schemas.py:5); campos str restantes são texto livre ou URL | sem ação |
+| 14 | todos (app/) | nomenclatura semântica (CLAUDE.md) | nenhum | nomes de variáveis levantados por ast; nenhum data, obj, tmp, helper ou utils isolado; task_data é qualificado pelo domínio; value aparece só em validadores e TypeDecorator, assinatura exigida pelo Pydantic e pelo SQLAlchemy | sem ação |
+| 15 | todos (app/) | docstrings em classes e funções públicas (CLAUDE.md) | nenhum | contagem por ast: todas com docstring; só lifespan, função interna de create_app, não tem | sem ação (conferido de novo no passo 4) |
+| 16 | docs/decisoes.md | promoção de DT a ADR (blueprint, seção 5) | DT-01, DT-15, DT-04, DT-12 e DT-13 estruturais sem ADR | tabela da seção 5 do blueprint, confirmada pela leitura do código | registrado: ADR-19 e ADR-20; linha "Promovida" nas DTs; citação da DT-05 no ADR-15 e da DT-11 no ADR-17 |
+
+Divergências do blueprint: nenhuma.
+
+Git: alterações na branch refactor/revisao-v050, sem commit.

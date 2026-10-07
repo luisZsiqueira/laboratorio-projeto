@@ -52,6 +52,8 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 33 | 06/10/2026 | Código / testes | `priority_advisor` (funções puras), DT-09, 22 testes unitários | ~1 h |
 | 34 | 06/10/2026 | Código / testes / documentação | integração do *advisor* ao *service* e às rotas, filtro por prioridade, datas no horário local, DT-10 a DT-15, ADR-16 a ADR-18, exemplos do README, 43 testes | ~3,5 h |
 | 35 | 06/10/2026 | Documentação / fechamento de *release* | README, diagramas, escopo, backlog, `CHANGELOG.md`, este histórico | ~1,5 h |
+| 36 | 06/10/2026 | Planejamento / *blueprint* | `docs/blueprint-v050.md` (revisão), com levantamento prévio no código | ~1 h |
+| 37 | 06/10/2026 | Revisão de arquitetura | checklist de 16 verificações, ADR-19 e ADR-20, sem desvio de código | ~1 h |
 
 ## Entradas
 
@@ -583,6 +585,40 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Ganho percebido acumulado:** ~9 h (soma das estimativas dos Prompts 32 a 35).
 - **Horas reais:** 3 h, informadas pelo autor, contra 7,25 h estimadas (5,75 h dos itens, mais *blueprint* e fechamento). Foi a primeira *release* abaixo da estimativa; a projeção do projeto caiu para cerca de 22 h.
 - **Lição principal:** o *blueprint* executável, com protótipo prévio, transferiu o risco para o planejamento: os seis problemas encontrados no protótipo (formato da *query string*, base de fusos no Windows, conversões do Pydantic, teste antigo invalidado) foram resolvidos antes da execução, e o modelo de execução seguiu os passos sem improvisar. A mudança de escopo pedida pelo autor (D-09) entrou pelo mesmo caminho: decisão registrada, custo estimado e testes previstos.
+
+## Entradas da release v0.5.0
+
+### Prompt 36: *blueprint* da `v0.5.0`
+
+- **Data:** 06/10/2026
+- **Fase:** planejamento da *release* `v0.5.0` (revisão)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - leitura do backlog (RT-11 a RT-14), das DT-01 a DT-15, dos ADR-01 a ADR-18 e dos Prompts 37 a 40 planejados;
+  - levantamento prévio no código, para que o *blueprint* não deixasse decisões em aberto: importações por camada, tamanho das funções, SQL textual, testes de erro existentes e conversões em `app/models/`;
+  - `docs/blueprint-v050.md`: ordem das revisões, critérios copiados do backlog, forma do checklist, regra de decisão entre código e documento, critério de promoção de DT a ADR já aplicado (ADR-19 e ADR-20), limites, condição de parada e estimativa (4 h).
+- **Prompt:** [`prompts/Prompt 36 - blueprint da v0.5.0`](../prompts/Prompt%2036%20-%20blueprint%20da%20v0.5.0)
+- **Refinamentos:** nenhum; aprovado pelo autor ao pedir o Prompt 37.
+- **Ganho percebido:** ~1 h
+- **Desafios:**
+  - **Regra genérica contra código real.** O `CLAUDE.md` diz "modelos sem lógica", e o código tem três conversões em `app/models/`. A IA não as tratou como desvio a corrigir: propôs registrar a exceção (ADR-20), porque movê-las mudaria o contrato do `422`.
+  - **Detalhe interno no `422`.** O nome `parse_local_due_at` no `loc` foi classificado pela regra escrita (*stack trace*, SQL, caminho) e não por impressão, com a decisão (R-05) deixada para o autor confirmar.
+
+### Prompt 37: revisão de arquitetura
+
+- **Data:** 06/10/2026
+- **Fase:** revisão (passo 1 do `docs/blueprint-v050.md`, RT-11)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - comparação automática (*script* com `ast`) das 28 importações internas de `app/` com as arestas do diagrama de módulos, sem divergência;
+  - contagem de linhas por função, de *docstrings* e levantamento dos nomes de variáveis;
+  - checklist de 16 verificações com evidência; ADR-19 e ADR-20, citações nos ADR-15 e ADR-17, DTs marcadas como promovidas e diagrama de módulos com o antes e o depois em `docs/mermaid.md`.
+- **Prompt:** [`prompts/Prompt 37 - revisão de arquitetura`](../prompts/Prompt%2037%20-%20revis%C3%A3o%20de%20arquitetura)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~1 h
+- **Desafios:**
+  - **Nenhum desvio de código.** As camadas foram respeitadas desde a `v0.2.0`; o resultado da revisão foi só documental. A comparação por *script*, e não por leitura, dá a evidência de que nenhuma importação ficou de fora.
+  - **Edição por *script*.** A inserção das linhas "Promovida" falhou na DT-13, que tem a mesma linha de IDs da DT-14; a edição passou a ser feita pela posição de cada DT, sem efeito parcial no arquivo.
 
 ## Observações transversais
 

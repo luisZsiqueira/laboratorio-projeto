@@ -10,6 +10,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `importlib.reload` de `app.main` com variáveis de ambiente alteradas, porque é frágil e depende da ordem dos testes.
 - **Consequências:** `app/main.py` continua só com composição. Cada teste tem sua própria instância da aplicação, sem estado compartilhado. O *engine* do módulo `database.py` nunca conecta nos testes.
 - **IDs relacionados:** RT-03, RT-04, RF-13, ADR-05, ADR-08.
+- **Promovida ao ADR-19** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-02: `get_settings()` com `lru_cache(maxsize=1)`
 
@@ -37,6 +38,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `DateTime(timezone=True)`, porque o SQLite não guarda fuso e a leitura volta sem `tzinfo`; conversão no *service*, porque deixaria a leitura direta do banco sem fuso e espalharia a regra fora dos modelos.
 - **Consequências:** a conversão fica num único ponto e é coberta por testes de persistência. Valores gravados são sempre UTC; um fuso diferente só existe na entrada da API, onde `AwareDatetime` o exige e a conversão para UTC acontece na gravação.
 - **IDs relacionados:** RT-05, ADR-10.
+- **Promovida ao ADR-20** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-05: `TaskPatch` com campos opcionais e rejeição de `null` em campos obrigatórios
 
@@ -109,6 +111,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `int` com `Query(ge=1, le=4)`, porque o `CLAUDE.md` exige `Literal` para conjuntos fechados; `BeforeValidator(int)`, porque a mensagem de `?priority=alta` exporia o texto interno do `int()`.
 - **Consequências:** os corpos JSON continuam com `TaskPriority`: `{"priority": "1"}` segue respondendo `422`.
 - **IDs relacionados:** RF-14, D-06, ADR-17.
+- **Promovida ao ADR-20** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-13: `due_at` na entrada aceita três formatos (`TaskDueAt`)
 
@@ -118,6 +121,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** aceitar ISO só com a data, porque o Pydantic o converte para 00:00 (o oposto de "até o fim do dia"); 23:59:59, porque 23:59 é mais legível e não muda a sugestão.
 - **Consequências:** o esquema devolve datas sem fuso para os formatos locais; quem acrescenta o fuso é o *service* (`attach_timezone`, ADR-18). Não fica registrado que o usuário informou só o dia.
 - **IDs relacionados:** RF-09, D-09, ADR-18.
+- **Promovida ao ADR-20** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-14: `LOCAL_UTC_OFFSET` como texto `±HH:MM` e deslocamento fixo
 
@@ -136,3 +140,4 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `Depends(get_settings)` na rota, porque leria o ambiente e o `.env` da máquina, e não as `Settings` passadas a `create_app`.
 - **Consequências:** cada aplicação usa as suas configurações; a anotação `Settings` na leitura de `app.state` é o único ponto sem verificação estática de tipo.
 - **IDs relacionados:** RF-09, D-09, ADR-18, DT-01, DT-02.
+- **Promovida ao ADR-19** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).

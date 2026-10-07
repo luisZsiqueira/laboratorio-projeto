@@ -1,0 +1,18 @@
+Contexto: Release v0.5.0 (revisão) do backlog: RT-11 a RT-14. Código completo das releases v0.2.0 a v0.4.0 em main; DTs em docs/decisoes.md; horas reais acumuladas no backlog.
+Objetivo: Escrever docs/blueprint-v050.md: ordem das revisões (arquitetura, segurança, documentação e dependências), critérios de aceite de cada uma copiados do backlog, forma do checklist de cada revisão (arquivo, linha, desvio, evidência, ação), regra de decisão para corrigir no código ou registrar em documento, critério para promover uma DT a ADR, limites do que pode ser alterado (sem funcionalidade nova, sem dependência nova) e estimativa frente às 2,5 h.
+Estilo: Blueprint curto; sem decisões em aberto; sem código.
+Resposta: Apenas docs/blueprint-v050.md, para aprovação. Git: branch refactor/revisao-v050 a partir de main; adicionar; não comitar.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 06/10/2026
+
+Resumo da execução:
+
+1. Lidos docs/backlog.md (seções 2 e 4.4, RT-11 a RT-14), as DT-01 a DT-15 de docs/decisoes.md, os ADR-01 a ADR-18 de docs/arquitetura.md, o requirements.txt e os Prompts 37 a 40 planejados em prompts/prompts-desenvolvimento.md.
+2. Levantamento prévio no código, para que o blueprint não deixe decisões em aberto: importações de app/ conferidas contra as camadas (nenhuma dependência para cima); nenhuma função de app/ acima de 20 linhas de código; SQL textual só em text("SELECT 1"); testes de 404, 422, 500, 503 e documentação em produção já existentes; conversões de formato em app/models/ (UTCDateTime, convert_priority_text, parse_local_due_at), em conflito com a frase "modelos sem lógica".
+3. Gerado docs/blueprint-v050.md: ordem das revisões (arquitetura, segurança, dependências, documentação, fechamento), critérios de aceite copiados do backlog, forma do checklist (arquivo e linha, regra, desvio, evidência, ação), regra de decisão entre código e documento, critério de promoção de DT a ADR já aplicado às DT-01 a DT-15 (ADR-19: composição da aplicação, de DT-01 e DT-15; ADR-20: conversão de formato em app/models/, de DT-04, DT-12 e DT-13), limites do que pode mudar, condição de parada, riscos e estimativa (2,5 h dos itens, 4 h da release, projeção de cerca de 22 h).
+4. Decisões do assistente a confirmar na aprovação: R-05 (o nome parse_local_due_at no loc do 422 de formato não é detalhe interno proibido; fica documentado como limitação) e R-06 (nenhuma atualização de versão sem vulnerabilidade ou defeito que afete o projeto).
+5. Git: branch refactor/revisao-v050 criada a partir de main; blueprint e este arquivo adicionados ao stage; sem commit.
