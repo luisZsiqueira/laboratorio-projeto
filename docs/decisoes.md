@@ -10,6 +10,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `importlib.reload` de `app.main` com variáveis de ambiente alteradas, porque é frágil e depende da ordem dos testes.
 - **Consequências:** `app/main.py` continua só com composição. Cada teste tem sua própria instância da aplicação, sem estado compartilhado. O *engine* do módulo `database.py` nunca conecta nos testes.
 - **IDs relacionados:** RT-03, RT-04, RF-13, ADR-05, ADR-08.
+- **Promovida ao ADR-19** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-02: `get_settings()` com `lru_cache(maxsize=1)`
 
@@ -37,6 +38,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `DateTime(timezone=True)`, porque o SQLite não guarda fuso e a leitura volta sem `tzinfo`; conversão no *service*, porque deixaria a leitura direta do banco sem fuso e espalharia a regra fora dos modelos.
 - **Consequências:** a conversão fica num único ponto e é coberta por testes de persistência. Valores gravados são sempre UTC; um fuso diferente só existe na entrada da API, onde `AwareDatetime` o exige e a conversão para UTC acontece na gravação.
 - **IDs relacionados:** RT-05, ADR-10.
+- **Promovida ao ADR-20** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-05: `TaskPatch` com campos opcionais e rejeição de `null` em campos obrigatórios
 
@@ -109,6 +111,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `int` com `Query(ge=1, le=4)`, porque o `CLAUDE.md` exige `Literal` para conjuntos fechados; `BeforeValidator(int)`, porque a mensagem de `?priority=alta` exporia o texto interno do `int()`.
 - **Consequências:** os corpos JSON continuam com `TaskPriority`: `{"priority": "1"}` segue respondendo `422`.
 - **IDs relacionados:** RF-14, D-06, ADR-17.
+- **Promovida ao ADR-20** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-13: `due_at` na entrada aceita três formatos (`TaskDueAt`)
 
@@ -118,6 +121,7 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** aceitar ISO só com a data, porque o Pydantic o converte para 00:00 (o oposto de "até o fim do dia"); 23:59:59, porque 23:59 é mais legível e não muda a sugestão.
 - **Consequências:** o esquema devolve datas sem fuso para os formatos locais; quem acrescenta o fuso é o *service* (`attach_timezone`, ADR-18). Não fica registrado que o usuário informou só o dia.
 - **IDs relacionados:** RF-09, D-09, ADR-18.
+- **Promovida ao ADR-20** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
 
 ## DT-14: `LOCAL_UTC_OFFSET` como texto `±HH:MM` e deslocamento fixo
 
@@ -136,3 +140,22 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Alternativas descartadas:** `Depends(get_settings)` na rota, porque leria o ambiente e o `.env` da máquina, e não as `Settings` passadas a `create_app`.
 - **Consequências:** cada aplicação usa as suas configurações; a anotação `Settings` na leitura de `app.state` é o único ponto sem verificação estática de tipo.
 - **IDs relacionados:** RF-09, D-09, ADR-18, DT-01, DT-02.
+- **Promovida ao ADR-19** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
+
+## DT-16: `task_id` limitado ao maior `INTEGER` do SQLite (`TaskId`)
+
+- **Data e *release*:** 07/10/2026, `v0.5.0` (revisão de segurança, Prompt 38).
+- **Contexto:** o parâmetro de rota `task_id: int` aceitava qualquer inteiro. Acima de `2**63 - 1`, o driver `sqlite3` levanta `OverflowError`, que não é `SQLAlchemyError`, não passa pelos tradutores do ADR-15 e virava `500` não tratado (corpo `Internal Server Error`, sem detalhe interno, mas fora do contrato).
+- **Decisão:** `MAX_TASK_ID = 2**63 - 1` e `TaskId = Annotated[int, Field(le=MAX_TASK_ID)]` em `app/models/task_schemas.py`; as cinco rotas de `/tasks/{task_id}` usam `TaskId`. Valor acima do limite responde `422` no formato padrão do FastAPI, como o `id` não numérico.
+- **Alternativas descartadas:** `Path(le=...)` do FastAPI no tipo, porque levaria a importação do FastAPI para `app/models/`; tradutor de `OverflowError` em `error_handlers.py`, porque trataria como falha interna (`500`) uma entrada inválida; limite inferior (`ge=1`), porque `id` zero ou negativo já responde `404` e mudá-lo alteraria o contrato sem motivo de segurança.
+- **Consequências:** toda entrada de rota tem limite (RNF-08); `id` zero ou negativo continua respondendo `404`.
+- **IDs relacionados:** RT-12, RNF-08, ADR-15.
+
+## DT-17: engine com `hide_parameters=True`
+
+- **Data e *release*:** 07/10/2026, `v0.5.0` (revisão de segurança, Prompt 38).
+- **Contexto:** o tradutor do `500` grava a exceção do SQLAlchemy no log (ADR-15). Por padrão, a mensagem dessa exceção traz os parâmetros da consulta, ou seja, os valores enviados pelo cliente (`[parameters: ('título', 'descrição', ...)]`).
+- **Decisão:** `create_db_engine` cria o engine com `hide_parameters=True`; o log mantém o tipo do erro e o SQL (sem valores), e mostra `[SQL parameters hidden due to hide_parameters=True]` no lugar dos parâmetros.
+- **Alternativas descartadas:** filtrar a mensagem no tradutor de erros, porque dependeria do formato do texto do SQLAlchemy; deixar de registrar a exceção, porque o diagnóstico da falha depende do log.
+- **Consequências:** logs sem dados do usuário (RNF-10); o diagnóstico de uma falha não mostra o valor que a causou. Os *engines* dos testes, criados com `create_engine` direto, não são afetados; o teste da DT-17 usa `create_db_engine`.
+- **IDs relacionados:** RT-12, RNF-10, ADR-04, ADR-15.

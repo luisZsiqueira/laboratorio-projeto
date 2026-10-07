@@ -1,6 +1,6 @@
 # Diagramas Mermaid
 
-> **Status:** catálogo criado na revisão dos diagramas de 04/10/2026 (Prompt 12) e atualizado nos fechamentos da `v0.2.0` (05/10/2026, Prompt 24) da `v0.3.0` (06/10/2026, Prompt 31) e da `v0.4.0` (06/10/2026, Prompt 35). A cada nova revisão, acrescentar uma seção com o antes e o depois.
+> **Status:** catálogo criado na revisão dos diagramas de 04/10/2026 (Prompt 12) e atualizado nos fechamentos da `v0.2.0` (05/10/2026, Prompt 24) da `v0.3.0` (06/10/2026, Prompt 31) da `v0.4.0` (06/10/2026, Prompt 35) e na revisão de arquitetura da `v0.5.0` (06/10/2026, Prompt 37). A cada nova revisão, acrescentar uma seção com o antes e o depois.
 
 Este arquivo é o histórico visual dos diagramas do projeto: mostra cada diagrama **antes** e **depois** de uma revisão, com o que mudou e por quê. A versão oficial de cada diagrama continua no arquivo de origem, indicado em cada item: [`docs/arquitetura.md`](arquitetura.md) ou o [`README.md`](../README.md). Quem altera um diagrama atualiza os dois lugares (regra do [`CLAUDE.md`](../CLAUDE.md)).
 
@@ -1244,4 +1244,154 @@ erDiagram
         datetime created_at "UTC no banco e fuso local na API, definido na criação"
         datetime updated_at "UTC no banco e fuso local na API, atualizado a cada alteração"
     }
+```
+
+## Revisão de 06/10/2026 (Prompt 37, revisão de arquitetura da `v0.5.0`)
+
+A revisão conferiu cada importação de `app/` contra o diagrama de módulos: todas as arestas existem no código e todas as importações internas estão no diagrama. A única mudança é de texto, pelo ADR-20. **Antes** é a versão do *commit* `a4d4b5d` (`main` depois da `v0.4.0`); **depois** é a versão oficial atual de [`docs/arquitetura.md`](arquitetura.md).
+
+| # | Diagrama | Origem | Resultado | Motivo |
+| --- | --- | --- | --- | --- |
+| 1 | Módulos e dependências | `arquitetura.md`, seção 2 | **alterado** | rótulo do subgrafo `app/models` de "sem lógica" para "sem regra de negócio" (ADR-20) |
+
+Os demais diagramas não mudaram.
+
+### 1. Módulos e dependências: alterado
+
+**O que mudou:** só o rótulo do subgrafo `app/models`. Nenhuma aresta mudou, então não há destaque de aresta; rótulos de subgrafo não aceitam destaque.
+
+**Antes**
+
+```mermaid
+flowchart TD
+    main["main.py"]
+
+    subgraph api["app/api (controller)"]
+        task_routes["task_routes.py"]
+        health_routes["health_routes.py"]
+        error_handlers["error_handlers.py<br/>404, 422 e 500"]
+    end
+
+    subgraph services["app/services (regras de negócio)"]
+        task_service["task_service.py"]
+        priority_advisor["priority_advisor.py<br/>funções puras"]
+        health_service["health_service.py"]
+    end
+
+    subgraph repositories["app/repositories (acesso ao banco)"]
+        task_repository["task_repository.py"]
+        database["database.py<br/>engine, get_db, ping"]
+    end
+
+    subgraph models["app/models (estruturas, sem lógica)"]
+        task_schemas["task_schemas.py"]
+        health_schemas["health_schemas.py"]
+        task["task.py"]
+        base["base.py<br/>Base, UTCDateTime, utc_now"]
+        settings["settings.py"]
+    end
+
+    db[("SQLite3")]
+
+    main --> task_routes
+    main --> health_routes
+    main -->|"create_tables, engine"| database
+    main --> settings
+    main -->|"register_error_handlers"| error_handlers
+
+    task_routes --> task_service
+    task_routes --> task_schemas
+    task_routes -->|"Settings"| settings
+    health_routes --> health_service
+    health_routes --> health_schemas
+    task_routes -.->|"Depends(get_db)"| database
+    health_routes -.->|"Depends(get_db)"| database
+    error_handlers -->|"TaskNotFoundError"| task_service
+    error_handlers -->|"IncoherentPriorityError"| priority_advisor
+
+    task_service -->|"ensure_priority_is_coherent, suggest_priority"| priority_advisor
+    task_service --> task_repository
+    task_service --> task_schemas
+    task_service --> task
+    task_service -->|"utc_now"| base
+    priority_advisor -->|"TaskPriority, TaskStatus"| task_schemas
+    health_service --> database
+    health_service --> health_schemas
+
+    task_repository --> task
+    task_repository -->|"TaskStatus, TaskPriority"| task_schemas
+    database --> base
+    database --> settings
+    task --> base
+    task -->|"TaskStatus, TaskPriority"| task_schemas
+
+    database --> db
+```
+
+**Depois**
+
+```mermaid
+flowchart TD
+    main["main.py"]
+
+    subgraph api["app/api (controller)"]
+        task_routes["task_routes.py"]
+        health_routes["health_routes.py"]
+        error_handlers["error_handlers.py<br/>404, 422 e 500"]
+    end
+
+    subgraph services["app/services (regras de negócio)"]
+        task_service["task_service.py"]
+        priority_advisor["priority_advisor.py<br/>funções puras"]
+        health_service["health_service.py"]
+    end
+
+    subgraph repositories["app/repositories (acesso ao banco)"]
+        task_repository["task_repository.py"]
+        database["database.py<br/>engine, get_db, ping"]
+    end
+
+    subgraph models["app/models (estruturas, sem regra de negócio)"]
+        task_schemas["task_schemas.py"]
+        health_schemas["health_schemas.py"]
+        task["task.py"]
+        base["base.py<br/>Base, UTCDateTime, utc_now"]
+        settings["settings.py"]
+    end
+
+    db[("SQLite3")]
+
+    main --> task_routes
+    main --> health_routes
+    main -->|"create_tables, engine"| database
+    main --> settings
+    main -->|"register_error_handlers"| error_handlers
+
+    task_routes --> task_service
+    task_routes --> task_schemas
+    task_routes -->|"Settings"| settings
+    health_routes --> health_service
+    health_routes --> health_schemas
+    task_routes -.->|"Depends(get_db)"| database
+    health_routes -.->|"Depends(get_db)"| database
+    error_handlers -->|"TaskNotFoundError"| task_service
+    error_handlers -->|"IncoherentPriorityError"| priority_advisor
+
+    task_service -->|"ensure_priority_is_coherent, suggest_priority"| priority_advisor
+    task_service --> task_repository
+    task_service --> task_schemas
+    task_service --> task
+    task_service -->|"utc_now"| base
+    priority_advisor -->|"TaskPriority, TaskStatus"| task_schemas
+    health_service --> database
+    health_service --> health_schemas
+
+    task_repository --> task
+    task_repository -->|"TaskStatus, TaskPriority"| task_schemas
+    database --> base
+    database --> settings
+    task --> base
+    task -->|"TaskStatus, TaskPriority"| task_schemas
+
+    database --> db
 ```

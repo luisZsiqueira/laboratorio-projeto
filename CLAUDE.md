@@ -111,16 +111,15 @@ Executar a partir da raiz do repositório, com o ambiente virtual `.venv` ativo:
 
 ```bash
 python -m pytest -W error
-python -m mypy --explicit-package-bases app
 ```
 
-Ambos devem passar, sem avisos. O `-W error` faz avisos de deprecação aparecerem como falha antes de virarem quebra. O `python -m` coloca a raiz do repositório no `sys.path`, o que permite aos testes importar `app` sem `conftest.py` nem arquivo de configuração. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` (ADR-03 e ADR-11 de `docs/arquitetura.md`). Nenhuma tarefa é dada como concluída sem a definição de pronto passando.
+Deve passar, sem avisos. O `-W error` faz avisos de deprecação aparecerem como falha antes de virarem quebra. O `python -m` coloca a raiz do repositório no `sys.path`, o que permite aos testes importar `app` sem `conftest.py` nem arquivo de configuração. Não há checagem estática de tipos por ferramenta: o mypy deixou de ser usado em 07/10/2026 (ADR-21 de `docs/arquitetura.md`), e a tipagem é conferida na revisão de código. Nenhuma tarefa é dada como concluída sem a definição de pronto passando.
 
 ### Reprodutibilidade
 
 O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem conhecimento prévio, instalar, rodar a API e rodar os testes.
 
-- O README (Como rodar) é a interface única de operação, com os comandos em PowerShell e em Bash: criar e ativar o `.venv`, instalar (`python -m pip install -r requirements.txt`), rodar a API em desenvolvimento (`python -m uvicorn app.main:app --reload`), rodar os testes e a checagem de tipos (os comandos da [definição de pronto](#definição-de-pronto)). Não há `Makefile`, `pyproject.toml` nem arquivos de configuração de ferramentas: as opções de `pytest` e `mypy` vão na linha de comando documentada.
+- O README (Como rodar) é a interface única de operação, com os comandos em PowerShell e em Bash: criar e ativar o `.venv`, instalar (`python -m pip install -r requirements.txt`), rodar a API em desenvolvimento (`python -m uvicorn app.main:app --reload`), rodar os testes (o comando da [definição de pronto](#definição-de-pronto)). Não há `Makefile`, `pyproject.toml` nem arquivos de configuração de ferramentas: as opções do `pytest` vão na linha de comando documentada.
 - O `requirements.txt`, com versões fixadas, é a única declaração de dependências.
 - Testes fazem parte da aplicação: versionados em `tests/`, sem depender de estado local, de arquivos fora do repositório ou de serviços externos. Banco sempre em memória nos testes.
 - Ambiente de desenvolvimento em Windows com PowerShell: os comandos do README são testados nele.
@@ -181,7 +180,7 @@ Ao final do projeto, o `HISTORY-IA.md` é a base do histórico de uso de IA exig
 
 - **Nomenclatura semântica.** Nomes dizem o que a coisa é ou faz, no vocabulário do domínio (`task`, `due_at`, `priority`, `mark_task_done`); nada de abreviações opacas, nomes genéricos (`data`, `obj`, `tmp`, `helper`, `utils`) ou sufixos numéricos. Funções com verbo; booleanos com `is_`/`has_`; exceções terminando em `Error`.
 - **Funções coesas.** Cada função faz uma coisa, no nível de abstração da sua camada, com efeitos colaterais explícitos no nome ou na *docstring*. Se precisa de "e" para ser descrita, ou passa de cerca de 30 linhas, é candidata a divisão. Sem parâmetros *flag* que mudam o comportamento da função.
-- **Atenção à tipagem.** *Type hints* em todas as funções, métodos e retornos; o código passa no `mypy`. Sem `Any` nem `# type: ignore` sem justificativa em comentário; ausência explícita com `X | None`; coleções parametrizadas (`list[Task]`); retorno preciso, nunca mais largo que o necessário.
+- **Atenção à tipagem.** *Type hints* em todas as funções, métodos e retornos, conferidos na revisão de código (sem checagem por ferramenta, ADR-21). Sem `Any` nem `# type: ignore` sem justificativa em comentário; ausência explícita com `X | None`; coleções parametrizadas (`list[Task]`); retorno preciso, nunca mais largo que o necessário.
 - *Docstrings* em português em todas as classes e funções públicas (propósito, parâmetros, retorno, exceções).
 - Conjuntos fechados de valores sempre com `typing.Literal` (por exemplo `TaskStatus`, `TaskPriority` e `ENVIRONMENT`). Nunca `str` ou `int` livre para esses casos.
 - Datas e horas sempre *timezone-aware*: em UTC na persistência; na entrada e na saída da API, no fuso local de `LOCAL_UTC_OFFSET` (ADR-18).
@@ -189,7 +188,7 @@ Ao final do projeto, o `HISTORY-IA.md` é a base do histórico de uso de IA exig
   - `app/api/`: rotas; não acessam o banco nem contêm regra de negócio.
   - `app/services/`: regras de negócio, incluindo o `priority_advisor`; não conhecem HTTP.
   - `app/repositories/`: único ponto de acesso ao banco (engine, sessão e consultas); sem regra de negócio.
-  - `app/models/`: modelos ORM, esquemas Pydantic e configurações; sem lógica.
+  - `app/models/`: modelos ORM, esquemas Pydantic e configurações, incluindo conversões de tipo e de formato (`UTCDateTime`, validadores de formato dos esquemas); sem regra de negócio (ADR-20).
   - `app/main.py`: apenas composição (criação da aplicação, `lifespan` e registro das rotas).
 - Configuração só via pydantic-settings (`app/models/settings.py`); nenhum literal de configuração no código.
 - Toda entrada e saída externa passa por esquemas Pydantic v2, com tipos, tamanhos máximos e `Literal`.
@@ -202,7 +201,7 @@ Toda escolha técnica feita durante a implementação que não esteja no *bluepr
 
 - O arquivo é criado com a primeira decisão registrada (não antes), com uma entrada por decisão, numerada `DT-NN`.
 - Cada entrada traz: data e *release*; contexto (o problema); decisão; alternativas consideradas e por que foram descartadas; consequências; IDs relacionados (RF, RT, ADR).
-- Limite com os ADRs: decisão que afeta camadas, dependências entre módulos, persistência ou contrato da API é ADR em `docs/arquitetura.md`; decisão local ao código é DT. Na dúvida, DT, e a revisão da `v0.5.0` promove a ADR o que for estrutural.
+- Limite com os ADRs: decisão que afeta camadas, dependências entre módulos, persistência ou contrato da API é ADR em `docs/arquitetura.md`; decisão local ao código é DT. Na dúvida, DT. A revisão da `v0.5.0` promoveu a ADR as DTs estruturais (DT-01 e DT-15 ao ADR-19; DT-04, DT-12 e DT-13 ao ADR-20); a DT promovida continua em `docs/decisoes.md`, com a linha "Promovida ao ADR-NN".
 - A DT nasce no mesmo *commit* do código que a aplica.
 
 ### APIs deprecadas: roteiro de checagem
@@ -224,11 +223,11 @@ Padrões suspeitos a checar primeiro, por serem os que assistentes de IA costuma
 | `declarative_base()` | `class Base(DeclarativeBase)` | estilo legado, evitar (SQLAlchemy 2.1.3, 04/10/2026): sem aviso; `DeclarativeBase` permitido |
 | cliente HTTP usado pelo `TestClient` (`httpx` vs. sucessor) | `httpx2` (2.13.1): sem ele, o Starlette recorre ao `httpx` e emite aviso de deprecação | proibido `httpx` (Starlette 1.7.0, 03/10/2026); `httpx2` permitido (04/10/2026) |
 | fixture de banco em memória sem `engine.dispose()` | chamar `engine.dispose()` ao final da fixture | proibido (SQLAlchemy 2.1.3, Python 3.14.6, 04/10/2026): `ResourceWarning` (`unclosed database`) vira `PytestUnraisableExceptionWarning`; com `dispose()` permitido |
-| `mypy app` sobre `app/` sem `__init__.py` na raiz | `python -m mypy --explicit-package-bases app` (ADR-11) | proibido `mypy app` (mypy 2.4.0, 04/10/2026): "Source file found twice under different module names"; com `--explicit-package-bases` permitido |
+| `mypy app` sobre `app/` sem `__init__.py` na raiz | `python -m mypy --explicit-package-bases app` (ADR-11) | proibido `mypy app` (mypy 2.4.0, 04/10/2026): "Source file found twice under different module names"; com `--explicit-package-bases` permitido. Não se aplica desde 07/10/2026: mypy removido do projeto (ADR-21) |
 | `status.HTTP_422_UNPROCESSABLE_ENTITY` | `status.HTTP_422_UNPROCESSABLE_CONTENT` no código; o inteiro `422` nos testes | proibido (Starlette 1.7.0, 05/10/2026): `StarletteDeprecationWarning`; `HTTP_422_UNPROCESSABLE_CONTENT` permitido (06/10/2026) |
 | `session.query(...)` | `session.get(Task, task_id)` e `session.scalars(select(Task)...)` | estilo legado, evitar (SQLAlchemy 2.1.3, 05/10/2026): sem aviso; `session.get` e `scalars` permitidos |
 
-Situação possível: "proibido (vX.Y, dd/mm/aaaa)", "permitido (vX.Y, dd/mm/aaaa)" ou "estilo legado, evitar". Os testes mínimos da rodada de 04/10/2026 estão em `docs/release-review-010.md`; a rodada de 05/10/2026 está em `docs/blueprint-v030.md` (seção 5.2) e em `docs/HISTORY-IA.md` (Prompt 25).
+Situação possível: "proibido (vX.Y, dd/mm/aaaa)", "permitido (vX.Y, dd/mm/aaaa)" ou "estilo legado, evitar". Os testes mínimos da rodada de 04/10/2026 estão em `docs/release-review-010.md`; a rodada de 05/10/2026 está em `docs/blueprint-v030.md` (seção 5.2) e em `docs/HISTORY-IA.md` (Prompt 25). Na revisão de 07/10/2026 (`v0.5.0`, Prompt 39), nenhuma versão mudou e a tabela ficou como estava.
 
 ## Testes
 
@@ -262,12 +261,12 @@ laboratorio-projeto/
 │   │   ├── __init__.py
 │   │   ├── task_routes.py     # endpoints de tarefas
 │   │   ├── health_routes.py   # endpoint /health
-│   │   └── error_handlers.py  # tradutores de exceção (404 e 500), registrados na aplicação
-│   ├── models/                # estruturas de dados, sem lógica
+│   │   └── error_handlers.py  # tradutores de exceção (404, 422 de coerência e 500), registrados na aplicação
+│   ├── models/                # estruturas de dados e conversões de formato, sem regra de negócio
 │   │   ├── __init__.py
 │   │   ├── base.py            # Base declarativo, tipo de coluna UTCDateTime e utc_now()
 │   │   ├── task.py            # modelo ORM da tarefa
-│   │   ├── task_schemas.py    # esquemas Pydantic e tipos TaskStatus, TaskPriority
+│   │   ├── task_schemas.py    # esquemas Pydantic e tipos TaskStatus, TaskPriority, TaskId
 │   │   ├── health_schemas.py  # esquema HealthRead e tipo HealthStatus da resposta de /health
 │   │   └── settings.py        # configurações lidas do ambiente/.env (pydantic-settings)
 │   ├── repositories/          # acesso ao banco

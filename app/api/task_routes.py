@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.settings import Settings
 from app.models.task_schemas import (
     TaskCreate,
+    TaskId,
     TaskPatch,
     TaskPriorityQuery,
     TaskRead,
@@ -81,7 +82,7 @@ def list_tasks(
 
 
 @router.get("/{task_id}", responses=NOT_FOUND_RESPONSE)
-def read_task(task_id: int, service: TaskServiceDependency) -> TaskRead:
+def read_task(task_id: TaskId, service: TaskServiceDependency) -> TaskRead:
     """Consulta uma tarefa pelo identificador.
 
     Args:
@@ -96,7 +97,7 @@ def read_task(task_id: int, service: TaskServiceDependency) -> TaskRead:
 
 @router.put("/{task_id}", responses=NOT_FOUND_RESPONSE)
 def replace_task(
-    task_id: int, task_data: TaskUpdate, service: TaskServiceDependency
+    task_id: TaskId, task_data: TaskUpdate, service: TaskServiceDependency
 ) -> TaskRead:
     """Substitui todos os campos editáveis de uma tarefa.
 
@@ -113,7 +114,7 @@ def replace_task(
 
 @router.patch("/{task_id}", responses=NOT_FOUND_RESPONSE)
 def patch_task(
-    task_id: int, task_data: TaskPatch, service: TaskServiceDependency
+    task_id: TaskId, task_data: TaskPatch, service: TaskServiceDependency
 ) -> TaskRead:
     """Altera só os campos enviados de uma tarefa.
 
@@ -129,7 +130,7 @@ def patch_task(
 
 
 @router.post("/{task_id}/complete", responses=NOT_FOUND_RESPONSE)
-def complete_task(task_id: int, service: TaskServiceDependency) -> TaskRead:
+def complete_task(task_id: TaskId, service: TaskServiceDependency) -> TaskRead:
     """Marca a tarefa como concluída; idempotente (D-02).
 
     Args:
@@ -145,7 +146,7 @@ def complete_task(task_id: int, service: TaskServiceDependency) -> TaskRead:
 @router.delete(
     "/{task_id}", status_code=status.HTTP_204_NO_CONTENT, responses=NOT_FOUND_RESPONSE
 )
-def delete_task(task_id: int, service: TaskServiceDependency) -> None:
+def delete_task(task_id: TaskId, service: TaskServiceDependency) -> None:
     """Exclui uma tarefa.
 
     Args:

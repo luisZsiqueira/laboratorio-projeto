@@ -1,0 +1,98 @@
+Contexto: Item RT-12; seção Segurança do CLAUDE.md; RNF-08 a RNF-10.
+Objetivo: Verificar e corrigir: nenhum SQL por concatenação ou f-string (busca por text(, execute( e strings formatadas em app/); toda entrada passando por esquemas Pydantic com limites e Literal, inclusive parâmetros de consulta e de rota; respostas 404, 422, 500 e 503 sem stack trace, SQL ou caminho, com os testes existentes conferidos e completados; documentação desabilitada em production confirmada por teste; varredura de segredos nos arquivos e no histórico (git log -p com padrões de chave, token e senha; .env ausente do repositório); logs sem dados sensíveis.
+Estilo: Checklist com evidência (comando executado e resultado) para cada item; correções mínimas; nenhuma dependência nova.
+Resposta: Checklist, diffs aplicados, testes acrescentados e saída da definição de pronto.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 07/10/2026
+
+Resumo da execução (passo 2 do docs/blueprint-v050.md, RT-12):
+
+1. Buscas por SQL textual e strings formatadas em app/; leitura das rotas, dos esquemas, dos tradutores de erro e das chamadas de log.
+2. Sondagem por script temporário (fora do repositório) das respostas de erro em ENVIRONMENT=production e do conteúdo do log de uma falha real do banco.
+3. Dois desvios encontrados e corrigidos (seção 4, item 1 do blueprint, e o pedido explícito deste prompt):
+   - task_id sem limite superior: GET /tasks/9223372036854775808 levantava OverflowError do driver sqlite3, fora dos tradutores do ADR-15, e respondia 500 não tratado. Corrigido com TaskId = Annotated[int, Field(le=MAX_TASK_ID)] (DT-16); a resposta passa a 422.
+   - log com dados do cliente: a exceção do SQLAlchemy registrada pelo tradutor do 500 trazia "[parameters: ('título', 'descrição', ...)]". Corrigido com hide_parameters=True em create_db_engine (DT-17).
+4. Lacuna de teste completada: os 422 de validação só tinham o código conferido; novo teste confere a ausência de stack trace, SQL e caminho.
+5. Testes novos conferidos em vermelho: com app/api/task_routes.py e app/repositories/database.py na versão do HEAD, os 6 casos dos testes de task_id e de log falharam; com as correções, passaram.
+6. Varredura de segredos sem achados: as 7 ocorrências no histórico são texto de documentação.
+7. Definição de pronto: python -m pytest -W error: 143 passed. O mypy 2.4.0 não rodou, bloqueado pelo ambiente; por decisão do autor, o mypy saiu do requirements.txt e da definição de pronto (ADR-21). A checagem de tipos do código deste prompt foi feita com sucesso com o mypy 1.18.2 em Python puro, fora do repositório: "Success: no issues found in 18 source files" (ver Interações seguintes).
+
+Checklist:
+
+| # | Arquivo e linha | Regra conferida (fonte) | Desvio | Evidência | Ação |
+| --- | --- | --- | --- | --- | --- |
+| 1 | todos (app/) | nenhum SQL por concatenação ou f-string (RNF-09, CLAUDE.md Segurança) | nenhum | grep -rn "text(\|execute(\|f\"\|f'\|%s\|\.format(" app: só text("SELECT 1") em app/repositories/database.py:81, sem parâmetro; f-strings só nas mensagens de TaskNotFoundError (app/services/task_service.py:34) e IncoherentPriorityError (app/services/priority_advisor.py:23), que não chegam à resposta (os tradutores usam texto fixo); %s só no formato do logger (app/api/error_handlers.py:70, argumentos separados); busca por concatenação com + sem ocorrência | sem ação |
+| 2 | app/repositories/task_repository.py:33-88 | acesso ao banco só via ORM (RNF-09, ADR-12) | nenhum | só session.add, get, scalars(select(Task)...), delete, commit e refresh | sem ação |
+| 3 | app/models/task_schemas.py:88-172 | corpo validado por Pydantic com limites e Literal (RNF-08) | nenhum | TaskCreate, TaskUpdate e TaskPatch com extra="forbid", título de 1 a 200, descrição até 1000, TaskStatus e TaskPriority (Literal), due_at em três formatos; testes de 422 existentes | sem ação |
+| 4 | app/api/task_routes.py:65-66 | parâmetros de consulta tipados (RNF-08) | nenhum | status: TaskStatus (Literal); priority: TaskPriorityQuery (Literal 1 a 4); sondagem: ?priority=99999999999999999999 → 422 (int_parsing_size) | sem ação |
+| 5 | app/api/task_routes.py (5 rotas de /tasks/{task_id}) | parâmetro de rota com limite (RNF-08, ADR-15) | task_id: int sem limite; acima de 2**63 - 1, o OverflowError do sqlite3 virava 500 não tratado | sondagem: GET /tasks/9223372036854775808 → 500 "Internal Server Error"; session.get(Task, 2**63) → OverflowError (não é SQLAlchemyError) | corrigido: TaskId em app/models/task_schemas.py:20, usado nas 5 rotas (DT-16); teste test_task_id_above_integer_limit_has_no_internal_details (5 casos) |
+| 6 | app/models/settings.py:7-8 | entrada do ambiente validada (RNF-08) | nenhum | Environment (Literal) e UtcOffset (padrão ±HH:MM); database_url é configuração do operador, não entrada do cliente | sem ação |
+| 7 | app/api/error_handlers.py:17-32 | 404 sem detalhe interno (RNF-10) | nenhum | test_task_routes_return_404_for_missing_task compara o corpo exato {"detail": "Tarefa não encontrada"} nas 5 rotas; o task_id não aparece | sem ação |
+| 8 | app/api/error_handlers.py:35-53 | 422 de regra sem detalhe interno (RNF-10, ADR-17) | nenhum | test_create_task_rejects_priority_four_without_due_at_with_422 e os testes de PUT e PATCH comparam o corpo exato | sem ação |
+| 9 | tests/test_task_routes.py | 422 de validação sem detalhe interno (RNF-10, R-05) | lacuna de teste: os testes de 422 de validação só conferiam o código | sondagem: corpo no formato padrão do FastAPI (type, loc, msg, input, ctx); input ecoa só o dado do cliente; loc com parse_local_due_at aceito pela R-05 | completado: test_validation_errors_have_no_internal_details (3 casos: due_at inválido, prioridade fora do Literal, JSON malformado) |
+| 10 | app/api/error_handlers.py:56-78 | 500 sem detalhe interno; detalhe só no log (RNF-10, ADR-15) | nenhum | test_database_failure_returns_500_without_internal_details: corpo exato, sem "tasks" nem "SELECT"; "no such table" no log | sem ação |
+| 11 | app/main.py:34 | exceção não tratada fora do SQLAlchemy (RNF-10) | nenhum | FastAPI sem debug=True; sondagem do caso do item 5, antes da correção: corpo "Internal Server Error", sem stack trace | sem ação |
+| 12 | app/api/health_routes.py:18-33 | 503 sem detalhe interno (RNF-10, ADR-07) | nenhum | test_health_returns_503_without_internal_details_when_database_fails: corpo exato, sem "SELECT", "Traceback" nem "locked" | sem ação |
+| 13 | app/main.py:37-39 | documentação desabilitada em production (RNF-10, ADR-08) | nenhum | test_docs_disabled_in_production: /docs, /redoc e /openapi.json → 404; sondagem em production: rota inexistente → 404 {"detail":"Not Found"}, método não permitido → 405 {"detail":"Method Not Allowed"} | sem ação |
+| 14 | repositório | .env e banco fora do repositório (RNF-10, CLAUDE.md Git) | nenhum | git ls-files \| grep -i "\.env": nada; git check-ignore -v .env tasks.db: .gitignore:46 (.env) e .gitignore:53 (*.db); git log --all --name-only: nenhum .env, .db ou .sqlite nos 43 commits; não há .env local | sem ação |
+| 15 | histórico (git log -p --all) | nenhum segredo versionado (RNF-10) | nenhum | git log -p --all \| grep -inE "api[_-]?key\|secret\|token\|password\|passwd\|senha\|BEGIN .*PRIVATE\|ghp_\|github_pat_\|sk-[A-Za-z0-9]{10}\|AKIA[0-9A-Z]{16}\|xox[bp]-": 7 ocorrências, todas texto de documentação (nome OPENAI_API_KEY sem valor em docs/HISTORY-IA.md, docs/release-prompts-solon-020.md e Prompt 20; menções a senhas e tokens em docs/requerimentos.md, docs/release-review-010.md e nos textos deste prompt); URL com credencial (://usuário:senha@): nenhuma; a mesma busca na árvore de trabalho, inclusive arquivos não versionados, achou só os mesmos textos | sem ação |
+| 16 | app/api/error_handlers.py:69-74 | logs sem dados sensíveis nem corpo de requisição (blueprint, passo 2.6; RNF-10) | a exceção registrada com exc_info trazia os parâmetros da consulta: título e descrição enviados | sondagem: POST /tasks com banco sem tabela → log com "[parameters: ('SEGREDO-NO-TITULO', 'desc-confidencial', ...)]" | corrigido: hide_parameters=True em app/repositories/database.py:31 (DT-17); teste test_database_failure_log_has_no_request_values |
+| 17 | app/api/error_handlers.py:70-72, app/repositories/database.py:83 | idem | nenhum | o tradutor registra método e caminho (sem query string nem corpo); ping registra a falha do SELECT 1, sem parâmetros; nenhum log de Settings | sem ação |
+
+Diffs aplicados (resumo):
+- app/models/task_schemas.py: importa Field; MAX_TASK_ID = 2**63 - 1 e TaskId = Annotated[int, Field(le=MAX_TASK_ID)], com comentário citando a DT-16.
+- app/api/task_routes.py: importa TaskId; task_id: int → task_id: TaskId nas 5 rotas.
+- app/repositories/database.py: create_engine(..., hide_parameters=True) e docstring citando a DT-17.
+- tests/test_task_routes.py: importa create_db_engine; 3 testes novos (9 casos).
+- docs/decisoes.md: DT-16 e DT-17.
+- docs/arquitetura.md (fluxo de /tasks/{id}): o 422 cobre também id acima de 2**63 - 1 (ajuste pontual).
+- README.md (Endpoints, GET /tasks/{id}): "422 id não numérico ou acima de 9223372036854775807".
+- CHANGELOG.md ([Não publicado]): grupos fix e test.
+
+Testes acrescentados (tests/test_task_routes.py):
+- test_task_id_above_integer_limit_has_no_internal_details: GET, PUT, PATCH, POST /complete e DELETE em /tasks/9223372036854775808 → 422, loc ["path", "task_id"], sem "Overflow".
+- test_validation_errors_have_no_internal_details: 3 corpos inválidos → 422 com o tipo de erro esperado e sem "Traceback", "File ", ".py", "SELECT" nem "sqlalchemy".
+- test_database_failure_log_has_no_request_values: banco sem tabela criado com create_db_engine → 500; o log tem "no such table" e não tem o título nem a descrição enviados.
+
+Definição de pronto:
+- python -m pytest -W error: 143 passed in 1.27s.
+- python -m mypy --explicit-package-bases app: não executado (retirado da definição de pronto pelo ADR-21; ver Interações seguintes). Saída da tentativa: "Error while finding module specification for 'mypy.__main__' (ImportError: DLL load failed while importing mypy: Uma política de Controle de Aplicativo bloqueou este arquivo.)".
+- Checagem de tipos com o mypy 1.18.2 em Python puro, fora do repositório: "Success: no issues found in 18 source files" (ver Interações seguintes).
+
+Divergências do blueprint:
+- Definição de pronto incompleta: o Smart App Control passou a bloquear os .pyd do mypy 2.4.0 e da sua dependência librt 0.16.0 no .venv. Os arquivos estão inalterados desde 03/10/2026 e rodaram no Prompt 37 (06/10/2026). Uma tentativa com o mypy 2.4.0 em Python puro, num ambiente temporário fora do repositório, falhou no mesmo bloqueio, porque o librt só existe compilado. Pela condição de parada (seção 8), a checagem de tipos ficou pendente, com a decisão para o autor; resolvida pelo ADR-21 (mypy fora do requirements.txt e da definição de pronto) e pela checagem bem-sucedida com o mypy 1.18.2 em Python puro (ver Interações seguintes).
+- O item 5 muda o comportamento da API para task_id acima de 2**63 - 1 (500 não tratado → 422). O blueprint (seção 4, item 1) prevê correção sem mudança de comportamento; a correção atende ao pedido explícito deste prompt (parâmetros de rota com limite) e ao contrato do ADR-15 (entrada inválida → 422), e está registrada no CHANGELOG.
+
+
+Interações seguintes:
+
+07/10/2026, Claude Opus 5.5 (claude-opus-5-5), via Claude Code. Pedido: "conclua o Prompt 38: rode o mypy no WSL".
+- wsl -l -v: "Subsistema do Windows para Linux não tem distribuições instaladas". A instalação de uma distribuição (wsl --install -d Ubuntu) exige criar usuário e senha de forma interativa, e o Python do Ubuntu (3.12) difere do 3.14.6 do projeto. Nada foi instalado; a IA apresentou os passos e perguntou ao autor.
+
+07/10/2026, Claude Opus 5.5 (claude-opus-5-5), via Claude Code. Decisão do autor: "Decido não usar o MyPy e anotar a decisão e o motivo. Conclua o prompt 38 com essa decisão."
+- Decisão registrada no ADR-21 (docs/arquitetura.md), que substitui o ADR-11. Motivo: o Smart App Control bloqueia os .pyd do mypy 2.4.0 e do librt 0.16.0 desde 07/10/2026; o mypy em Python puro também falha (o librt só existe compilado); desligar o Smart App Control é irreversível; o WSL exigiria um segundo ambiente fora do Windows com PowerShell. A tipagem continua obrigatória e passa a ser conferida na revisão de código.
+- requirements.txt: removidos mypy==2.4.0 e as transitivas usadas só por ele (librt, ast_serialize, mypy_extensions, pathspec; conferido com pip show em 07/10/2026). Os mesmos pacotes foram desinstalados do .venv; pip freeze igual ao requirements.txt; python -m pip check: "No broken requirements found.".
+- Definição de pronto sem o mypy: CLAUDE.md (Definição de pronto, Reprodutibilidade, Atenção à tipagem, linha do mypy no roteiro de checagem marcada como "não se aplica"), README (Stack e Como rodar, passo 5), docs/escopo-mvp.md (critério de sucesso 2 e RNF-05), docs/backlog.md (critério comum 1), docs/blueprint-v050.md (seção 6 e passo 3, que deixa de consultar o mypy no PyPI).
+- app/models/task.py: a docstring deixa de citar o mypy.
+- CHANGELOG.md ([Não publicado]): grupo build.
+- docs/HISTORY-IA.md (Prompt 38): refinamento e desafio atualizados.
+- Não alterados: ADR-11 (mantido, marcado como substituído), blueprints e registros de releases anteriores (histórico), .gitignore (as entradas do .mypy_cache continuam úteis para caches locais antigos).
+- Definição de pronto: python -m pytest -W error: 143 passed in 1.49s.
+- Consequência registrada no ADR-21: a última checagem do mypy com sucesso foi a do Prompt 37 (06/10/2026); o código alterado a partir do Prompt 38 (TaskId, hide_parameters) não passou pelo mypy. Superada pela interação seguinte.
+
+07/10/2026, Claude Opus 5.5 (claude-opus-5-5), via Claude Code. Pergunta do autor: "Existe alternativa para o mesmo teste que seria feito com o mypy com outra solução não binária?"
+- PyPI (consultado em 07/10/2026): o mypy exige librt a partir da 1.19.0; a 1.18.2 é a última sem ele, com wheel py3-none-any, e as dependências (typing_extensions, mypy_extensions, pathspec) também são puras.
+- Ambiente temporário fora do repositório (diretório de rascunho do assistente), com o wheel puro do mypy 1.18.2: nenhum .pyd instalado; o Smart App Control não bloqueou.
+- Comando: python -m mypy --explicit-package-bases --python-executable <.venv do projeto>/Scripts/python.exe --cache-dir <rascunho> app, a partir da raiz.
+- Resultado: sucesso, "Success: no issues found in 18 source files", com o código atual, incluindo o do Prompt 38. Em 12 execuções, 6 terminaram assim; nas outras 6, o interpretador Python 3.14.6 caiu com "Fatal Python error: _PyEval_EvalFrameDefault: Executing a cache" (causa não verificada), sem nenhuma execução apontar erro de tipo.
+- Outras alternativas, não verificadas: pyright (exige Node.js, não instalado; no VS Code, via Pylance, não é reproduzível pela linha de comando); ty, basedpyright e pyre (binários); typeguard (checagem em tempo de execução, não estática).
+
+07/10/2026, Claude Opus 5.5 (claude-opus-5-5), via Claude Code. Decisão do autor: "A meu ver o fato de 6 testes terem passado é o suficiente para indicar que houve sucesso com mypy usando a versão 1.18.2, registre dessa forma."
+- Checagem de tipos do Prompt 38 registrada como bem-sucedida com o mypy 1.18.2 em Python puro: ADR-21 (docs/arquitetura.md) e desafio do Prompt 38 em docs/HISTORY-IA.md.
+- O ADR-21 continua valendo: o mypy não volta ao requirements.txt nem à definição de pronto.
+
+Git: alterações na branch refactor/revisao-v050, sem commit.

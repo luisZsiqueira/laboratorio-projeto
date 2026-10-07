@@ -1,6 +1,6 @@
 # laboratorio-projeto: micro-API de gestão de tarefas
 
-> **Status:** em desenvolvimento. Estão concluídas as *releases* `v0.1.0` (fundação: documentação, dependências e arquitetura), `v0.2.0` (base técnica: configuração, banco, aplicação FastAPI e `GET /health`), `v0.3.0` (CRUD de tarefas) e `v0.4.0` (prioridades, `priority_advisor` e datas no horário local). Todos os requisitos funcionais do escopo estão implementados: criar, listar com filtros por *status* e prioridade, consultar, atualizar, concluir e excluir tarefas, com a coerência entre prioridade e prazo validada e uma prioridade sugerida pela proximidade do prazo. Faltam a revisão (`v0.5.0`) e a entrega (`v1.0.0`). As mudanças de cada *release* estão no [`CHANGELOG.md`](CHANGELOG.md).
+> **Status:** em desenvolvimento. Estão concluídas as *releases* `v0.1.0` (fundação: documentação, dependências e arquitetura), `v0.2.0` (base técnica: configuração, banco, aplicação FastAPI e `GET /health`), `v0.3.0` (CRUD de tarefas), `v0.4.0` (prioridades, `priority_advisor` e datas no horário local) e `v0.5.0` (revisão de arquitetura, segurança, documentação e dependências). Todos os requisitos funcionais do escopo estão implementados: criar, listar com filtros por *status* e prioridade, consultar, atualizar, concluir e excluir tarefas, com a coerência entre prioridade e prazo validada e uma prioridade sugerida pela proximidade do prazo. A revisão da `v0.5.0` não acrescentou funcionalidade: limitou o `id` das rotas ao maior inteiro do SQLite (acima dele, `422`) e retirou do log os valores enviados pelo cliente. Falta a entrega (`v1.0.0`). As mudanças de cada *release* estão no [`CHANGELOG.md`](CHANGELOG.md).
 
 Micro-API REST de gestão de tarefas (*To-Do List*) com prioridades, em Python, FastAPI e SQLite3. É o miniprojeto acadêmico do curso 1 da pós-graduação SWE-GENAI, que exige o uso de IA generativa em todo o ciclo de vida do software.
 
@@ -55,10 +55,9 @@ Toda resposta de tarefa traz `suggested_priority`, calculada pela proximidade do
 | SQLite3 | embutido no Python | banco de dados |
 | pytest | 9.1.1 | testes unitários e de integração |
 | httpx2 | 2.13.1 | cliente HTTP do `TestClient` |
-| mypy | 2.4.0 | checagem estática de tipos |
 | Mermaid.js | renderizado pelo GitHub | diagramas de arquitetura |
 
-As versões estão fixadas no [`requirements.txt`](requirements.txt), incluindo as dependências transitivas. Elas foram consultadas no PyPI em 03/10/2026. O Python 3.11 é o mínimo porque o SQLAlchemy 2.1 o exige.
+As versões estão fixadas no [`requirements.txt`](requirements.txt), incluindo as dependências transitivas. Elas foram consultadas no PyPI em 03/10/2026 e conferidas de novo em 07/10/2026, na revisão da `v0.5.0`: sem vulnerabilidade publicada e sem conflito no `pip check`; as versões mais novas do FastAPI (0.142.3) e do SQLAlchemy (2.1.4), publicadas no mesmo dia, não foram adotadas, porque não corrigem defeito que afete o projeto. O Python 3.11 é o mínimo porque o SQLAlchemy 2.1 o exige.
 
 ## Arquitetura
 
@@ -85,7 +84,7 @@ Com a API em execução (ver [Como rodar localmente](#como-rodar-localmente)), t
 | --- | --- | --- |
 | `POST /tasks` | cria uma tarefa; prioridade `4` exige `due_at` | `201` criada; `422` corpo inválido ou prioridade incoerente |
 | `GET /tasks` | lista as tarefas por `id`; filtros opcionais `?status=pending` ou `?status=done` e `?priority=1` a `4`, combináveis (`?status=done&priority=1`) | `200`; `422` *status* ou prioridade inválidos |
-| `GET /tasks/{id}` | consulta uma tarefa | `200`; `404` não existe; `422` `id` não numérico |
+| `GET /tasks/{id}` | consulta uma tarefa | `200`; `404` não existe; `422` `id` não numérico ou acima de 9223372036854775807 |
 | `PUT /tasks/{id}` | substitui os cinco campos editáveis (todos obrigatórios) | `200`; `404`; `422` corpo inválido ou prioridade incoerente |
 | `PATCH /tasks/{id}` | altera só os campos enviados; a coerência entre prioridade e `due_at` vale para o estado resultante | `200`; `404`; `422` corpo inválido ou prioridade incoerente |
 | `POST /tasks/{id}/complete` | marca como concluída; repetir a chamada é permitido e devolve a mesma tarefa | `200`; `404`; `422` |
@@ -131,7 +130,7 @@ Campos desconhecidos ou somente leitura no corpo (`id`, `created_at`, `updated_a
 
 ### Exemplos de uso
 
-Os exemplos foram executados contra a API em execução em 06/10/2026, com o banco vazio e `LOCAL_UTC_OFFSET` no padrão (`-03:00`), na ordem da seção, exceto os exemplos de prioridade 4, de `422` por coerência e de filtro por prioridade, executados no fim, com a tarefa 1 concluída e a tarefa de `id` 2 excluída (a que eles criam recebe o `id` 2). Os JSON mostrados são as respostas reais; o `id`, os instantes (`created_at`, `updated_at`) e a `suggested_priority` do seu teste serão outros, pois dependem do momento da execução. Em Bash, `curl -i` mostra a linha de *status*. Em PowerShell, `Invoke-RestMethod` converte o JSON da resposta em objeto; o texto JSON abaixo é o corpo enviado pela API.
+Os exemplos foram executados contra a API em execução em 06/10/2026 e de novo em 07/10/2026, no Windows PowerShell 5.1, com os mesmos códigos e corpos, com o banco vazio e `LOCAL_UTC_OFFSET` no padrão (`-03:00`), na ordem da seção, exceto os exemplos de prioridade 4, de `422` por coerência e de filtro por prioridade, executados no fim, com a tarefa 1 concluída e a tarefa de `id` 2 excluída (a que eles criam recebe o `id` 2). Os JSON mostrados são as respostas reais; o `id`, os instantes (`created_at`, `updated_at`) e a `suggested_priority` do seu teste serão outros, pois dependem do momento da execução. Em Bash, `curl -i` mostra a linha de *status*. Em PowerShell, `Invoke-RestMethod` converte o JSON da resposta em objeto; o texto JSON abaixo é o corpo enviado pela API.
 
 Em PowerShell, `Invoke-RestMethod` lança exceção nas respostas de erro (`404`, `422`). Para ver o código e o corpo, use `try`/`catch`, como nos exemplos de erro abaixo (verificado no Windows PowerShell 5.1).
 
@@ -548,14 +547,13 @@ python -m uvicorn app.main:app --reload
 
 A API fica disponível em `http://127.0.0.1:8000`, e a documentação interativa em `http://127.0.0.1:8000/docs`. O log do *uvicorn* mostra `Application startup complete.` quando a aplicação está pronta; o primeiro início cria o arquivo `tasks.db` na raiz, que não é versionado. Para conferir, use o exemplo de [`GET /health`](#get-health-saúde-da-aplicação-e-do-banco).
 
-### 5. Rodar os testes e a checagem de tipos
+### 5. Rodar os testes
 
 ```bash
 python -m pytest -W error
-python -m mypy --explicit-package-bases app
 ```
 
-Os testes usam SQLite em memória e não criam arquivos no repositório. Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` na raiz (ADR-03 e ADR-11 em [`docs/arquitetura.md`](docs/arquitetura.md)).
+Os testes usam SQLite em memória e não criam arquivos no repositório. Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo. O projeto não usa checagem estática de tipos por ferramenta: o mypy foi retirado em 07/10/2026, porque o Smart App Control do Windows bloqueia as suas extensões compiladas (ADR-21 em [`docs/arquitetura.md`](docs/arquitetura.md)). Os *type hints* continuam obrigatórios e são conferidos na revisão de código.
 
 ### Solução de problemas (Windows)
 
@@ -579,7 +577,7 @@ Os itens de cada *release* (requisitos funcionais RF e técnicos RT), com crité
 | `v0.2.0` | Base técnica: configuração por ambiente, banco SQLite, aplicação FastAPI com `lifespan` e `/health` | concluída (05/10/2026, *tag* `v0.2.0`) |
 | `v0.3.0` | CRUD de tarefas: criar, listar com filtro por *status*, consultar, atualizar (total e parcial), concluir e excluir | concluída (06/10/2026, *tag* `v0.3.0`) |
 | `v0.4.0` | Prioridades e `priority_advisor` (coerência e sugestão, regras determinísticas), filtro por prioridade e datas no horário local | concluída (06/10/2026, *tag* `v0.4.0`) |
-| `v0.5.0` | Revisão da arquitetura, de segurança e da documentação | planejada |
+| `v0.5.0` | Revisão de arquitetura, de segurança, da documentação e das dependências; correções de segurança (`id` limitado, log sem os valores da requisição) e retirada do mypy | concluída (07/10/2026, *tag* `v0.5.0`) |
 | `v1.0.0` | Entrega do curso: validação em máquina limpa, histórico de uso de IA consolidado; marcada com *tag* e *release* `v1.0.0` no GitHub | planejada |
 
 ## Uso de IA generativa
@@ -599,11 +597,12 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 | Claude Code | Claude Sonnet 5.5 | execução do *blueprint* da `v0.3.0`: modelo, esquemas, *repository*, *service*, rotas, tradutores de erro e 56 testes novos (Prompts 26 a 29); exemplos de uso da seção Endpoints, executados na API (Prompt 30) |
 | Claude Code | Claude Opus 5.5 | *blueprint* da `v0.4.0` ([`docs/blueprint-v040.md`](docs/blueprint-v040.md)), com protótipo verificado e a revisão das datas no horário local pedida pelo autor (Prompt 32), e fechamento da *release* (Prompt 35) |
 | Claude Code | Claude Sonnet 5.5 | execução do *blueprint* da `v0.4.0`: `priority_advisor` e seus testes (Prompt 33); integração ao *service* e às rotas, filtro por prioridade, datas no horário local, 43 testes novos e exemplos do README executados na API (Prompt 34) |
+| Claude Code | Claude Opus 5.5 | *blueprint* da `v0.5.0` ([`docs/blueprint-v050.md`](docs/blueprint-v050.md), Prompt 36); revisões de arquitetura (Prompt 37), de segurança, com duas correções, três testes novos e a retirada do mypy (Prompt 38), e da documentação e das dependências, com os exemplos do README executados de novo na API (Prompt 39); fechamento da *release* (Prompt 40) |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*; os *prompts* planejados para as *releases* `v0.2.0` a `v1.0.0` estão em [`prompts/prompts-desenvolvimento.md`](prompts/prompts-desenvolvimento.md).
 - O histórico de uso da IA (etapas, ganhos, desafios) está em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md); o uso anterior ao repositório, em [`docs/PRE-HISTORY-IA.md`](docs/PRE-HISTORY-IA.md); o uso em modo *chat* fora do repositório, em [`docs/EXTRA-HISTORY-IA.md`](docs/EXTRA-HISTORY-IA.md).
-- Os *blueprints* aprovados ([`docs/blueprint-v020.md`](docs/blueprint-v020.md), [`docs/blueprint-v030.md`](docs/blueprint-v030.md) e [`docs/blueprint-v040.md`](docs/blueprint-v040.md)) são escritos para que um modelo de execução, como o Claude Sonnet 5.5, os siga sem depender do contexto da conversa (regra em [`CLAUDE.md`](CLAUDE.md), Blueprint executável).
+- Os *blueprints* aprovados ([`docs/blueprint-v020.md`](docs/blueprint-v020.md), [`docs/blueprint-v030.md`](docs/blueprint-v030.md), [`docs/blueprint-v040.md`](docs/blueprint-v040.md) e [`docs/blueprint-v050.md`](docs/blueprint-v050.md)) são escritos para que um modelo de execução, como o Claude Sonnet 5.5, os siga sem depender do contexto da conversa (regra em [`CLAUDE.md`](CLAUDE.md), Blueprint executável).
 
 Todo código gerado por IA é revisado e testado antes de ser incorporado.
 
@@ -614,7 +613,8 @@ Limitações conhecidas da versão atual:
 - o fuso local é um deslocamento fixo (`LOCAL_UTC_OFFSET`), sem horário de verão; para uma região com horário de verão, o valor precisa ser trocado na mudança de horário;
 - a API não registra se `due_at` foi informado só com o dia: a resposta mostra 23:59;
 - a `suggested_priority` é calculada no momento de cada resposta e muda com o passar do tempo; ela não é gravada nem pode ser consultada em filtro;
-- um `due_at` em formato não aceito responde `422` com uma entrada de erro para cada formato tentado (ISO com fuso e data local).
+- um `due_at` em formato não aceito responde `422` com uma entrada de erro para cada formato tentado (ISO com fuso e data local); a segunda traz no `loc` o nome do validador interno (`parse_local_due_at`), que não revela *stack trace*, SQL nem caminho e foi mantido para não mudar o formato do `422` (R-05 de [`docs/blueprint-v050.md`](docs/blueprint-v050.md));
+- não há checagem estática de tipos por ferramenta: os *type hints* são conferidos na revisão de código (ADR-21).
 
 Fora do escopo do MVP. São possibilidades futuras, não compromissos:
 

@@ -1,6 +1,6 @@
 # Escopo do MVP
 
-> **Status:** escopo definido após a *release* `v0.1.0`, antes do código da aplicação; decisões D-01 a D-04 incorporadas aos requisitos no fechamento da `v0.3.0` (06/10/2026). Vale como referência para os *blueprints* das *releases* `v0.2.0` a `v1.0.0`. Mudança de escopo só com pedido explícito do autor, registrada aqui e no [`CHANGELOG.md`](../CHANGELOG.md).
+> **Status:** escopo definido após a *release* `v0.1.0`, antes do código da aplicação; decisões D-01 a D-04 incorporadas aos requisitos no fechamento da `v0.3.0` e D-05 a D-07 e D-09 no da `v0.4.0` (06/10/2026); conferido na revisão da `v0.5.0` (07/10/2026), sem decisão em aberto. Vale como referência para os *blueprints* das *releases* `v0.2.0` a `v1.0.0`. Mudança de escopo só com pedido explícito do autor, registrada aqui e no [`CHANGELOG.md`](../CHANGELOG.md).
 
 Este documento é a fonte de verdade dos requisitos do MVP: objetivo, requisitos funcionais e não funcionais, itens fora de escopo e decisões em aberto. O [`README.md`](../README.md) traz o resumo, o roadmap e as instruções de uso; a [`docs/arquitetura.md`](arquitetura.md) traz o desenho técnico e os ADRs; o [`docs/backlog.md`](backlog.md) desdobra os requisitos em itens por *release*, com critérios de aceite.
 
@@ -16,7 +16,7 @@ O MVP está concluído, na *release* `v1.0.0`, quando:
 
 1. todos os requisitos funcionais da seção 3 estão implementados e cobertos por testes;
 2. a definição de pronto passa em ambiente limpo, sem avisos:
-   `python -m pytest -W error` e `python -m mypy --explicit-package-bases app`;
+   `python -m pytest -W error` (sem checagem de tipos por ferramenta, ADR-21);
 3. o README permite instalar, executar e testar seguindo apenas os comandos documentados, em PowerShell e em Bash;
 4. os requisitos de entrega do curso ([`docs/requerimentos.md`](requerimentos.md)) estão atendidos (seção 7);
 5. a *tag* `v1.0.0` está publicada no GitHub.
@@ -86,7 +86,7 @@ Cada requisito indica a *release* prevista no roadmap do README. Os códigos de 
 | RNF-02 | Dependências | o `requirements.txt` é a única declaração de dependências, com versões fixadas e verificadas (fonte e data registradas) | `python -m pip check`; comparação com `pip freeze` |
 | RNF-03 | Testabilidade | testes unitários do *service* e do `priority_advisor` e testes de integração de todos os endpoints, cobrindo sucesso e erro de cada um; banco em memória; sem estado local nem serviços externos | `python -m pytest -W error` |
 | RNF-04 | Ausência de avisos | nenhum aviso de deprecação ou de recurso não liberado; padrões proibidos listados no roteiro de checagem do `CLAUDE.md` | `-W error` na definição de pronto |
-| RNF-05 | Tipagem | *type hints* em todas as funções e retornos; conjuntos fechados com `typing.Literal` | `python -m mypy --explicit-package-bases app` |
+| RNF-05 | Tipagem | *type hints* em todas as funções e retornos; conjuntos fechados com `typing.Literal` | revisão de código (mypy retirado em 07/10/2026, ADR-21) |
 | RNF-06 | Arquitetura | camadas Controller → Service → Repository, um pacote por camada; rotas sem acesso ao banco nem regra de negócio; *service* sem conhecimento de HTTP (ADR-01) | revisão de código na `v0.5.0` |
 | RNF-07 | Configuração | toda configuração vem do ambiente ou do `.env`, via pydantic-settings; nenhum literal de configuração no código; variáveis documentadas no README sem valores sensíveis | revisão de código; testes com `ENVIRONMENT=production` |
 | RNF-08 | Segurança: entrada | todo dado externo passa por esquemas Pydantic v2 com tipos, tamanhos máximos e `Literal` | testes de 422 |
@@ -141,7 +141,7 @@ Decisões deixadas para o *blueprint* da *release* indicada. A recomendação é
 | D-08 | Esquema Pydantic da resposta de `/health` e arquivo onde fica | **Decidida** em 05/10/2026: novo `app/models/health_schemas.py`, separado dos esquemas de tarefa, com o modelo `HealthRead` (`status` e `database`, ambos `ok` ou `unavailable`); contrato no ADR-13 de [`docs/arquitetura.md`](arquitetura.md) e em [`docs/blueprint-v020.md`](blueprint-v020.md). Levantada na revisão dos diagramas (Prompt 12) | `v0.2.0` |
 | D-09 | Datas no horário local, para preenchimento por pessoas | **Decidida** em 06/10/2026, a pedido do autor na revisão do *blueprint* da `v0.4.0`: `due_at` aceito em `DD/MM/AAAA HH:MM` e `DD/MM/AAAA` (23:59) no horário local, além de ISO 8601 com fuso; datas devolvidas no fuso local; fuso fixo em `LOCAL_UTC_OFFSET` (padrão `-03:00`); persistência em UTC. Migrada para a seção 2.1, o RF-09, o RNF-11 e o ADR-18 | `v0.4.0` |
 
-As decisões D-01 a D-04 foram tomadas no [`docs/blueprint-v030.md`](blueprint-v030.md) (seção 2.1), e D-05 a D-07 e D-09 no [`docs/blueprint-v040.md`](blueprint-v040.md) (seção 2.1), todas confirmadas na aprovação do autor. Ficam na tabela, marcadas como decididas, para manter a rastreabilidade; o conteúdo vigente está nos requisitos e ADRs indicados. Não há decisão em aberto.
+A decisão D-08 foi tomada no [`docs/blueprint-v020.md`](blueprint-v020.md) (seção 2), as decisões D-01 a D-04 no [`docs/blueprint-v030.md`](blueprint-v030.md) (seção 2.1), e D-05 a D-07 e D-09 no [`docs/blueprint-v040.md`](blueprint-v040.md) (seção 2.1), todas confirmadas na aprovação do autor. Ficam na tabela, marcadas como decididas, para manter a rastreabilidade; o conteúdo vigente está nos requisitos e ADRs indicados. Não há decisão em aberto.
 
 ## 7. Rastreabilidade com os requisitos de entrega do curso
 
@@ -155,5 +155,5 @@ As decisões D-01 a D-04 foram tomadas no [`docs/blueprint-v030.md`](blueprint-v
 | README: limitações e próximos passos | README (Limitações e próximos passos); seção 5 deste documento | atendido |
 | README: créditos e licença | README (Créditos e licença); `LICENSE` | atendido |
 | Gerenciamento de dependências | `requirements.txt`; RNF-02 | atendido |
-| Testes automatizados executáveis e passando | RNF-03 e RNF-04 | em andamento: 13 testes na `v0.2.0`, 69 na `v0.3.0` e 134 na `v0.4.0` (com `tests/test_priority_advisor.py`), todos passando com `-W error`; revisão final na `v0.5.0` |
+| Testes automatizados executáveis e passando | RNF-03 e RNF-04 | atendido: 13 testes na `v0.2.0`, 69 na `v0.3.0`, 134 na `v0.4.0` (com `tests/test_priority_advisor.py`) e 143 na `v0.5.0` (revisão de segurança), todos passando com `-W error`; validação em clone limpo a cada *release* |
 | *Release* ou *tag* de entrega | *tag* e *release* `v1.0.0`; RNF-14 | pendente |

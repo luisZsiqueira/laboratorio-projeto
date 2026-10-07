@@ -21,7 +21,7 @@ O backlog organiza por *release* o trabalho que falta para entregar o MVP descri
 
 Valem para todo item, além dos critérios próprios, e não são repetidos nas tabelas:
 
-1. A definição de pronto passa sem avisos: `python -m pytest -W error` e `python -m mypy --explicit-package-bases app` **[C]**.
+1. A definição de pronto passa sem avisos: `python -m pytest -W error` **[C]**. Até a `v0.4.0` incluía `python -m mypy --explicit-package-bases app`, retirado em 07/10/2026 (ADR-21).
 2. Código com *type hints*, *docstrings* em português e conjuntos fechados com `typing.Literal` **[I]**.
 3. Camadas respeitadas: rotas sem acesso ao banco nem regra de negócio, *service* sem HTTP, *repository* sem regra de negócio **[I]**.
 4. Nenhum padrão proibido no roteiro de checagem de APIs deprecadas do `CLAUDE.md` **[I]**.
@@ -45,11 +45,11 @@ Executado ao final de cada *release*, conforme o `CLAUDE.md` (Fechamento de rele
 | `v0.2.0` | base técnica: configuração, banco, aplicação, `/health` | RT-01 a RT-04, RF-12, RF-13 | 4 h | 4 h |
 | `v0.3.0` | CRUD de tarefas | RT-05 a RT-09, RF-01 a RF-08 | 6,5 h | 8 h |
 | `v0.4.0` | prioridades e `priority_advisor`, filtro por prioridade e datas no horário local | RT-10, RF-09 a RF-11, RF-14; D-09 | 5,75 h | 3 h |
-| `v0.5.0` | revisão de arquitetura, segurança e documentação | RT-11 a RT-14 | 2,5 h | — |
+| `v0.5.0` | revisão de arquitetura, segurança e documentação | RT-11 a RT-14 | 2,5 h | 4 h |
 | `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h | — |
-| **Total** | | 17 RT, 14 RF | **20,75 h** | **15 h** (até a `v0.4.0`) |
+| **Total** | | 17 RT, 14 RF | **20,75 h** | **19 h** (até a `v0.5.0`) |
 
-As horas reais são informadas pelo autor por *release*, e não por item. Elas incluem o *blueprint*, o fechamento e o *git*, que as estimativas por item não cobrem. O tempo da `v0.1.0` (inicialização e documentação) não foi medido. Até a `v0.3.0`, foram gastas 12 h contra 10,5 h estimadas. Na `v0.4.0`, a estimativa passou de 3,5 h para 5,75 h com o RF-14 (0,5 h) e a D-09 (1,75 h), aprovados no *blueprint*; com o *blueprint* e o fechamento, a *release* foi estimada em 7,25 h. As horas reais da `v0.4.0` foram 3 h, abaixo da estimativa, e até a `v0.4.0` foram gastas 15 h contra 16,75 h estimadas. Somadas as estimativas das *releases* restantes, com *blueprint* e fechamento (`v0.5.0`: 4 h; `v1.0.0`: 3 h), a projeção é de cerca de 22 h, dentro do orçamento de cerca de 30 horas. A comparação é refeita no fechamento de cada *release*.
+As horas reais são informadas pelo autor por *release*, e não por item. Elas incluem o *blueprint*, o fechamento e o *git*, que as estimativas por item não cobrem. O tempo da `v0.1.0` (inicialização e documentação) não foi medido. Até a `v0.3.0`, foram gastas 12 h contra 10,5 h estimadas. Na `v0.4.0`, a estimativa passou de 3,5 h para 5,75 h com o RF-14 (0,5 h) e a D-09 (1,75 h), aprovados no *blueprint*; com o *blueprint* e o fechamento, a *release* foi estimada em 7,25 h. As horas reais da `v0.4.0` foram 3 h, abaixo da estimativa, e até a `v0.4.0` foram gastas 15 h contra 16,75 h estimadas. Na `v0.5.0`, as horas reais foram 4 h, iguais à estimativa com *blueprint* e fechamento (2,5 h dos itens), e até a `v0.5.0` foram gastas 19 h contra 20,75 h estimadas. Somada a estimativa da *release* restante, com *blueprint* e fechamento (`v1.0.0`: 3 h), a projeção é de cerca de 22 h, dentro do orçamento de cerca de 30 horas. A comparação é refeita no fechamento de cada *release*.
 
 ## 4. Backlog por *release*
 
@@ -106,12 +106,14 @@ Decisões do *blueprint* ([`docs/blueprint-v040.md`](blueprint-v040.md)): D-05 (
 
 ### 4.4 `v0.5.0`: revisão
 
+**Situação da *release*:** concluída em 07/10/2026. Os quatro itens foram entregues como planejados em [`docs/blueprint-v050.md`](blueprint-v050.md), sem item movido: arquitetura no Prompt 37, segurança no Prompt 38, dependências e documentação no Prompt 39 e fechamento no Prompt 40. A revisão de segurança corrigiu dois desvios (DT-16 e DT-17) e acrescentou 9 casos de teste (143 no total); por decisão do autor, o mypy saiu do projeto (ADR-21). Horas reais (informadas pelo autor em 07/10/2026): 4 h para a *release* inteira, iguais à estimativa com *blueprint* e fechamento. Não há medição por item.
+
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |
-| RT-11 | Revisão de arquitetura | 1. Importações conferidas contra o diagrama de módulos de `docs/arquitetura.md`; nenhuma dependência para cima **[I]**<br>2. Divergências corrigidas no código ou registradas em `docs/arquitetura.md` (ajuste pontual ou novo ADR) **[I]** | RNF-06 | 0,5 h | a fazer |
-| RT-12 | Revisão de segurança | 1. Nenhum SQL montado por concatenação ou *f-string* **[I]**<br>2. Respostas de erro (404, 422, 500, 503) sem detalhes internos **[T]**<br>3. Varredura de segredos no repositório e no histórico **[C]**<br>4. Documentação desabilitada em produção confirmada **[T]** | RNF-08, RNF-09, RNF-10 | 1 h | a fazer |
-| RT-13 | Revisão da documentação | 1. README conferido contra o comportamento real da API: endpoints, códigos e exemplos executados **[C]**<br>2. *Docstrings* presentes em todas as classes e funções públicas **[I]**<br>3. `docs/escopo-mvp.md` sem decisões em aberto pendentes **[I]** | RNF-13 | 0,5 h | a fazer |
-| RT-14 | Nova rodada do roteiro de checagem de APIs deprecadas | 1. Versões do `requirements.txt` conferidas com o PyPI, com data **[C]**<br>2. Se alguma versão mudar: notas de versão lidas, testes mínimos executados e tabela do `CLAUDE.md` atualizada **[C]**<br>3. `python -m pip check` sem conflitos **[C]** | RNF-02, RNF-04 | 0,5 h | a fazer |
+| RT-11 | Revisão de arquitetura | 1. Importações conferidas contra o diagrama de módulos de `docs/arquitetura.md`; nenhuma dependência para cima **[I]**<br>2. Divergências corrigidas no código ou registradas em `docs/arquitetura.md` (ajuste pontual ou novo ADR) **[I]** | RNF-06 | 0,5 h | concluído (07/10/2026) |
+| RT-12 | Revisão de segurança | 1. Nenhum SQL montado por concatenação ou *f-string* **[I]**<br>2. Respostas de erro (404, 422, 500, 503) sem detalhes internos **[T]**<br>3. Varredura de segredos no repositório e no histórico **[C]**<br>4. Documentação desabilitada em produção confirmada **[T]** | RNF-08, RNF-09, RNF-10 | 1 h | concluído (07/10/2026) |
+| RT-13 | Revisão da documentação | 1. README conferido contra o comportamento real da API: endpoints, códigos e exemplos executados **[C]**<br>2. *Docstrings* presentes em todas as classes e funções públicas **[I]**<br>3. `docs/escopo-mvp.md` sem decisões em aberto pendentes **[I]** | RNF-13 | 0,5 h | concluído (07/10/2026) |
+| RT-14 | Nova rodada do roteiro de checagem de APIs deprecadas | 1. Versões do `requirements.txt` conferidas com o PyPI, com data **[C]**<br>2. Se alguma versão mudar: notas de versão lidas, testes mínimos executados e tabela do `CLAUDE.md` atualizada **[C]**<br>3. `python -m pip check` sem conflitos **[C]** | RNF-02, RNF-04 | 0,5 h | concluído (07/10/2026) |
 
 ### 4.5 `v1.0.0`: entrega do curso
 

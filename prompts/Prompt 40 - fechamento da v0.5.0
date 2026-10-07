@@ -1,0 +1,32 @@
+Contexto: Revisões RT-11 a RT-14 concluídas na branch refactor/revisao-v050 com a definição de pronto verde.
+Objetivo: Aplicar "Fechamento de release" do CLAUDE.md: README por inteiro (status, roadmap com a v0.5.0 concluída, Uso de IA generativa); docs/arquitetura.md com os ADRs promovidos; docs/backlog.md com RT-11 a RT-14 concluídos e horas reais; CHANGELOG.md com a seção 0.5.0; docs/HISTORY-IA.md com os Prompts 36 a 40 e a consolidação; CLAUDE.md corrigido no que a revisão mostrou divergente das fontes de verdade.
+Estilo: README como o projeto está.
+Resposta: Lista dos arquivos alterados. Git, após minha aprovação: commits, merge --no-ff em main, tag anotada v0.5.0 e push; definição de pronto em clone limpo.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 07/10/2026
+
+Resumo da execução (passo 5 do docs/blueprint-v050.md, "Fechamento de release" do CLAUDE.md):
+
+1. Definição de pronto conferida antes e depois: python -m pytest -W error: 143 passed.
+2. Horas reais pedidas ao autor antes de atualizar o backlog: 4 h para a v0.5.0.
+3. Arquivos alterados:
+   - README.md: status (v0.5.0 concluída e o que a revisão mudou; falta a v1.0.0); Roadmap com a v0.5.0 concluída (07/10/2026, tag v0.5.0); Uso de IA generativa com os Prompts 36 a 40; lista de blueprints com o blueprint-v050; Limitações com o nome do validador parse_local_due_at no loc do 422 de formato (R-05) e a ausência de checagem de tipos por ferramenta (ADR-21). Stack, Endpoints, Configuração e Como rodar conferidos no Prompt 39, sem mudança.
+   - CLAUDE.md: app/models/ com conversões de tipo e de formato, sem regra de negócio (ADR-20), na regra de camadas e na estrutura de diretórios; regra de promoção de DTs com o que a revisão já promoveu (ADR-19 e ADR-20); comentário de error_handlers.py com o 422 de coerência; TaskId em task_schemas.py; rodada do roteiro de 07/10/2026 sem mudança de versão.
+   - docs/arquitetura.md: status com o fechamento (sem mudança de diagrama). Os ADR-19 a ADR-21 já estavam registrados (Prompts 37 e 38).
+   - docs/backlog.md: RT-11 a RT-14 concluídos (07/10/2026); situação da release; 4 h reais no resumo; total de 19 h até a v0.5.0 contra 20,75 h estimadas; projeção de cerca de 22 h mantida.
+   - docs/escopo-mvp.md: status (D-05 a D-07 e D-09 incorporadas na v0.4.0; conferido na v0.5.0, sem decisão em aberto); rastreabilidade dos testes como atendida (143 na v0.5.0).
+   - docs/blueprint-v050.md: status de executado.
+   - CHANGELOG.md: seção [0.5.0] - 2026-10-07 com o conteúdo de [Não publicado], a mudança de comportamento do id, as linhas que faltavam dos Prompts 36 e 37 e a do fechamento; links de comparação.
+   - docs/HISTORY-IA.md: linhas 38 a 40 no resumo; entrada do Prompt 40; consolidação da v0.5.0; observação transversal sobre o Smart App Control.
+   - Este arquivo: registro da execução.
+4. docs/mermaid.md e docs/decisoes.md não mudaram: nenhum diagrama foi alterado depois do Prompt 37, e as DT-16 e DT-17 já estavam registradas.
+
+Divergências do blueprint (também na consolidação da v0.5.0 em docs/HISTORY-IA.md):
+- Passo 5: além do mínimo previsto para o CLAUDE.md (frase de app/models/), foram corrigidos o comentário de error_handlers.py, a regra de promoção de DTs e a linha de task_schemas.py; o status de docs/escopo-mvp.md, defasado desde a v0.4.0, foi atualizado; a limitação da R-05 entrou no README só neste passo, porque nenhum passo anterior a registrou.
+- Passos anteriores: ver a consolidação (mudança de comportamento do task_id e retirada do mypy no passo 2).
+
+Git: pendente da aprovação do autor (commits, merge --no-ff em main, tag anotada v0.5.0, push e definição de pronto em clone limpo).

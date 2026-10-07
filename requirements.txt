@@ -2,6 +2,7 @@
 # Python: >= 3.11 (mínimo exigido pelo SQLAlchemy 2.1.3); testado em 3.14.6.
 # Versões consultadas no PyPI em 03/10/2026 (última versão estável de cada
 # pacote direto) e validadas com pip check em ambiente virtual limpo.
+# Conferidas de novo no PyPI em 07/10/2026 (revisão da v0.5.0), sem mudança.
 # Instalação: python -m pip install -r requirements.txt
 
 # ---------------------------------------------------------------------
@@ -14,13 +15,12 @@ pydantic==2.13.5
 pydantic-settings==2.15.0
 
 # ---------------------------------------------------------------------
-# Testes e checagem de tipos
+# Testes
 # httpx2: cliente HTTP exigido pelo TestClient do Starlette 1.7
 # (o uso de httpx emite aviso de deprecação)
 # ---------------------------------------------------------------------
 pytest==9.1.1
 httpx2==2.13.1
-mypy==2.4.0
 
 # ---------------------------------------------------------------------
 # Dependências transitivas (fixadas para reprodutibilidade)
@@ -28,18 +28,14 @@ mypy==2.4.0
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
-ast_serialize==0.12.1
 click==8.5.0
 colorama==0.4.6 ; sys_platform == "win32"
 h11==0.16.0
 httpcore2==2.13.1
 idna==3.20
 iniconfig==2.3.0
-librt==0.16.0 ; platform_python_implementation != "PyPy"
-mypy_extensions==1.1.0
 opentelemetry-api==1.45.0
 packaging==26.3
-pathspec==1.1.1
 pluggy==1.6.0
 pydantic_core==2.46.5
 Pygments==2.21.0
