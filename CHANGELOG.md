@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+### docs
+
+- Registra o resultado da publicação da `v1.0.0` no Prompt 44 e em `docs/HISTORY-IA.md`: *commits*, *merge*, *push*, *tag*, *Release* no GitHub e validação no clone da *tag*.
+
 ## [1.0.0] - 2026-10-07
 
 Entrega do curso, sem mudança de código nem de dependências, executada a partir de [`docs/blueprint-v100.md`](docs/blueprint-v100.md): validação em máquina limpa, histórico de uso de IA consolidado e publicação. O comportamento da API é o da `v0.5.0`; são 143 testes, que passam com `python -m pytest -W error`.

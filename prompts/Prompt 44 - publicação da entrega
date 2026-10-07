@@ -41,3 +41,16 @@ Arquivos alterados no fechamento:
 - docs/arquitetura.md e CLAUDE.md não mudaram: o Prompt 42 não mostrou divergência.
 
 Definição de pronto antes dos commits: python -m pytest -W error: 143 passed.
+
+Publicação (registrada depois da tag, na branch docs/registro-fechamento-v100):
+
+| # | Passo | Evidência | Situação |
+| --- | --- | --- | --- |
+| 12 | commits, merge e push | commits 49e0822 (docs: consolida o histórico de uso de IA) e 9d2a671 (docs: fecha a release v1.0.0) na branch docs/entrega-v100, recriada a partir de main no Prompt 43; merge --no-ff 1463679 em main; definição de pronto em main: 143 passed; push de main (6ae17f4..1463679, que inclui os commits do Prompt 42) e da branch docs/entrega-v100 | conforme |
+| 13 | tag anotada | git tag -a v1.0.0 -m "v1.0.0: entrega do curso" em 1463679; git ls-remote --tags origin v1.0.0: 5c31b3e3448727f0c78f34449359a97ec4fe7a05 refs/tags/v1.0.0 | conforme |
+| 14 | Release no GitHub | gh release create v1.0.0 --title "v1.0.0" --notes-file <arquivo em $env:TEMP com a seção [1.0.0] do CHANGELOG.md, sem o título> --verify-tag; gh release view: não é rascunho nem pre-release, publicada em 2026-10-07T21:20:49Z; URL https://github.com/luisZsiqueira/laboratorio-projeto/releases/tag/v1.0.0. A linha que calcula o fim da seção falhou no PowerShell (op_Addition), sem efeito: a linha seguinte recalculou o intervalo (linhas 8 a 21), e o corpo publicado começa pela frase da seção | conforme |
+| 15 | clone da tag | git clone --branch v1.0.0 em $env:TEMP\validacao-v100-final: HEAD 1463679; Python 3.14.6; pip install sem erro; pip check: No broken requirements found.; import sqlalchemy 2.1.3 sem bloqueio do Smart App Control; uvicorn --reload na porta 8001 (a 8000 estava ocupada pelo servidor do autor, PID 17712, como no Prompt 42): Application startup complete. e tasks.db criado; /health: 200 {"status":"ok","database":"ok"}; POST /tasks: 201; GET /tasks: 200; servidor parado (o filho do reloader, PID 25920, foi encerrado à parte; os processos do autor não foram tocados); python -m pytest -W error: 143 passed; git status --porcelain vazio; ignorados só .pytest_cache/, .venv/, __pycache__/ e tasks.db; diretório removido | conforme |
+
+Checklist de entrega: os 10 requisitos atendidos. Item 9: 143 passed também no clone da tag. Item 10: tag https://github.com/luisZsiqueira/laboratorio-projeto/releases/tag/v1.0.0 e Release na mesma URL.
+
+Divergências do blueprint: o gh não estava instalado (condição de parada 6) e foi instalado pelo autor durante a execução, sem outro desvio da E-12; a porta 8001 na validação do clone da tag; o registro da publicação ficou numa branch posterior à tag, como nas releases v0.3.0 e v0.4.0.

@@ -780,6 +780,8 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Ordem entre registro e publicação.** O *commit* de fechamento precisa vir antes da *tag*, então o README e o escopo já descrevem a *tag* e a *Release* que o passo seguinte cria. O resultado da publicação (URLs e clone da *tag*) foi registrado depois, como nas *releases* anteriores.
   - **Branch já mesclada.** A `docs/entrega-v100` tinha sido mesclada em `main` na sessão do Prompt 42 (Prompt 43, lacuna 14). Ela foi mesclada de novo, com `--no-ff`, depois dos *commits* dos Prompts 43 e 44.
   - ***Heredoc* recusado pelo *shell*.** Como nos Prompts 29, 34 e 43, um *script* longo passado por *heredoc* foi recusado; foi gravado em arquivo no diretório temporário da sessão e executado de lá.
+  - **Processo filho do *reloader*.** Na validação do clone da *tag*, encerrar o processo iniciado não liberou a porta 8001: o `--reload` do uvicorn cria um processo filho que segura a porta. A IA o identificou pela linha de comando e pelo processo pai e o encerrou, sem tocar nos processos do servidor do autor na porta 8000.
+- **Resultado do git:** *commits* `49e0822` (histórico) e `9d2a671` (fechamento) na *branch* `docs/entrega-v100`; *merge* `1463679` em `main`; *push* de `main`, que levou também os *commits* do Prompt 42, e da *branch*; *tag* anotada `v1.0.0` (`5c31b3e`) publicada; *Release* em <https://github.com/luisZsiqueira/laboratorio-projeto/releases/tag/v1.0.0>, com o texto da seção `1.0.0` do `CHANGELOG.md`. No clone da *tag*: instalação sem conflito, API respondendo em `/health` e em `/tasks`, 143 testes passando e `git status` limpo. O registro foi feito na *branch* `docs/registro-fechamento-v100`.
 
 ## Release v1.0.0: consolidação
 
