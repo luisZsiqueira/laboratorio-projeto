@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+## [0.5.0] - 2026-10-07
+
+Revisão de arquitetura, segurança, dependências e documentação, sem funcionalidade nova, executada a partir de [`docs/blueprint-v050.md`](docs/blueprint-v050.md). Inclui também o registro do fechamento da `v0.4.0`, feito em `main` depois da *tag*.
+
+**Mudança de comportamento:** um `id` acima de `9223372036854775807` nas rotas de `/tasks/{id}` passa a responder `422`, e não mais `500`.
+
 ### fix
 
 - Limita `task_id` ao maior `INTEGER` do SQLite (`2**63 - 1`) com o tipo `TaskId`: acima disso, as rotas de `/tasks/{task_id}` respondiam `500` não tratado (`OverflowError` do driver) e passam a responder `422` (RT-12, RNF-08, DT-16).
@@ -22,7 +28,10 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 ### docs
 
 - Registra o resultado do fechamento da `v0.4.0` no Prompt 35 e em `docs/HISTORY-IA.md`: *commits*, *merge*, *tag*, *push*, clone limpo e renderização dos diagramas no GitHub.
+- Adiciona `docs/blueprint-v050.md`: ordem das revisões, forma do checklist, regra de decisão entre código e documento e critério de promoção de DT a ADR (R-01 a R-07).
+- Revisa a arquitetura (RT-11): importações conferidas contra o diagrama de módulos, sem desvio de código; ADR-19 (composição por `create_app`, promove DT-01 e DT-15) e ADR-20 (conversões de formato em `app/models/`, promove DT-04, DT-12 e DT-13); citações nos ADR-15 e ADR-17; diagrama de módulos com o antes e o depois em `docs/mermaid.md`.
 - Revisa a documentação e as dependências (RT-13, RT-14): exemplos do README executados de novo na API, sem divergência; versões conferidas no PyPI em 07/10/2026, sem mudança; `docs/arquitetura.md` com `TaskId` (DT-16), `hide_parameters` (DT-17), a contagem de 143 testes e a assinatura de `build_task_service` ajustada pelo ADR-18; `docs/escopo-mvp.md` com a origem da D-08.
+- Fecha a `v0.5.0`: README (status, roadmap, Uso de IA generativa e limitações, com o nome do validador no `422` de formato pela R-05 e a ausência de checagem de tipos por ferramenta), backlog (RT-11 a RT-14 concluídos, 4 h reais), escopo, `docs/arquitetura.md`, status do *blueprint* e `docs/HISTORY-IA.md` (Prompts 39 e 40 e consolidação); `CLAUDE.md` alinhado ao ADR-20 (`app/models/` com conversões de formato, sem regra de negócio), à promoção de DTs feita na revisão, ao `422` de coerência em `error_handlers.py` e ao `TaskId`.
 
 ## [0.4.0] - 2026-10-06
 
@@ -141,7 +150,8 @@ Fundação do projeto: regras de trabalho com a IA, documentação, dependência
 - Inicializa o repositório com `.gitignore`, `CLAUDE.md` (regras de trabalho com a IA) e o primeiro *prompt*; os diretórios de `app/` e `tests/` entram no repositório com seus primeiros arquivos (`94f30f2`).
 - Amplia o `.gitignore` com seções por tecnologia e corrige o padrão que ignorava o `.env.example` (`c6ca4dd`).
 
-[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.4.0...HEAD
+[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.1.0...v0.2.0

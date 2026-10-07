@@ -1,6 +1,6 @@
 # Escopo do MVP
 
-> **Status:** escopo definido após a *release* `v0.1.0`, antes do código da aplicação; decisões D-01 a D-04 incorporadas aos requisitos no fechamento da `v0.3.0` (06/10/2026). Vale como referência para os *blueprints* das *releases* `v0.2.0` a `v1.0.0`. Mudança de escopo só com pedido explícito do autor, registrada aqui e no [`CHANGELOG.md`](../CHANGELOG.md).
+> **Status:** escopo definido após a *release* `v0.1.0`, antes do código da aplicação; decisões D-01 a D-04 incorporadas aos requisitos no fechamento da `v0.3.0` e D-05 a D-07 e D-09 no da `v0.4.0` (06/10/2026); conferido na revisão da `v0.5.0` (07/10/2026), sem decisão em aberto. Vale como referência para os *blueprints* das *releases* `v0.2.0` a `v1.0.0`. Mudança de escopo só com pedido explícito do autor, registrada aqui e no [`CHANGELOG.md`](../CHANGELOG.md).
 
 Este documento é a fonte de verdade dos requisitos do MVP: objetivo, requisitos funcionais e não funcionais, itens fora de escopo e decisões em aberto. O [`README.md`](../README.md) traz o resumo, o roadmap e as instruções de uso; a [`docs/arquitetura.md`](arquitetura.md) traz o desenho técnico e os ADRs; o [`docs/backlog.md`](backlog.md) desdobra os requisitos em itens por *release*, com critérios de aceite.
 
@@ -155,5 +155,5 @@ A decisão D-08 foi tomada no [`docs/blueprint-v020.md`](blueprint-v020.md) (se�
 | README: limitações e próximos passos | README (Limitações e próximos passos); seção 5 deste documento | atendido |
 | README: créditos e licença | README (Créditos e licença); `LICENSE` | atendido |
 | Gerenciamento de dependências | `requirements.txt`; RNF-02 | atendido |
-| Testes automatizados executáveis e passando | RNF-03 e RNF-04 | em andamento: 13 testes na `v0.2.0`, 69 na `v0.3.0` e 134 na `v0.4.0` (com `tests/test_priority_advisor.py`), todos passando com `-W error`; revisão final na `v0.5.0` |
+| Testes automatizados executáveis e passando | RNF-03 e RNF-04 | atendido: 13 testes na `v0.2.0`, 69 na `v0.3.0`, 134 na `v0.4.0` (com `tests/test_priority_advisor.py`) e 143 na `v0.5.0` (revisão de segurança), todos passando com `-W error`; validação em clone limpo a cada *release* |
 | *Release* ou *tag* de entrega | *tag* e *release* `v1.0.0`; RNF-14 | pendente |

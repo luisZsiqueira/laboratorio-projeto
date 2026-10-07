@@ -1,6 +1,6 @@
 # Blueprint da `v0.5.0`: revisão
 
-> **Status:** proposto em 06/10/2026 (Prompt 36) e aprovado pelo autor no mesmo dia. Execução prevista: Prompt 37 (passo 1), Prompt 38 (passo 2), Prompt 39 (passos 3 e 4) e Prompt 40 (passo 5, fechamento). Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
+> **Status:** proposto em 06/10/2026 (Prompt 36) e aprovado pelo autor no mesmo dia. Executado pelos Prompts 37 (passo 1), 38 (passo 2), 39 (passos 3 e 4) e 40 (passo 5, fechamento), concluído em 07/10/2026. As divergências da execução estão registradas em `docs/HISTORY-IA.md` (consolidação da `v0.5.0`). Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
 
 ## 1. Escopo da *release*
 

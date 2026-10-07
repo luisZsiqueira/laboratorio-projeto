@@ -54,6 +54,9 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 35 | 06/10/2026 | Documentação / fechamento de *release* | README, diagramas, escopo, backlog, `CHANGELOG.md`, este histórico | ~1,5 h |
 | 36 | 06/10/2026 | Planejamento / *blueprint* | `docs/blueprint-v050.md` (revisão), com levantamento prévio no código | ~1 h |
 | 37 | 06/10/2026 | Revisão de arquitetura | checklist de 16 verificações, ADR-19 e ADR-20, sem desvio de código | ~1 h |
+| 38 | 07/10/2026 | Revisão de segurança | checklist de 17 verificações, `TaskId` (DT-16), `hide_parameters` (DT-17), 9 casos de teste, retirada do mypy (ADR-21) | ~1 h |
+| 39 | 07/10/2026 | Revisão de documentação e dependências | versões conferidas no PyPI e na OSV, sem mudança; exemplos do README executados de novo; checklist de 21 verificações | ~1 h |
+| 40 | 07/10/2026 | Documentação / fechamento de *release* | README, `CLAUDE.md`, escopo, backlog, `CHANGELOG.md`, este histórico | ~1,5 h |
 
 ## Entradas
 
@@ -655,6 +658,38 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Exemplos em PowerShell e corpo da resposta.** O `Invoke-RestMethod` não mostra a lista vazia (`[]`) nem o `204`; o corpo bruto e os códigos de sucesso foram conferidos com `Invoke-WebRequest`. Nenhum exemplo divergiu: o README não mudou além das datas.
   - **Documentação defasada pelo prompt anterior.** As correções de segurança do Prompt 38 (`TaskId`, `hide_parameters`, 9 testes) não tinham chegado à seção de módulos nem à de testes da arquitetura; só a comparação do texto com o código mostrou a defasagem.
 
+### Prompt 40: fechamento da `v0.5.0`
+
+- **Data:** 07/10/2026
+- **Fase:** documentação e fechamento de *release* (passo 5 do `docs/blueprint-v050.md`)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - README: status com a `v0.5.0` concluída e o que a revisão mudou, roadmap, Uso de IA generativa (Prompts 36 a 40), lista de *blueprints* e duas limitações (nome do validador no `loc` do `422` de formato, pela R-05; ausência de checagem de tipos por ferramenta, ADR-21);
+  - `CLAUDE.md` corrigido onde a revisão o mostrou divergente: `app/models/` com conversões de formato e sem regra de negócio (ADR-20), promoção de DTs já feita, `error_handlers.py` com o `422` de coerência, `TaskId` na estrutura, rodada do roteiro de 07/10/2026 sem mudança;
+  - backlog com RT-11 a RT-14 concluídos e as horas reais; escopo com status e rastreabilidade atualizados; `CHANGELOG.md` com a seção `0.5.0`, completada com as linhas dos Prompts 36 e 37 que faltavam; status do *blueprint*; consolidação da *release*.
+- **Prompt:** [`prompts/Prompt 40 - fechamento da v0.5.0`](../prompts/Prompt%2040%20-%20fechamento%20da%20v0.5.0)
+- **Refinamentos:** a IA pediu ao autor as horas reais da *release* antes de atualizar o backlog.
+- **Ganho percebido:** ~1,5 h
+- **Desafios:**
+  - **Pendências de fechamentos anteriores.** O status de `docs/escopo-mvp.md` ainda citava só as decisões da `v0.3.0`, e o comentário de `error_handlers.py` na estrutura do `CLAUDE.md` não citava o `422` de coerência da `v0.4.0`. Ambos foram achados ao reler os arquivos por inteiro, e não só as seções previstas.
+  - **R-05 sem registro.** O *blueprint* dizia que o nome `parse_local_due_at` no `422` ficaria "documentado nas Limitações do README", mas nenhum passo anterior o fez; a limitação entrou no fechamento.
+
+## Release v0.5.0: consolidação
+
+- **Período:** 06 e 07/10/2026 (Prompts 36 a 40)
+- **Entregas:** revisões de arquitetura (RT-11), segurança (RT-12), dependências (RT-14) e documentação (RT-13), cada uma com checklist e evidência no arquivo do *prompt*. Sem funcionalidade nova. A arquitetura não tinha desvio de código; as DTs estruturais viraram ADR-19 e ADR-20. A segurança corrigiu dois desvios achados por sondagem da API em execução: `id` acima do maior inteiro do SQLite respondia `500` não tratado (DT-16) e o log de falha do banco trazia os dados enviados pelo cliente (DT-17); os testes passaram de 134 para 143. As dependências não mudaram (R-06), e os exemplos do README conferiram com a API.
+- **Uso da IA:**
+  - o Opus 5.5 fez o planejamento, as quatro revisões e o fechamento; não houve modelo de execução separado, porque a revisão exige julgamento a cada verificação;
+  - as verificações foram feitas por *script* sempre que possível (importações contra o diagrama, *docstrings* por `ast`, diagramas contra o catálogo, exemplos do README contra a API), o que deixa evidência reproduzível em vez de impressão de leitura.
+- **Divergências do *blueprint*:**
+  - passo 1: nenhuma;
+  - passo 2: a correção do `task_id` mudou o comportamento da API (`500` para `422`), o que a seção 4, item 1, não prevê; foi feita pelo pedido explícito do Prompt 38 e pelo contrato do ADR-15, e registrada no `CHANGELOG.md`. O mypy deixou de rodar por bloqueio do ambiente e saiu do projeto por decisão do autor (ADR-21), com o *blueprint* ajustado;
+  - passos 3 e 4: nenhuma;
+  - passo 5: além do previsto, o `CLAUDE.md` também foi corrigido no comentário de `error_handlers.py`, na regra de promoção de DTs e no `TaskId`; o status do escopo, defasado desde a `v0.4.0`, foi atualizado; a limitação da R-05 entrou no README só no fechamento.
+- **Ganho percebido acumulado:** ~5,5 h (soma das estimativas dos Prompts 36 a 40).
+- **Horas reais:** 4 h, informadas pelo autor, iguais à estimativa (2,5 h dos itens, mais *blueprint* e fechamento). Até a `v0.5.0`, 19 h contra 20,75 h estimadas; a projeção do projeto continua em cerca de 22 h.
+- **Lição principal:** revisar lendo o código não bastou. Os dois desvios de segurança não apareciam no código nem nos testes: um vinha do *driver* e o outro da mensagem padrão da exceção do SQLAlchemy. Só apareceram ao executar a API com entradas extremas e ler o log produzido. Do mesmo modo, a documentação defasada pelas próprias correções só apareceu ao comparar o texto com o código, item a item.
+
 ## Observações transversais
 
 Padrões que se repetiram nas interações até aqui, a aprofundar na análise final:
@@ -663,4 +698,4 @@ Padrões que se repetiram nas interações até aqui, a aprofundar na análise f
 - **Verificação por execução supera o conhecimento do modelo.** O caso `httpx2` mostra que versões e APIs mudam depois do corte de treinamento; consultar o PyPI e rodar código no ambiente real evitou um erro que só apareceria nos testes.
 - **Premissas erradas nos *prompts* foram detectadas, não completadas.** Arquivos inexistentes, roadmap inexistente e códigos HTTP impossíveis no fluxo pedido foram apontados antes de a IA produzir conteúdo sobre eles.
 - **A IA também erra.** O `.gitignore` do Prompt 00 tinha um padrão que ignorava o `.env.example`; a revisão seguinte corrigiu. Por isso toda saída passa por revisão antes de entrar em `main`.
-- **Ambiente Windows gera atritos próprios:** bloqueio de arquivo aberto em outro programa e conversão de fim de linha (LF/CRLF), tratados sem perda de dados.
+- **Ambiente Windows gera atritos próprios:** bloqueio de arquivo aberto em outro programa e conversão de fim de linha (LF/CRLF), tratados sem perda de dados. O Smart App Control bloqueou extensões compiladas não assinadas: as do SQLAlchemy, contornadas com a instalação em Python puro, e as do mypy, que saiu do projeto (ADR-21).
