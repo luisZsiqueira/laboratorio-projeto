@@ -16,6 +16,8 @@ def create_db_engine(database_url: str) -> Engine:
 
     O SQLite recebe `check_same_thread=False` porque as rotas síncronas rodam no
     *pool* de *threads* do FastAPI; a sessão é criada e fechada por requisição.
+    Com `hide_parameters=True`, as exceções do SQLAlchemy, e portanto o log,
+    trazem o SQL sem os valores enviados pelo cliente (DT-17).
 
     Args:
         database_url: URL de conexão do SQLAlchemy.
@@ -23,7 +25,11 @@ def create_db_engine(database_url: str) -> Engine:
     Returns:
         O engine, que só conecta na primeira consulta.
     """
-    return create_engine(database_url, connect_args={"check_same_thread": False})
+    return create_engine(
+        database_url,
+        connect_args={"check_same_thread": False},
+        hide_parameters=True,
+    )
 
 
 engine: Engine = create_db_engine(get_settings().database_url)

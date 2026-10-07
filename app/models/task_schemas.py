@@ -6,6 +6,7 @@ from pydantic import (
     BaseModel,
     BeforeValidator,
     ConfigDict,
+    Field,
     NaiveDatetime,
     StringConstraints,
     field_validator,
@@ -13,6 +14,10 @@ from pydantic import (
 
 TaskStatus = Literal["pending", "done"]
 TaskPriority = Literal[1, 2, 3, 4]
+
+# Maior valor do INTEGER do SQLite; acima dele o driver levanta OverflowError (DT-16).
+MAX_TASK_ID = 2**63 - 1
+TaskId = Annotated[int, Field(le=MAX_TASK_ID)]
 
 TaskTitle = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)

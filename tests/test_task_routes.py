@@ -18,7 +18,7 @@ from app.models.base import Base
 from app.models.settings import Environment, Settings
 from app.models.task import Task
 from app.repositories import database
-from app.repositories.database import get_db, ping
+from app.repositories.database import create_db_engine, get_db, ping
 from app.repositories.task_repository import TaskRepository
 
 
@@ -633,6 +633,79 @@ def test_database_failure_returns_500_without_internal_details(
     assert "tasks" not in response.text
     assert "SELECT" not in response.text
     assert "no such table" in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "json_body"),
+    [
+        ("GET", f"/tasks/{2**63}", None),
+        ("PUT", f"/tasks/{2**63}", PUT_BODY),
+        ("PATCH", f"/tasks/{2**63}", {"title": "B"}),
+        ("POST", f"/tasks/{2**63}/complete", None),
+        ("DELETE", f"/tasks/{2**63}", None),
+    ],
+)
+def test_task_id_above_integer_limit_has_no_internal_details(
+    client: TestClient,
+    method: str,
+    path: str,
+    json_body: dict[str, object] | None,
+) -> None:
+    """task_id acima do INTEGER do SQLite responde 422, sem chegar ao banco (DT-16)."""
+    response = client.request(method, path, json=json_body)
+
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["path", "task_id"]
+    assert "Overflow" not in response.text
+
+
+@pytest.mark.parametrize(
+    ("request_content", "error_type"),
+    [
+        (b'{"title": "A", "due_at": "31/02/2026"}', "value_error"),
+        (b'{"title": "A", "priority": 5}', "literal_error"),
+        (b'{"title": ', "json_invalid"),
+    ],
+)
+def test_validation_errors_have_no_internal_details(
+    client: TestClient, request_content: bytes, error_type: str
+) -> None:
+    """O 422 de validação traz só o formato padrão, sem stack trace, SQL nem caminho (R-05)."""
+    response = client.post(
+        "/tasks", content=request_content, headers={"Content-Type": "application/json"}
+    )
+
+    assert response.status_code == 422
+    assert error_type in {error["type"] for error in response.json()["detail"]}
+    for internal_detail in ("Traceback", "File ", ".py", "SELECT", "sqlalchemy"):
+        assert internal_detail not in response.text
+
+
+def test_database_failure_log_has_no_request_values(
+    test_engine: Engine, caplog: pytest.LogCaptureFixture
+) -> None:
+    """O log da falha do banco traz o erro, mas não os valores enviados pelo cliente (DT-17)."""
+    engine_without_tables = create_db_engine("sqlite://")
+    application = create_app(Settings(_env_file=None, environment="test"), test_engine)
+    application.dependency_overrides[get_db] = build_get_db_override(
+        sessionmaker(bind=engine_without_tables)
+    )
+    try:
+        with (
+            TestClient(application) as test_client,
+            caplog.at_level(logging.ERROR, logger="app.api.error_handlers"),
+        ):
+            response = test_client.post(
+                "/tasks", json={"title": "Consulta sigilosa", "description": "Dado pessoal"}
+            )
+    finally:
+        application.dependency_overrides.clear()
+        engine_without_tables.dispose()
+
+    assert response.status_code == 500
+    assert "no such table" in caplog.text
+    assert "Consulta sigilosa" not in caplog.text
+    assert "Dado pessoal" not in caplog.text
 
 
 INCOHERENT_PRIORITY_RESPONSE = {

@@ -70,7 +70,7 @@ Aplicação às DTs existentes (o passo 1 confirma; só muda se o código contra
 
 ## 6. Passos
 
-Cada passo termina com a definição de pronto verde, na raiz, com o `.venv` ativo: `python -m pytest -W error` e `python -m mypy --explicit-package-bases app`. Estado inicial: 134 testes, mypy sem erros em 18 arquivos.
+Cada passo termina com a definição de pronto verde, na raiz, com o `.venv` ativo: `python -m pytest -W error`. Estado inicial: 134 testes, mypy sem erros em 18 arquivos. A partir do passo 2 (Prompt 38, 07/10/2026), o mypy deixou de ser usado (ADR-21): sai da definição de pronto e do `requirements.txt`.
 
 ### Passo 1: arquitetura (RT-11) — Prompt 37
 
@@ -97,7 +97,7 @@ Verificações, cada uma uma linha do checklist:
 
 ### Passo 3: dependências (RT-14) — Prompt 39
 
-1. Para cada pacote direto do `requirements.txt` (`fastapi`, `uvicorn`, `SQLAlchemy`, `pydantic`, `pydantic-settings`, `pytest`, `httpx2`, `mypy`), consultar o PyPI e registrar: versão fixada, última versão, data da consulta e decisão pela R-06.
+1. Para cada pacote direto do `requirements.txt` (`fastapi`, `uvicorn`, `SQLAlchemy`, `pydantic`, `pydantic-settings`, `pytest`, `httpx2`; o `mypy` saiu pelo ADR-21), consultar o PyPI e registrar: versão fixada, última versão, data da consulta e decisão pela R-06.
 2. `python -m pip check` (esperado: "No broken requirements found.").
 3. Se uma versão mudar pela R-06: notas de versão lidas, testes mínimos do roteiro (`CLAUDE.md`, APIs deprecadas) executados com `-W error`, tabela do roteiro, `requirements.txt` e README (Stack) atualizados. Sem mudança, a tabela do roteiro não muda.
 

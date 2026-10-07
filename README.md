@@ -55,7 +55,6 @@ Toda resposta de tarefa traz `suggested_priority`, calculada pela proximidade do
 | SQLite3 | embutido no Python | banco de dados |
 | pytest | 9.1.1 | testes unitários e de integração |
 | httpx2 | 2.13.1 | cliente HTTP do `TestClient` |
-| mypy | 2.4.0 | checagem estática de tipos |
 | Mermaid.js | renderizado pelo GitHub | diagramas de arquitetura |
 
 As versões estão fixadas no [`requirements.txt`](requirements.txt), incluindo as dependências transitivas. Elas foram consultadas no PyPI em 03/10/2026. O Python 3.11 é o mínimo porque o SQLAlchemy 2.1 o exige.
@@ -85,7 +84,7 @@ Com a API em execução (ver [Como rodar localmente](#como-rodar-localmente)), t
 | --- | --- | --- |
 | `POST /tasks` | cria uma tarefa; prioridade `4` exige `due_at` | `201` criada; `422` corpo inválido ou prioridade incoerente |
 | `GET /tasks` | lista as tarefas por `id`; filtros opcionais `?status=pending` ou `?status=done` e `?priority=1` a `4`, combináveis (`?status=done&priority=1`) | `200`; `422` *status* ou prioridade inválidos |
-| `GET /tasks/{id}` | consulta uma tarefa | `200`; `404` não existe; `422` `id` não numérico |
+| `GET /tasks/{id}` | consulta uma tarefa | `200`; `404` não existe; `422` `id` não numérico ou acima de 9223372036854775807 |
 | `PUT /tasks/{id}` | substitui os cinco campos editáveis (todos obrigatórios) | `200`; `404`; `422` corpo inválido ou prioridade incoerente |
 | `PATCH /tasks/{id}` | altera só os campos enviados; a coerência entre prioridade e `due_at` vale para o estado resultante | `200`; `404`; `422` corpo inválido ou prioridade incoerente |
 | `POST /tasks/{id}/complete` | marca como concluída; repetir a chamada é permitido e devolve a mesma tarefa | `200`; `404`; `422` |
@@ -548,14 +547,13 @@ python -m uvicorn app.main:app --reload
 
 A API fica disponível em `http://127.0.0.1:8000`, e a documentação interativa em `http://127.0.0.1:8000/docs`. O log do *uvicorn* mostra `Application startup complete.` quando a aplicação está pronta; o primeiro início cria o arquivo `tasks.db` na raiz, que não é versionado. Para conferir, use o exemplo de [`GET /health`](#get-health-saúde-da-aplicação-e-do-banco).
 
-### 5. Rodar os testes e a checagem de tipos
+### 5. Rodar os testes
 
 ```bash
 python -m pytest -W error
-python -m mypy --explicit-package-bases app
 ```
 
-Os testes usam SQLite em memória e não criam arquivos no repositório. Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` na raiz (ADR-03 e ADR-11 em [`docs/arquitetura.md`](docs/arquitetura.md)).
+Os testes usam SQLite em memória e não criam arquivos no repositório. Todos os comandos são executados a partir da raiz do repositório, com o `.venv` ativo. O projeto não usa checagem estática de tipos por ferramenta: o mypy foi retirado em 07/10/2026, porque o Smart App Control do Windows bloqueia as suas extensões compiladas (ADR-21 em [`docs/arquitetura.md`](docs/arquitetura.md)). Os *type hints* continuam obrigatórios e são conferidos na revisão de código.
 
 ### Solução de problemas (Windows)
 

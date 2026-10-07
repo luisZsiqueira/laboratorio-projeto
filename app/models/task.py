@@ -10,8 +10,8 @@ from app.models.task_schemas import TaskPriority, TaskStatus
 class Task(Base):
     """Modelo ORM da tarefa, tabela `tasks` (RT-05).
 
-    O tipo da coluna é explícito: o `Literal` da anotação serve ao mypy e o banco
-    guarda texto e inteiro. As datas são gravadas em UTC e lidas com fuso
+    O tipo da coluna é explícito: o `Literal` da anotação documenta os valores
+    aceitos e o banco guarda texto e inteiro. As datas são gravadas em UTC e lidas com fuso
     (`UTCDateTime`, DT-04); `updated_at` muda a cada alteração (`onupdate`).
 
     Attributes:

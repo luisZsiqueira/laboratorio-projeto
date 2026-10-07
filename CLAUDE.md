@@ -111,16 +111,15 @@ Executar a partir da raiz do repositório, com o ambiente virtual `.venv` ativo:
 
 ```bash
 python -m pytest -W error
-python -m mypy --explicit-package-bases app
 ```
 
-Ambos devem passar, sem avisos. O `-W error` faz avisos de deprecação aparecerem como falha antes de virarem quebra. O `python -m` coloca a raiz do repositório no `sys.path`, o que permite aos testes importar `app` sem `conftest.py` nem arquivo de configuração. O `--explicit-package-bases` é necessário porque `app/` não tem `__init__.py` (ADR-03 e ADR-11 de `docs/arquitetura.md`). Nenhuma tarefa é dada como concluída sem a definição de pronto passando.
+Deve passar, sem avisos. O `-W error` faz avisos de deprecação aparecerem como falha antes de virarem quebra. O `python -m` coloca a raiz do repositório no `sys.path`, o que permite aos testes importar `app` sem `conftest.py` nem arquivo de configuração. Não há checagem estática de tipos por ferramenta: o mypy deixou de ser usado em 07/10/2026 (ADR-21 de `docs/arquitetura.md`), e a tipagem é conferida na revisão de código. Nenhuma tarefa é dada como concluída sem a definição de pronto passando.
 
 ### Reprodutibilidade
 
 O avaliador deve conseguir clonar o repositório em uma máquina limpa e, sem conhecimento prévio, instalar, rodar a API e rodar os testes.
 
-- O README (Como rodar) é a interface única de operação, com os comandos em PowerShell e em Bash: criar e ativar o `.venv`, instalar (`python -m pip install -r requirements.txt`), rodar a API em desenvolvimento (`python -m uvicorn app.main:app --reload`), rodar os testes e a checagem de tipos (os comandos da [definição de pronto](#definição-de-pronto)). Não há `Makefile`, `pyproject.toml` nem arquivos de configuração de ferramentas: as opções de `pytest` e `mypy` vão na linha de comando documentada.
+- O README (Como rodar) é a interface única de operação, com os comandos em PowerShell e em Bash: criar e ativar o `.venv`, instalar (`python -m pip install -r requirements.txt`), rodar a API em desenvolvimento (`python -m uvicorn app.main:app --reload`), rodar os testes (o comando da [definição de pronto](#definição-de-pronto)). Não há `Makefile`, `pyproject.toml` nem arquivos de configuração de ferramentas: as opções do `pytest` vão na linha de comando documentada.
 - O `requirements.txt`, com versões fixadas, é a única declaração de dependências.
 - Testes fazem parte da aplicação: versionados em `tests/`, sem depender de estado local, de arquivos fora do repositório ou de serviços externos. Banco sempre em memória nos testes.
 - Ambiente de desenvolvimento em Windows com PowerShell: os comandos do README são testados nele.
@@ -181,7 +180,7 @@ Ao final do projeto, o `HISTORY-IA.md` é a base do histórico de uso de IA exig
 
 - **Nomenclatura semântica.** Nomes dizem o que a coisa é ou faz, no vocabulário do domínio (`task`, `due_at`, `priority`, `mark_task_done`); nada de abreviações opacas, nomes genéricos (`data`, `obj`, `tmp`, `helper`, `utils`) ou sufixos numéricos. Funções com verbo; booleanos com `is_`/`has_`; exceções terminando em `Error`.
 - **Funções coesas.** Cada função faz uma coisa, no nível de abstração da sua camada, com efeitos colaterais explícitos no nome ou na *docstring*. Se precisa de "e" para ser descrita, ou passa de cerca de 30 linhas, é candidata a divisão. Sem parâmetros *flag* que mudam o comportamento da função.
-- **Atenção à tipagem.** *Type hints* em todas as funções, métodos e retornos; o código passa no `mypy`. Sem `Any` nem `# type: ignore` sem justificativa em comentário; ausência explícita com `X | None`; coleções parametrizadas (`list[Task]`); retorno preciso, nunca mais largo que o necessário.
+- **Atenção à tipagem.** *Type hints* em todas as funções, métodos e retornos, conferidos na revisão de código (sem checagem por ferramenta, ADR-21). Sem `Any` nem `# type: ignore` sem justificativa em comentário; ausência explícita com `X | None`; coleções parametrizadas (`list[Task]`); retorno preciso, nunca mais largo que o necessário.
 - *Docstrings* em português em todas as classes e funções públicas (propósito, parâmetros, retorno, exceções).
 - Conjuntos fechados de valores sempre com `typing.Literal` (por exemplo `TaskStatus`, `TaskPriority` e `ENVIRONMENT`). Nunca `str` ou `int` livre para esses casos.
 - Datas e horas sempre *timezone-aware*: em UTC na persistência; na entrada e na saída da API, no fuso local de `LOCAL_UTC_OFFSET` (ADR-18).
@@ -224,7 +223,7 @@ Padrões suspeitos a checar primeiro, por serem os que assistentes de IA costuma
 | `declarative_base()` | `class Base(DeclarativeBase)` | estilo legado, evitar (SQLAlchemy 2.1.3, 04/10/2026): sem aviso; `DeclarativeBase` permitido |
 | cliente HTTP usado pelo `TestClient` (`httpx` vs. sucessor) | `httpx2` (2.13.1): sem ele, o Starlette recorre ao `httpx` e emite aviso de deprecação | proibido `httpx` (Starlette 1.7.0, 03/10/2026); `httpx2` permitido (04/10/2026) |
 | fixture de banco em memória sem `engine.dispose()` | chamar `engine.dispose()` ao final da fixture | proibido (SQLAlchemy 2.1.3, Python 3.14.6, 04/10/2026): `ResourceWarning` (`unclosed database`) vira `PytestUnraisableExceptionWarning`; com `dispose()` permitido |
-| `mypy app` sobre `app/` sem `__init__.py` na raiz | `python -m mypy --explicit-package-bases app` (ADR-11) | proibido `mypy app` (mypy 2.4.0, 04/10/2026): "Source file found twice under different module names"; com `--explicit-package-bases` permitido |
+| `mypy app` sobre `app/` sem `__init__.py` na raiz | `python -m mypy --explicit-package-bases app` (ADR-11) | proibido `mypy app` (mypy 2.4.0, 04/10/2026): "Source file found twice under different module names"; com `--explicit-package-bases` permitido. Não se aplica desde 07/10/2026: mypy removido do projeto (ADR-21) |
 | `status.HTTP_422_UNPROCESSABLE_ENTITY` | `status.HTTP_422_UNPROCESSABLE_CONTENT` no código; o inteiro `422` nos testes | proibido (Starlette 1.7.0, 05/10/2026): `StarletteDeprecationWarning`; `HTTP_422_UNPROCESSABLE_CONTENT` permitido (06/10/2026) |
 | `session.query(...)` | `session.get(Task, task_id)` e `session.scalars(select(Task)...)` | estilo legado, evitar (SQLAlchemy 2.1.3, 05/10/2026): sem aviso; `session.get` e `scalars` permitidos |
 

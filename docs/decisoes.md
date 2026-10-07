@@ -141,3 +141,21 @@ Registro das decisões técnicas de implementação (DT) que não estão no *blu
 - **Consequências:** cada aplicação usa as suas configurações; a anotação `Settings` na leitura de `app.state` é o único ponto sem verificação estática de tipo.
 - **IDs relacionados:** RF-09, D-09, ADR-18, DT-01, DT-02.
 - **Promovida ao ADR-19** na revisão da `v0.5.0` (06/10/2026); a decisão vigente está em [`docs/arquitetura.md`](arquitetura.md).
+
+## DT-16: `task_id` limitado ao maior `INTEGER` do SQLite (`TaskId`)
+
+- **Data e *release*:** 07/10/2026, `v0.5.0` (revisão de segurança, Prompt 38).
+- **Contexto:** o parâmetro de rota `task_id: int` aceitava qualquer inteiro. Acima de `2**63 - 1`, o driver `sqlite3` levanta `OverflowError`, que não é `SQLAlchemyError`, não passa pelos tradutores do ADR-15 e virava `500` não tratado (corpo `Internal Server Error`, sem detalhe interno, mas fora do contrato).
+- **Decisão:** `MAX_TASK_ID = 2**63 - 1` e `TaskId = Annotated[int, Field(le=MAX_TASK_ID)]` em `app/models/task_schemas.py`; as cinco rotas de `/tasks/{task_id}` usam `TaskId`. Valor acima do limite responde `422` no formato padrão do FastAPI, como o `id` não numérico.
+- **Alternativas descartadas:** `Path(le=...)` do FastAPI no tipo, porque levaria a importação do FastAPI para `app/models/`; tradutor de `OverflowError` em `error_handlers.py`, porque trataria como falha interna (`500`) uma entrada inválida; limite inferior (`ge=1`), porque `id` zero ou negativo já responde `404` e mudá-lo alteraria o contrato sem motivo de segurança.
+- **Consequências:** toda entrada de rota tem limite (RNF-08); `id` zero ou negativo continua respondendo `404`.
+- **IDs relacionados:** RT-12, RNF-08, ADR-15.
+
+## DT-17: engine com `hide_parameters=True`
+
+- **Data e *release*:** 07/10/2026, `v0.5.0` (revisão de segurança, Prompt 38).
+- **Contexto:** o tradutor do `500` grava a exceção do SQLAlchemy no log (ADR-15). Por padrão, a mensagem dessa exceção traz os parâmetros da consulta, ou seja, os valores enviados pelo cliente (`[parameters: ('título', 'descrição', ...)]`).
+- **Decisão:** `create_db_engine` cria o engine com `hide_parameters=True`; o log mantém o tipo do erro e o SQL (sem valores), e mostra `[SQL parameters hidden due to hide_parameters=True]` no lugar dos parâmetros.
+- **Alternativas descartadas:** filtrar a mensagem no tradutor de erros, porque dependeria do formato do texto do SQLAlchemy; deixar de registrar a exceção, porque o diagnóstico da falha depende do log.
+- **Consequências:** logs sem dados do usuário (RNF-10); o diagnóstico de uma falha não mostra o valor que a causou. Os *engines* dos testes, criados com `create_engine` direto, não são afetados; o teste da DT-17 usa `create_db_engine`.
+- **IDs relacionados:** RT-12, RNF-10, ADR-04, ADR-15.

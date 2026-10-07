@@ -620,6 +620,23 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Nenhum desvio de código.** As camadas foram respeitadas desde a `v0.2.0`; o resultado da revisão foi só documental. A comparação por *script*, e não por leitura, dá a evidência de que nenhuma importação ficou de fora.
   - **Edição por *script*.** A inserção das linhas "Promovida" falhou na DT-13, que tem a mesma linha de IDs da DT-14; a edição passou a ser feita pela posição de cada DT, sem efeito parcial no arquivo.
 
+### Prompt 38: revisão de segurança
+
+- **Data:** 07/10/2026
+- **Fase:** revisão (passo 2 do `docs/blueprint-v050.md`, RT-12)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - buscas por SQL textual e strings formatadas em `app/`; leitura de rotas, esquemas, tradutores de erro e chamadas de log;
+  - sondagem por *script* temporário, fora do repositório, das respostas de erro em `production` e do conteúdo do log de uma falha real do banco;
+  - duas correções: `task_id` limitado a `2**63 - 1` (`TaskId`, DT-16), que respondia `500` não tratado (`OverflowError` do driver), e `hide_parameters=True` no engine (DT-17), porque o log trazia o título e a descrição enviados;
+  - três testes novos (9 casos), dois deles conferidos em vermelho contra o código do `HEAD`; varredura de segredos no histórico sem achados; checklist de 17 verificações.
+- **Prompt:** [`prompts/Prompt 38 - revisão de segurança`](../prompts/Prompt%2038%20-%20revis%C3%A3o%20de%20seguran%C3%A7a)
+- **Refinamentos:** três interações seguintes. O autor pediu para rodar o mypy no WSL; a IA verificou que o WSL não tinha distribuição instalada e apresentou o que a instalação exigiria (usuário Linux interativo, outra versão do Python). O autor decidiu não usar mais o mypy: ADR-21, mypy e as dependências que só ele usava retirados do `requirements.txt`, do `.venv` e da definição de pronto (`CLAUDE.md`, README, escopo, backlog e *blueprint* da `v0.5.0`). Depois, a pedido do autor, a IA testou o mypy 1.18.2 em Python puro, e o autor registrou a checagem como bem-sucedida (ver Desafios).
+- **Ganho percebido:** ~1 h
+- **Desafios:**
+  - **Sondar em vez de só ler.** Nenhum dos dois desvios aparece na leitura do código nem nos testes existentes: o `OverflowError` vem do driver, e os parâmetros entram no log pela mensagem padrão da exceção do SQLAlchemy. Ambos foram achados executando a API com entradas extremas e lendo o log produzido.
+  - **Definição de pronto bloqueada pelo ambiente.** O Smart App Control passou a bloquear os `.pyd` do mypy 2.4.0 e do `librt`, que tinham rodado no dia anterior. O mypy em Python puro também falhou, porque o `librt` só existe compilado. A checagem de tipos ficou pendente, com a decisão para o autor, que retirou o mypy do projeto (ADR-21): desligar o Smart App Control é irreversível, e o WSL exigiria instalar e manter um segundo ambiente fora do Windows com PowerShell. A tipagem passa a ser conferida na revisão de código. A pedido do autor, a IA procurou alternativa não binária: o mypy 1.18.2, última versão sem o `librt`, tem pacote em Python puro e não é bloqueado. Executado fora do repositório sobre o código do Prompt 38, terminou com sucesso (18 arquivos sem erros) em 6 de 12 execuções; nas outras 6, o interpretador Python 3.14.6 caiu com erro interno (`Executing a cache`), sem apontar erro de tipo. O autor considerou as execuções bem-sucedidas suficientes como evidência da checagem.
+
 ## Observações transversais
 
 Padrões que se repetiram nas interações até aqui, a aprofundar na análise final:

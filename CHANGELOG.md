@@ -6,6 +6,19 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+### fix
+
+- Limita `task_id` ao maior `INTEGER` do SQLite (`2**63 - 1`) com o tipo `TaskId`: acima disso, as rotas de `/tasks/{task_id}` respondiam `500` não tratado (`OverflowError` do driver) e passam a responder `422` (RT-12, RNF-08, DT-16).
+- Cria o engine com `hide_parameters=True`: o log da falha do banco deixa de trazer os valores enviados pelo cliente (título, descrição); o SQL e o erro continuam no log (RT-12, RNF-10, DT-17).
+
+### build
+
+- Remove o mypy 2.4.0 do `requirements.txt`, com as dependências transitivas que só ele usava (`librt`, `ast_serialize`, `mypy_extensions` e `pathspec`): o Smart App Control do Windows bloqueia as suas extensões compiladas. A definição de pronto passa a ser só `python -m pytest -W error`, e a tipagem é conferida na revisão de código (ADR-21, que substitui o ADR-11).
+
+### test
+
+- Adiciona a `tests/test_task_routes.py` `test_task_id_above_integer_limit_has_no_internal_details` (5 casos, um por rota), `test_validation_errors_have_no_internal_details` (3 casos: formato de `due_at`, prioridade fora do `Literal` e JSON malformado) e `test_database_failure_log_has_no_request_values`; são 143 testes no total.
+
 ### docs
 
 - Registra o resultado do fechamento da `v0.4.0` no Prompt 35 e em `docs/HISTORY-IA.md`: *commits*, *merge*, *tag*, *push*, clone limpo e renderização dos diagramas no GitHub.

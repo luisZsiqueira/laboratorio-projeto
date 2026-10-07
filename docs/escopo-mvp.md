@@ -16,7 +16,7 @@ O MVP está concluído, na *release* `v1.0.0`, quando:
 
 1. todos os requisitos funcionais da seção 3 estão implementados e cobertos por testes;
 2. a definição de pronto passa em ambiente limpo, sem avisos:
-   `python -m pytest -W error` e `python -m mypy --explicit-package-bases app`;
+   `python -m pytest -W error` (sem checagem de tipos por ferramenta, ADR-21);
 3. o README permite instalar, executar e testar seguindo apenas os comandos documentados, em PowerShell e em Bash;
 4. os requisitos de entrega do curso ([`docs/requerimentos.md`](requerimentos.md)) estão atendidos (seção 7);
 5. a *tag* `v1.0.0` está publicada no GitHub.
@@ -86,7 +86,7 @@ Cada requisito indica a *release* prevista no roadmap do README. Os códigos de 
 | RNF-02 | Dependências | o `requirements.txt` é a única declaração de dependências, com versões fixadas e verificadas (fonte e data registradas) | `python -m pip check`; comparação com `pip freeze` |
 | RNF-03 | Testabilidade | testes unitários do *service* e do `priority_advisor` e testes de integração de todos os endpoints, cobrindo sucesso e erro de cada um; banco em memória; sem estado local nem serviços externos | `python -m pytest -W error` |
 | RNF-04 | Ausência de avisos | nenhum aviso de deprecação ou de recurso não liberado; padrões proibidos listados no roteiro de checagem do `CLAUDE.md` | `-W error` na definição de pronto |
-| RNF-05 | Tipagem | *type hints* em todas as funções e retornos; conjuntos fechados com `typing.Literal` | `python -m mypy --explicit-package-bases app` |
+| RNF-05 | Tipagem | *type hints* em todas as funções e retornos; conjuntos fechados com `typing.Literal` | revisão de código (mypy retirado em 07/10/2026, ADR-21) |
 | RNF-06 | Arquitetura | camadas Controller → Service → Repository, um pacote por camada; rotas sem acesso ao banco nem regra de negócio; *service* sem conhecimento de HTTP (ADR-01) | revisão de código na `v0.5.0` |
 | RNF-07 | Configuração | toda configuração vem do ambiente ou do `.env`, via pydantic-settings; nenhum literal de configuração no código; variáveis documentadas no README sem valores sensíveis | revisão de código; testes com `ENVIRONMENT=production` |
 | RNF-08 | Segurança: entrada | todo dado externo passa por esquemas Pydantic v2 com tipos, tamanhos máximos e `Literal` | testes de 422 |

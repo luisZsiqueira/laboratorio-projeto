@@ -21,7 +21,7 @@ O backlog organiza por *release* o trabalho que falta para entregar o MVP descri
 
 Valem para todo item, além dos critérios próprios, e não são repetidos nas tabelas:
 
-1. A definição de pronto passa sem avisos: `python -m pytest -W error` e `python -m mypy --explicit-package-bases app` **[C]**.
+1. A definição de pronto passa sem avisos: `python -m pytest -W error` **[C]**. Até a `v0.4.0` incluía `python -m mypy --explicit-package-bases app`, retirado em 07/10/2026 (ADR-21).
 2. Código com *type hints*, *docstrings* em português e conjuntos fechados com `typing.Literal` **[I]**.
 3. Camadas respeitadas: rotas sem acesso ao banco nem regra de negócio, *service* sem HTTP, *repository* sem regra de negócio **[I]**.
 4. Nenhum padrão proibido no roteiro de checagem de APIs deprecadas do `CLAUDE.md` **[I]**.
