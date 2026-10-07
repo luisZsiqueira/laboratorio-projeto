@@ -1,0 +1,19 @@
+Contexto: Release v1.0.0 (entrega) do backlog: RT-15 a RT-17; docs/requerimentos.md e a rastreabilidade da seção 7 de docs/escopo-mvp.md; horas reais acumuladas frente ao orçamento de cerca de 30 h.
+Objetivo: Escrever docs/blueprint-v100.md: roteiro da validação em máquina limpa (diretório temporário fora do repositório, comandos do README em PowerShell e em Bash, resultado esperado de cada um); lista de verificação do histórico de uso de IA (prompts sem registro de execução, entradas faltantes no HISTORY-IA.md, modelos ausentes do README); checklist de publicação (rastreabilidade, status do README, CHANGELOG.md, tag, Release no GitHub); critério de parada se um requisito do curso não estiver atendido; estimativa frente às 2 h.
+Estilo: Blueprint curto; sem decisões em aberto; sem código.
+Resposta: Apenas docs/blueprint-v100.md, para aprovação. Git: branch docs/entrega-v100 a partir de main; adicionar; não comitar.
+
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 07/10/2026
+
+Resumo da execução:
+
+1. Lidos docs/backlog.md (seções 2, 3 e 4.5, RT-15 a RT-17), docs/requerimentos.md, docs/escopo-mvp.md (RNF e seção 7), o README (Configuração, Como rodar, Roadmap, Uso de IA generativa), docs/HISTORY-IA.md, docs/EXTRA-HISTORY-IA.md, docs/blueprint-v050.md (formato) e os Prompts 42 a 44.
+2. Levantamento prévio, para que o blueprint não deixe decisões em aberto: definição de pronto em main (6ae17f4, igual a origin/main) com 143 testes verdes; tags v0.1.0 a v0.5.0; 33 commits no padrão Conventional Commits; registro de execução presente em todos os prompts de 00 a 40; lacunas do histórico (Prompts 14 a 19 inexistentes e não explicados, tabela Ambiente desatualizada desde o Prompt 31, link file:/// no EXTRA-HISTORY-IA.md, status e menção ao mypy em prompts-desenvolvimento.md); GitHub CLI e winget ausentes; WSL sem distribuição; Git Bash com python3 disponível.
+3. Gerado docs/blueprint-v100.md: escopo com os critérios do backlog; levantamento prévio; decisões E-01 a E-15; passo 1 com o roteiro da validação em PowerShell e Git Bash (12 linhas, resultado esperado de cada uma); passo 2 com a lista de verificação do histórico (8 itens); passo 3 com o checklist dos 10 requisitos do curso e o fechamento (merge, tag, Release com gh, validação no clone da tag); o que pode e não pode mudar (sem Makefile, sem código, sem mudança de versão); condição de parada (requisito do curso não atendido bloqueia a tag); riscos; estimativa (2 h dos itens, 3 h da release, projeção de cerca de 22 h).
+4. Decisões do assistente a confirmar na aprovação: E-03 (Linux/macOS registrado como não verificado), E-04 (README ganha a ativação e a Solução de problemas para o Git Bash do Windows), E-09 e E-10 (correções pontuais no EXTRA-HISTORY-IA.md e em prompts-desenvolvimento.md) e E-12 (instalação e autenticação da GitHub CLI pelo autor antes do Prompt 44).
+5. Definição de pronto: 143 passed, sem avisos (nenhum arquivo de app/ ou tests/ alterado).
+6. Git: branch docs/entrega-v100 criada a partir de main; blueprint e este arquivo adicionados ao stage; sem commit.
