@@ -46,10 +46,10 @@ Executado ao final de cada *release*, conforme o `CLAUDE.md` (Fechamento de rele
 | `v0.3.0` | CRUD de tarefas | RT-05 a RT-09, RF-01 a RF-08 | 6,5 h | 8 h |
 | `v0.4.0` | prioridades e `priority_advisor`, filtro por prioridade e datas no horário local | RT-10, RF-09 a RF-11, RF-14; D-09 | 5,75 h | 3 h |
 | `v0.5.0` | revisão de arquitetura, segurança e documentação | RT-11 a RT-14 | 2,5 h | 4 h |
-| `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h | — |
-| **Total** | | 17 RT, 14 RF | **20,75 h** | **19 h** (até a `v0.5.0`) |
+| `v1.0.0` | entrega do curso | RT-15 a RT-17 | 2 h | 2 h |
+| **Total** | | 17 RT, 14 RF | **20,75 h** | **21 h** |
 
-As horas reais são informadas pelo autor por *release*, e não por item. Elas incluem o *blueprint*, o fechamento e o *git*, que as estimativas por item não cobrem. O tempo da `v0.1.0` (inicialização e documentação) não foi medido. Até a `v0.3.0`, foram gastas 12 h contra 10,5 h estimadas. Na `v0.4.0`, a estimativa passou de 3,5 h para 5,75 h com o RF-14 (0,5 h) e a D-09 (1,75 h), aprovados no *blueprint*; com o *blueprint* e o fechamento, a *release* foi estimada em 7,25 h. As horas reais da `v0.4.0` foram 3 h, abaixo da estimativa, e até a `v0.4.0` foram gastas 15 h contra 16,75 h estimadas. Na `v0.5.0`, as horas reais foram 4 h, iguais à estimativa com *blueprint* e fechamento (2,5 h dos itens), e até a `v0.5.0` foram gastas 19 h contra 20,75 h estimadas. Somada a estimativa da *release* restante, com *blueprint* e fechamento (`v1.0.0`: 3 h), a projeção é de cerca de 22 h, dentro do orçamento de cerca de 30 horas. A comparação é refeita no fechamento de cada *release*.
+As horas reais são informadas pelo autor por *release*, e não por item. Elas incluem o *blueprint*, o fechamento e o *git*, que as estimativas por item não cobrem. O tempo da `v0.1.0` (inicialização e documentação) não foi medido. Até a `v0.3.0`, foram gastas 12 h contra 10,5 h estimadas. Na `v0.4.0`, a estimativa passou de 3,5 h para 5,75 h com o RF-14 (0,5 h) e a D-09 (1,75 h), aprovados no *blueprint*; com o *blueprint* e o fechamento, a *release* foi estimada em 7,25 h. As horas reais da `v0.4.0` foram 3 h, abaixo da estimativa, e até a `v0.4.0` foram gastas 15 h contra 16,75 h estimadas. Na `v0.5.0`, as horas reais foram 4 h, iguais à estimativa com *blueprint* e fechamento (2,5 h dos itens), e até a `v0.5.0` foram gastas 19 h contra 20,75 h estimadas. Na `v1.0.0`, as horas reais foram 2 h, contra 3 h estimadas com *blueprint* e fechamento (2 h dos itens). O projeto fechou com 21 h medidas, da `v0.2.0` à `v1.0.0`, abaixo da projeção de cerca de 22 h e dentro do orçamento de cerca de 30 horas; o tempo da `v0.1.0` não entra na soma, porque não foi medido.
 
 ## 4. Backlog por *release*
 
@@ -117,11 +117,13 @@ Decisões do *blueprint* ([`docs/blueprint-v040.md`](blueprint-v040.md)): D-05 (
 
 ### 4.5 `v1.0.0`: entrega do curso
 
+**Situação da *release*:** concluída em 07/10/2026. Os três itens foram entregues como planejados em [`docs/blueprint-v100.md`](blueprint-v100.md), sem item movido: validação em máquina limpa no Prompt 42, histórico de uso de IA no Prompt 43, publicação e fechamento no Prompt 44. Sem código novo: a validação só acrescentou ao README a ativação e a Solução de problemas do Git Bash; Linux/macOS ficou como não verificado (E-03). Horas reais (informadas pelo autor em 07/10/2026): 2 h para a *release* inteira, contra 2 h estimadas para os itens e 3 h com *blueprint* e fechamento. Não há medição por item.
+
 | ID | Item | Critérios de aceite | Atende | Est. | Situação |
 | --- | --- | --- | --- | --- | --- |
-| RT-15 | Validação em máquina limpa | 1. Clone novo, `.venv` novo e instalação só com os comandos do README **[C]**<br>2. API sobe e responde em `/health` e nos exemplos do README **[C]**<br>3. Definição de pronto passa no clone **[C]**<br>4. Execução feita em PowerShell; Bash conferido no Git Bash ou registrado como não verificado **[C]** | RNF-01, RNF-02 | 0,75 h | a fazer |
-| RT-16 | Histórico de uso de IA consolidado | 1. `docs/HISTORY-IA.md` com todas as entradas, consolidação por *release* e análise final **[I]**<br>2. README (Uso de IA generativa) lista todos os assistentes, modelos e etapas **[I]**<br>3. Todo *prompt* de `prompts/` tem o registro da execução **[I]** | RNF-15 | 0,75 h | a fazer |
-| RT-17 | Publicação da entrega | 1. Rastreabilidade com os requisitos do curso (seção 7 do escopo) toda como atendida **[I]**<br>2. Status do README como "concluído" na `v1.0.0` **[I]**<br>3. *Tag* `v1.0.0` publicada e *Release* criada no GitHub com o texto do `CHANGELOG.md` **[C]** | RNF-14 | 0,5 h | a fazer |
+| RT-15 | Validação em máquina limpa | 1. Clone novo, `.venv` novo e instalação só com os comandos do README **[C]**<br>2. API sobe e responde em `/health` e nos exemplos do README **[C]**<br>3. Definição de pronto passa no clone **[C]**<br>4. Execução feita em PowerShell; Bash conferido no Git Bash ou registrado como não verificado **[C]** | RNF-01, RNF-02 | 0,75 h | concluído (07/10/2026) |
+| RT-16 | Histórico de uso de IA consolidado | 1. `docs/HISTORY-IA.md` com todas as entradas, consolidação por *release* e análise final **[I]**<br>2. README (Uso de IA generativa) lista todos os assistentes, modelos e etapas **[I]**<br>3. Todo *prompt* de `prompts/` tem o registro da execução **[I]** | RNF-15 | 0,75 h | concluído (07/10/2026) |
+| RT-17 | Publicação da entrega | 1. Rastreabilidade com os requisitos do curso (seção 7 do escopo) toda como atendida **[I]**<br>2. Status do README como "concluído" na `v1.0.0` **[I]**<br>3. *Tag* `v1.0.0` publicada e *Release* criada no GitHub com o texto do `CHANGELOG.md` **[C]** | RNF-14 | 0,5 h | concluído (07/10/2026) |
 
 ## 5. Rastreabilidade dos requisitos não funcionais
 

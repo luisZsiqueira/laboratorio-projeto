@@ -17,7 +17,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | Item | Valor |
 | --- | --- |
 | Assistente | Claude Code (CLI), no VS Code, em Windows 11 com PowerShell |
-| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) nos Prompts 00 a 08, 10 a 13, 21, 24, 25, 31, 32, 35 a 41 e 43; Claude Sonnet 5.5 (`claude-sonnet-5-5`) nos Prompts 22, 23, 26 a 30, 33, 34 e 42; Claude Fable 5.1 (`claude-fable-5-1`) no Prompt 20 |
+| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) nos Prompts 00 a 08, 10 a 13, 21, 24, 25, 31, 32, 35 a 41, 43 e 44; Claude Sonnet 5.5 (`claude-sonnet-5-5`) nos Prompts 22, 23, 26 a 30, 33, 34 e 42; Claude Fable 5.1 (`claude-fable-5-1`) no Prompt 20 |
 | Outras ferramentas de IA | Claude in Chrome (extensão do navegador) para conferir a renderização dos diagramas no GitHub (Prompts 07, 12, 31 e 35); Claude em modo *chat*: Opus 5.5 na concepção do `CLAUDE.md` ([`PRE-HISTORY-IA.md`](PRE-HISTORY-IA.md)) e Sonnet 5.5 na extração dos *prompts* do tutor ([`EXTRA-HISTORY-IA.md`](EXTRA-HISTORY-IA.md)) |
 | Regras de trabalho com a IA | [`CLAUDE.md`](../CLAUDE.md) |
 | Formato dos *prompts* | Contexto, Objetivo, Estilo, Resposta (e Observações, a partir do Prompt 04) |
@@ -63,6 +63,7 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 41 | 07/10/2026 | Planejamento / *blueprint* | `docs/blueprint-v100.md`, com levantamento prévio do repositório e do ambiente | ~1 h |
 | 42 | 07/10/2026 | Validação / execução | clone limpo em PowerShell e Git Bash, exemplos do README executados, ativação do Git Bash no README | ~1 h |
 | 43 | 07/10/2026 | Documentação do processo | consolidação deste histórico, análise final, README (Uso de IA generativa) | ~1 h |
+| 44 | 07/10/2026 | Publicação / fechamento de *release* | checklist dos requisitos do curso, README, escopo, backlog, `CHANGELOG.md`, *tag* e *Release* `v1.0.0` | ~1 h |
 
 ## Entradas da release v0.1.0
 
@@ -761,6 +762,40 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Intervalo sem consolidação.** Os Prompts 10 a 13 e 20 ficavam fora de qualquer consolidação, e a consolidação da `v0.1.0` estava depois deles. A seção foi movida para logo após o Prompt 08, e o intervalo ganhou a sua.
   - **README incompleto.** O Claude in Chrome aparecia só nos Prompts 07 e 12, e foi usado também nos Prompts 31 e 35.
 
+### Prompt 44: publicação da entrega
+
+- **Data:** 07/10/2026
+- **Fase:** publicação e fechamento de *release* (passo 3 do `docs/blueprint-v100.md`, RT-17)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - conferência da GitHub CLI no início, como manda a E-12. Sem o `gh`, a execução parou (condição de parada 6) e a IA ofereceu ao autor um passo a passo de instalação em PowerShell como administrador: versão conferida na API do GitHub (2.102.0), *download* do MSI, conferência do SHA256 contra o arquivo de *hashes* da *Release*, instalação silenciosa e `gh auth login` numa janela sem privilégio;
+  - checklist dos 10 requisitos do curso com evidência: página do repositório com `200` sem autenticação, `git ls-files` sem `.env` nem `*.db`, busca de segredos no histórico (12 ocorrências, todas texto de documentação), 35 *commits* no padrão *Conventional Commits*, `pip check` sem conflito e seções do README;
+  - fechamento: README (status "concluído", roadmap, Uso de IA generativa e a limitação de Linux/macOS não verificado), rastreabilidade da seção 7 de `docs/escopo-mvp.md` toda como atendida, `docs/backlog.md` com RT-15 a RT-17 concluídos e as horas reais, `CHANGELOG.md` com a seção `1.0.0`, status do *blueprint* e este histórico;
+  - depois da autorização do autor: *commits*, *merge* em `main`, *tag* anotada `v1.0.0`, *push*, *Release* com `gh release create` e definição de pronto no clone da *tag*.
+- **Prompt:** [`prompts/Prompt 44 - publicação da entrega`](../prompts/Prompt%2044%20-%20publica%C3%A7%C3%A3o%20da%20entrega)
+- **Refinamentos:** três interações seguintes. Na condição de parada, o autor pediu o passo a passo de instalação do `gh`. Depois de instalá-lo, preferiu não reiniciar o Claude Code, e a IA passou a chamar o `gh` pelo caminho completo (`C:\Program Files\GitHub CLI\gh.exe`), porque a sessão não enxergava o PATH novo. Por fim, o autor informou 2 h reais para a `v1.0.0` e autorizou toda a publicação.
+- **Ganho percebido:** ~1 h (estimativa)
+- **Desafios:**
+  - **Ferramenta ausente na máquina.** A condição de parada da E-12 evitou um desvio silencioso: em vez de criar a *Release* à mão ou pular o passo, a decisão voltou ao autor. A instalação ficou com ele, porque exige privilégio de administrador e autenticação interativa.
+  - **Ordem entre registro e publicação.** O *commit* de fechamento precisa vir antes da *tag*, então o README e o escopo já descrevem a *tag* e a *Release* que o passo seguinte cria. O resultado da publicação (URLs e clone da *tag*) foi registrado depois, como nas *releases* anteriores.
+  - **Branch já mesclada.** A `docs/entrega-v100` tinha sido mesclada em `main` na sessão do Prompt 42 (Prompt 43, lacuna 14). Ela foi mesclada de novo, com `--no-ff`, depois dos *commits* dos Prompts 43 e 44.
+  - ***Heredoc* recusado pelo *shell*.** Como nos Prompts 29, 34 e 43, um *script* longo passado por *heredoc* foi recusado; foi gravado em arquivo no diretório temporário da sessão e executado de lá.
+
+## Release v1.0.0: consolidação
+
+- **Período:** 07/10/2026 (Prompts 41 a 44)
+- **Entregas:** validação em máquina limpa (PowerShell e Git Bash), histórico de uso de IA consolidado com a análise final e publicação: *tag* anotada e *Release* `v1.0.0` no GitHub. Sem código novo nem mudança de dependência; o README ganhou a ativação e a Solução de problemas do Git Bash. A rastreabilidade com os requisitos do curso ficou toda como atendida.
+- **Uso da IA:**
+  - o Opus 5.5 planejou (Prompt 41), consolidou o histórico (Prompt 43) e fechou a *release* (Prompt 44); o Sonnet 5.5 executou o roteiro de validação (Prompt 42), como nas *releases* de código;
+  - cada item de entrega foi conferido com evidência executada (comando e saída), e não por leitura.
+- **Divergências do *blueprint*:**
+  - passo 1: a API do clone subiu na porta 8001, porque a 8000 estava ocupada por outro processo do autor; depois do relatório, a sessão fez os *commits* e o *merge* em `main`, previstos só para o passo 3 (E-14);
+  - passo 2: além do previsto, o histórico foi reorganizado e ganhou a consolidação do intervalo entre a `v0.1.0` e a `v0.2.0`;
+  - passo 3: o `gh` não estava instalado (condição de parada 6); o autor o instalou durante o *prompt*, e a E-12 foi seguida sem outro desvio.
+- **Ganho percebido acumulado:** ~4 h (soma das estimativas dos Prompts 41 a 44).
+- **Horas reais:** 2 h, informadas pelo autor, contra 3 h estimadas (2 h dos itens, mais *blueprint* e fechamento). O projeto fechou com 21 h medidas, da `v0.2.0` à `v1.0.0`.
+- **Lição principal:** seguir o README à risca, como faria o avaliador, achou a única falha da entrega: a ativação no Git Bash do Windows. As condições de parada do *blueprint* fizeram o resto do trabalho: a ferramenta ausente parou a publicação até a decisão do autor, em vez de virar um passo manual não registrado.
+
 ## Observações transversais
 
 Padrões que se repetiram nas interações. A análise final, a seguir, os retoma com os números do projeto.
@@ -773,20 +808,20 @@ Padrões que se repetiram nas interações. A análise final, a seguir, os retom
 
 ## Análise final
 
-Escrita no Prompt 43 (07/10/2026), com o projeto validado em máquina limpa e antes da publicação da `v1.0.0`. Cada afirmação cita o *prompt* ou o arquivo de origem; números de ganho são estimativas. O Prompt 44 acrescenta a sua entrada, a consolidação da `v1.0.0` e as horas reais da *release*.
+Escrita no Prompt 43 (07/10/2026), com o projeto validado em máquina limpa, e completada no Prompt 44 com a sua entrada e as horas reais da `v1.0.0`. Cada afirmação cita o *prompt* ou o arquivo de origem; números de ganho são estimativas.
 
 ### Uso por modelo e por etapa
 
 | Modelo | *Prompts* | Etapas |
 | --- | --- | --- |
-| Claude Opus 5.5 (Claude Code) | 26: 00 a 08, 10 a 13, 21, 24, 25, 31, 32, 35 a 41 e 43 | inicialização, requisitos, arquitetura, *blueprints*, revisões, fechamentos de *release* e consolidação do histórico |
+| Claude Opus 5.5 (Claude Code) | 27: 00 a 08, 10 a 13, 21, 24, 25, 31, 32, 35 a 41, 43 e 44 | inicialização, requisitos, arquitetura, *blueprints*, revisões, fechamentos de *release*, consolidação do histórico e publicação |
 | Claude Sonnet 5.5 (Claude Code) | 10: 22, 23, 26 a 30, 33, 34 e 42 | execução dos *blueprints* (código, testes, exemplos do README) e validação em máquina limpa |
 | Claude Fable 5.1 (Claude Code) | 1: 20 | planejamento dos *prompts* de desenvolvimento |
 | Claude in Chrome | 07, 12, 31 e 35 | conferência da renderização dos diagramas no GitHub |
 | Claude Opus 5.5 (*chat*) | antes do repositório | concepção do `CLAUDE.md` ([`PRE-HISTORY-IA.md`](PRE-HISTORY-IA.md)) |
 | Claude Sonnet 5.5 (*chat*) | fora do repositório | extração dos *prompts* do tutor ([`EXTRA-HISTORY-IA.md`](EXTRA-HISTORY-IA.md), R-02) |
 
-São 37 *prompts* executados no Claude Code até o Prompt 43.
+São 38 *prompts* executados no Claude Code, do Prompt 00 ao 44.
 
 ### Ganho percebido e horas reais
 
@@ -798,14 +833,14 @@ São 37 *prompts* executados no Claude Code até o Prompt 43.
 | `v0.3.0` | 25 a 31 | ~9,5 h | 8 h |
 | `v0.4.0` | 32 a 35 | ~9 h | 3 h |
 | `v0.5.0` | 36 a 40 | ~5,5 h | 4 h |
-| `v1.0.0` | 41 a 43 (o 44 entra no fechamento) | ~3 h | a informar no Prompt 44 |
-| **Total** | 37 *prompts* | **~50,9 h** | **19 h** (`v0.2.0` a `v0.5.0`) |
+| `v1.0.0` | 41 a 44 | ~4 h | 2 h |
+| **Total** | 38 *prompts* | **~51,9 h** | **21 h** (`v0.2.0` a `v1.0.0`) |
 
 Leitura dos números:
 
 - **As estimativas são da IA.** O ganho de cada *prompt* foi estimado pelo assistente no registro (Prompt 06, Desafios), e não há registro de revisão dessas estimativas pelo autor. Valem como ordem de grandeza.
-- **Comparação só onde há as duas medidas.** Da `v0.2.0` à `v0.5.0`, o ganho estimado soma ~30 h, e as horas reais, 19 h. Pela definição de ganho deste arquivo, a mesma entrega sem IA levaria cerca de 49 h, ou cerca de 2,6 vezes o tempo gasto. É uma conta sobre estimativas, não uma medição.
-- **Horas reais contra o orçamento.** Até a `v0.5.0`, 19 h contra 20,75 h estimadas no backlog; a projeção do projeto é de cerca de 22 h, dentro das cerca de 30 horas (`docs/backlog.md`, seção 3). O tempo da `v0.1.0` não foi medido.
+- **Comparação só onde há as duas medidas.** Da `v0.2.0` à `v1.0.0`, o ganho estimado soma ~34 h, e as horas reais, 21 h. Pela definição de ganho deste arquivo, a mesma entrega sem IA levaria cerca de 55 h, ou cerca de 2,6 vezes o tempo gasto. É uma conta sobre estimativas, não uma medição.
+- **Horas reais contra o orçamento.** O projeto fechou com 21 h medidas, da `v0.2.0` à `v1.0.0`, abaixo da projeção de cerca de 22 h e dentro das cerca de 30 horas (`docs/backlog.md`, seção 3). O tempo da `v0.1.0` não foi medido.
 - **Tempo perdido fora da IA.** Na `v0.3.0`, segundo o autor, cerca de metade das 8 h se perdeu com falhas de conexão com a API do Claude numa internet por *hotspot* do celular, e o trabalho caberia em 3 a 4 h (Prompt 31).
 
 ### Principais desafios

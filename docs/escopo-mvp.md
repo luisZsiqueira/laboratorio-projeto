@@ -1,6 +1,6 @@
 # Escopo do MVP
 
-> **Status:** escopo definido após a *release* `v0.1.0`, antes do código da aplicação; decisões D-01 a D-04 incorporadas aos requisitos no fechamento da `v0.3.0` e D-05 a D-07 e D-09 no da `v0.4.0` (06/10/2026); conferido na revisão da `v0.5.0` (07/10/2026), sem decisão em aberto. Vale como referência para os *blueprints* das *releases* `v0.2.0` a `v1.0.0`. Mudança de escopo só com pedido explícito do autor, registrada aqui e no [`CHANGELOG.md`](../CHANGELOG.md).
+> **Status:** escopo definido após a *release* `v0.1.0`, antes do código da aplicação; decisões D-01 a D-04 incorporadas aos requisitos no fechamento da `v0.3.0` e D-05 a D-07 e D-09 no da `v0.4.0` (06/10/2026); conferido na revisão da `v0.5.0` (07/10/2026), sem decisão em aberto; entregue na `v1.0.0` (07/10/2026), com todos os requisitos de entrega do curso atendidos (seção 7). Vale como referência para os *blueprints* das *releases* `v0.2.0` a `v1.0.0`. Mudança de escopo só com pedido explícito do autor, registrada aqui e no [`CHANGELOG.md`](../CHANGELOG.md).
 
 Este documento é a fonte de verdade dos requisitos do MVP: objetivo, requisitos funcionais e não funcionais, itens fora de escopo e decisões em aberto. O [`README.md`](../README.md) traz o resumo, o roadmap e as instruções de uso; a [`docs/arquitetura.md`](arquitetura.md) traz o desenho técnico e os ADRs; o [`docs/backlog.md`](backlog.md) desdobra os requisitos em itens por *release*, com critérios de aceite.
 
@@ -147,13 +147,13 @@ A decisão D-08 foi tomada no [`docs/blueprint-v020.md`](blueprint-v020.md) (se�
 
 | Requisito de [`docs/requerimentos.md`](requerimentos.md) | Atendido por | Situação |
 | --- | --- | --- |
-| Repositório público, sem informações sensíveis | repositório no GitHub; `.env` ignorado; RNF-07 e RNF-10 | atendido desde a `v0.1.0` |
-| Histórico de *commits* consistente (*Conventional Commits*) | RNF-14; `CHANGELOG.md` | em andamento |
-| README: título, descrição, configuração, como rodar | README (Objetivo, Configuração, Como rodar) | atendido; revisado a cada *release* |
-| README: exemplos de uso da API | README (Endpoints) | atendido na `v0.3.0`: exemplos executados na API em PowerShell e Bash; ampliado na `v0.4.0` com prioridade, sugestão, filtro e datas no horário local |
-| README: tecnologias, modelos de IA e assistentes | README (Stack e Uso de IA generativa); RNF-15 | atendido |
+| Repositório público, sem informações sensíveis | repositório no GitHub; `.env` ignorado; RNF-07 e RNF-10 | atendido desde a `v0.1.0`; conferido na `v1.0.0`: a página do repositório responde `200` sem autenticação, `git ls-files` sem `.env` nem `*.db` e a busca de segredos no histórico (`git log -p --all`) só achou texto de documentação |
+| Histórico de *commits* consistente (*Conventional Commits*) | RNF-14; `CHANGELOG.md` | atendido: 35 *commits* no padrão *Conventional Commits* antes do fechamento da `v1.0.0` (os demais são *merges* com a mensagem padrão do git) |
+| README: título, descrição, configuração, como rodar | README (Objetivo, Configuração, Como rodar) | atendido; revisado a cada *release* e validado em clone limpo na `v1.0.0` (PowerShell e Git Bash) |
+| README: exemplos de uso da API | README (Endpoints) | atendido na `v0.3.0`: exemplos executados na API em PowerShell e Bash; ampliado na `v0.4.0` com prioridade, sugestão, filtro e datas no horário local; executados de novo em clone limpo na `v1.0.0` |
+| README: tecnologias, modelos de IA e assistentes | README (Stack e Uso de IA generativa); RNF-15 | atendido; consolidado na `v1.0.0` com todos os modelos e etapas e a análise final em `docs/HISTORY-IA.md` |
 | README: limitações e próximos passos | README (Limitações e próximos passos); seção 5 deste documento | atendido |
 | README: créditos e licença | README (Créditos e licença); `LICENSE` | atendido |
-| Gerenciamento de dependências | `requirements.txt`; RNF-02 | atendido |
-| Testes automatizados executáveis e passando | RNF-03 e RNF-04 | atendido: 13 testes na `v0.2.0`, 69 na `v0.3.0`, 134 na `v0.4.0` (com `tests/test_priority_advisor.py`) e 143 na `v0.5.0` (revisão de segurança), todos passando com `-W error`; validação em clone limpo a cada *release* |
-| *Release* ou *tag* de entrega | *tag* e *release* `v1.0.0`; RNF-14 | pendente |
+| Gerenciamento de dependências | `requirements.txt`; RNF-02 | atendido: instalação em clone limpo e `pip check` sem conflito na `v1.0.0` |
+| Testes automatizados executáveis e passando | RNF-03 e RNF-04 | atendido: 13 testes na `v0.2.0`, 69 na `v0.3.0`, 134 na `v0.4.0` (com `tests/test_priority_advisor.py`) e 143 na `v0.5.0` (revisão de segurança), todos passando com `-W error`; validação em clone limpo a cada *release* e no clone da *tag* `v1.0.0` |
+| *Release* ou *tag* de entrega | *tag* e *release* `v1.0.0`; RNF-14 | atendido: *tag* anotada `v1.0.0` e *Release* no GitHub (07/10/2026) |

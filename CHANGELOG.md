@@ -6,6 +6,19 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 
 ## [Não publicado]
 
+## [1.0.0] - 2026-10-07
+
+Entrega do curso, sem mudança de código nem de dependências, executada a partir de [`docs/blueprint-v100.md`](docs/blueprint-v100.md): validação em máquina limpa, histórico de uso de IA consolidado e publicação. O comportamento da API é o da `v0.5.0`; são 143 testes, que passam com `python -m pytest -W error`.
+
+### docs
+
+- Adiciona `docs/blueprint-v100.md`, o *blueprint* da *release*, com o levantamento prévio, as decisões E-01 a E-15, o roteiro de validação, a lista de verificação do histórico e o checklist dos requisitos do curso.
+- Valida a instalação, a execução, os exemplos da seção Endpoints e os testes em clone limpo, só com os comandos do README, em PowerShell e em Git Bash (RT-15). O README ganha a ativação do `.venv` no Git Bash do Windows (`source .venv/Scripts/activate`) e a forma Bash da Solução de problemas do SQLAlchemy; Linux/macOS fica registrado como não verificado.
+- Consolida o histórico de uso de IA em `docs/HISTORY-IA.md` (RT-16): entradas dos Prompts 41 a 44, consolidação do intervalo entre a `v0.1.0` e a `v0.2.0` e da `v1.0.0`, tabela Ambiente com o modelo de cada *prompt*, motivo da numeração dos *prompts* e análise final (uso por modelo, ganho percebido e horas reais, desafios, decisões que ficaram com o humano e lições).
+- Atualiza o README (Uso de IA generativa) com todos os assistentes, modelos e etapas, inclusive o Claude in Chrome nos Prompts 31 e 35 e a `v1.0.0`; corrige o *link* local de `docs/EXTRA-HISTORY-IA.md`; marca `prompts/prompts-desenvolvimento.md` como executado, com a nota sobre o mypy (ADR-21).
+- Registra nos Prompts 41 e 42 os *commits* feitos na sessão do Prompt 42, conferidos no `git log`.
+- Fecha a *release* (RT-17): README com status "concluído" e o roadmap com todas as *releases* concluídas; rastreabilidade com os requisitos do curso toda como atendida em `docs/escopo-mvp.md`; RT-15 a RT-17 concluídos em `docs/backlog.md`, com 2 h reais na `v1.0.0` e 21 h no total, da `v0.2.0` à `v1.0.0`; status do *blueprint*.
+
 ## [0.5.0] - 2026-10-07
 
 Revisão de arquitetura, segurança, dependências e documentação, sem funcionalidade nova, executada a partir de [`docs/blueprint-v050.md`](docs/blueprint-v050.md). Inclui também o registro do fechamento da `v0.4.0`, feito em `main` depois da *tag*.
@@ -150,7 +163,8 @@ Fundação do projeto: regras de trabalho com a IA, documentação, dependência
 - Inicializa o repositório com `.gitignore`, `CLAUDE.md` (regras de trabalho com a IA) e o primeiro *prompt*; os diretórios de `app/` e `tests/` entram no repositório com seus primeiros arquivos (`94f30f2`).
 - Amplia o `.gitignore` com seções por tecnologia e corrige o padrão que ignorava o `.env.example` (`c6ca4dd`).
 
-[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.5.0...HEAD
+[Não publicado]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.5.0...v1.0.0
 [0.5.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/luisZsiqueira/laboratorio-projeto/compare/v0.2.0...v0.3.0

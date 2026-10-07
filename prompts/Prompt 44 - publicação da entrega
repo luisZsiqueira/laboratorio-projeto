@@ -1,0 +1,43 @@
+Contexto: Item RT-17; validação e histórico concluídos na branch docs/entrega-v100; docs/requerimentos.md e a rastreabilidade da seção 7 de docs/escopo-mvp.md; CHANGELOG.md.
+Objetivo: Fechar a release v1.0.0 conforme o CLAUDE.md: rastreabilidade toda como atendida; status do README como concluído e roadmap com todas as releases concluídas; CHANGELOG.md com a seção 1.0.0; docs/backlog.md fechado com horas reais e totais; docs/HISTORY-IA.md com os Prompts 41 a 44; após minha autorização, commits, merge --no-ff em main, tag anotada v1.0.0, push e Release no GitHub com o texto do CHANGELOG.md (gh release create); definição de pronto no clone final.
+Estilo: Checklist de entrega com evidência (URL da tag e da Release); item não atendido reportado explicitamente, nunca omitido.
+Resposta: Checklist concluída e URLs da tag e da Release.
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 07/10/2026
+
+Resumo da execução (passo 3 do docs/blueprint-v100.md, RT-17):
+
+1. Condição de parada 6 (E-12): a GitHub CLI não estava instalada (PATH, Program Files, AppData, scoop e WinGet conferidos). Execução parada e decisão devolvida ao autor.
+2. Interação seguinte: o autor pediu um passo a passo para instalar o gh no PowerShell como administrador. A IA conferiu na API do GitHub a última versão (v2.102.0, de 30/09/2026, com o MSI windows_amd64 e o arquivo de checksums) e entregou: download do MSI e do arquivo de hashes, conferência do SHA256, instalação silenciosa com msiexec, limpeza dos arquivos baixados, gh auth login numa janela sem privilégio e gh auth status.
+3. Interação seguinte: o autor instalou e autenticou o gh e preferiu não reiniciar o Claude Code. O gh passou a ser chamado pelo caminho completo (C:\Program Files\GitHub CLI\gh.exe): gh version 2.102.0; logado em github.com como luisZsiqueira.
+4. Interação seguinte: o autor informou 2 h reais para a v1.0.0 e autorizou os commits, o merge --no-ff em main, o push de main e da branch, a tag anotada v1.0.0, o push da tag e a Release.
+
+Checklist de entrega (docs/requerimentos.md; blueprint, passo 3):
+
+| # | Requisito do curso | Evidência | Situação |
+| --- | --- | --- | --- |
+| 1 | Repositório público, sem informações sensíveis | HEAD https://github.com/luisZsiqueira/laboratorio-projeto sem autenticação: 200; git ls-files sem .env, *.db nem *.sqlite; git log -p --all com a busca do Prompt 38 (mais gho_): 12 ocorrências, todas texto de documentação (o próprio padrão de busca e menções a chave, token e senha em registros de prompts, blueprints e docs/requerimentos.md; o nome OPENAI_API_KEY sem valor); URL com credencial: 1 ocorrência, que é o texto do padrão no registro do Prompt 38 | atendido |
+| 2 | Histórico de commits consistente | git log --format=%s: 51 commits, 35 no padrão Conventional Commits, 16 merges com a mensagem padrão do git | atendido |
+| 3 | README: título, descrição, configuração e como rodar | seções Objetivo, Configuração e Como rodar, validadas em clone limpo no Prompt 42 | atendido |
+| 4 | README: exemplos de uso | seção Endpoints, executada no Prompt 42 (16 exemplos em PowerShell, 3 em Git Bash) | atendido |
+| 5 | README: tecnologias, modelos de IA e assistentes | seções Stack e Uso de IA generativa, conferidas no Prompt 43 e completadas com o Prompt 44 | atendido |
+| 6 | README: limitações e próximos passos | seção Limitações e próximos passos, com a nota de Linux/macOS não verificado | atendido |
+| 7 | README: créditos e licença | seção Créditos e licença; arquivo LICENSE (MIT) | atendido |
+| 8 | Gerenciamento de dependências | requirements.txt com versões fixadas; pip check: No broken requirements found. | atendido |
+| 9 | Testes executáveis e passando | python -m pytest -W error: 143 passed (repositório de trabalho e clones do Prompt 42) | atendido; clone da tag em "Publicação" |
+| 10 | Release ou tag | tag anotada e Release v1.0.0 | ver "Publicação" |
+
+Arquivos alterados no fechamento:
+- README.md: status "concluído" (E-13); roadmap com a v1.0.0 concluída; Uso de IA generativa no passado, com o Prompt 44; limitação de Linux/macOS não verificado (E-03).
+- docs/escopo-mvp.md: status; seção 7 toda como atendida, com a evidência.
+- docs/backlog.md: RT-15 a RT-17 concluídos; situação da release; 2 h reais na v1.0.0 e 21 h no total.
+- CHANGELOG.md: seção [1.0.0] - 2026-10-07 (docs) e links de comparação.
+- docs/HISTORY-IA.md: linha 44 do Resumo, modelo do Prompt 44 na tabela Ambiente, entrada do Prompt 44, consolidação da v1.0.0, análise final com as horas reais (21 h) e o ganho estimado (~51,9 h).
+- docs/blueprint-v100.md: status de executado.
+- Este arquivo: registro da execução.
+- docs/arquitetura.md e CLAUDE.md não mudaram: o Prompt 42 não mostrou divergência.
+
+Definição de pronto antes dos commits: python -m pytest -W error: 143 passed.
