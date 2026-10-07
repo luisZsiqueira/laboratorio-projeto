@@ -22,6 +22,7 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 ### docs
 
 - Registra o resultado do fechamento da `v0.4.0` no Prompt 35 e em `docs/HISTORY-IA.md`: *commits*, *merge*, *tag*, *push*, clone limpo e renderização dos diagramas no GitHub.
+- Revisa a documentação e as dependências (RT-13, RT-14): exemplos do README executados de novo na API, sem divergência; versões conferidas no PyPI em 07/10/2026, sem mudança; `docs/arquitetura.md` com `TaskId` (DT-16), `hide_parameters` (DT-17), a contagem de 143 testes e a assinatura de `build_task_service` ajustada pelo ADR-18; `docs/escopo-mvp.md` com a origem da D-08.
 
 ## [0.4.0] - 2026-10-06
 

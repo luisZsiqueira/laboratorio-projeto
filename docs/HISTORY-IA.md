@@ -637,6 +637,24 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Sondar em vez de só ler.** Nenhum dos dois desvios aparece na leitura do código nem nos testes existentes: o `OverflowError` vem do driver, e os parâmetros entram no log pela mensagem padrão da exceção do SQLAlchemy. Ambos foram achados executando a API com entradas extremas e lendo o log produzido.
   - **Definição de pronto bloqueada pelo ambiente.** O Smart App Control passou a bloquear os `.pyd` do mypy 2.4.0 e do `librt`, que tinham rodado no dia anterior. O mypy em Python puro também falhou, porque o `librt` só existe compilado. A checagem de tipos ficou pendente, com a decisão para o autor, que retirou o mypy do projeto (ADR-21): desligar o Smart App Control é irreversível, e o WSL exigiria instalar e manter um segundo ambiente fora do Windows com PowerShell. A tipagem passa a ser conferida na revisão de código. A pedido do autor, a IA procurou alternativa não binária: o mypy 1.18.2, última versão sem o `librt`, tem pacote em Python puro e não é bloqueado. Executado fora do repositório sobre o código do Prompt 38, terminou com sucesso (18 arquivos sem erros) em 6 de 12 execuções; nas outras 6, o interpretador Python 3.14.6 caiu com erro interno (`Executing a cache`), sem apontar erro de tipo. O autor considerou as execuções bem-sucedidas suficientes como evidência da checagem.
 
+### Prompt 39: revisão da documentação e das dependências
+
+- **Data:** 07/10/2026
+- **Fase:** revisão (passos 3 e 4 do `docs/blueprint-v050.md`, RT-14 e RT-13)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - consulta à API JSON do PyPI das 7 dependências diretas e à base OSV dos 26 pacotes fixados; leitura das notas de versão do FastAPI 0.142.3 e do SQLAlchemy 2.1.4, publicadas no dia; `pip check` e comparação do `pip freeze` com o `requirements.txt`;
+  - execução, por *script* PowerShell fora do repositório, dos exemplos do README contra a API com banco temporário (31 requisições), e da seção Configuração (`production`, valores inválidos, outro fuso, `.env`, `--reload`);
+  - contagem de *docstrings* por `ast`; comparação por *script* dos diagramas oficiais com o catálogo `docs/mermaid.md` e das importações com o diagrama de módulos;
+  - checklist de 21 verificações; quatro ajustes de texto em `docs/arquitetura.md` (`TaskId`, `hide_parameters`, contagem de testes, assinatura no ADR-14) e um em `docs/escopo-mvp.md` (origem da D-08).
+- **Prompt:** [`prompts/Prompt 39 - revisão da documentação e das dependências`](../prompts/Prompt%2039%20-%20revis%C3%A3o%20da%20documenta%C3%A7%C3%A3o%20e%20das%20depend%C3%AAncias)
+- **Refinamentos:** nenhum.
+- **Ganho percebido:** ~1 h
+- **Desafios:**
+  - **Versões novas no dia da revisão.** O FastAPI 0.142.3 e o SQLAlchemy 2.1.4 saíram horas antes da consulta. A decisão seguiu a R-06 do *blueprint*: nenhuma vulnerabilidade na OSV e nenhuma correção com efeito observável no projeto (os 143 testes passam com `-W error`). Ficaram registradas como "disponível, não adotada", com o motivo de cada uma.
+  - **Exemplos em PowerShell e corpo da resposta.** O `Invoke-RestMethod` não mostra a lista vazia (`[]`) nem o `204`; o corpo bruto e os códigos de sucesso foram conferidos com `Invoke-WebRequest`. Nenhum exemplo divergiu: o README não mudou além das datas.
+  - **Documentação defasada pelo prompt anterior.** As correções de segurança do Prompt 38 (`TaskId`, `hide_parameters`, 9 testes) não tinham chegado à seção de módulos nem à de testes da arquitetura; só a comparação do texto com o código mostrou a defasagem.
+
 ## Observações transversais
 
 Padrões que se repetiram nas interações até aqui, a aprofundar na análise final:

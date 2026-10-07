@@ -57,7 +57,7 @@ Toda resposta de tarefa traz `suggested_priority`, calculada pela proximidade do
 | httpx2 | 2.13.1 | cliente HTTP do `TestClient` |
 | Mermaid.js | renderizado pelo GitHub | diagramas de arquitetura |
 
-As versões estão fixadas no [`requirements.txt`](requirements.txt), incluindo as dependências transitivas. Elas foram consultadas no PyPI em 03/10/2026. O Python 3.11 é o mínimo porque o SQLAlchemy 2.1 o exige.
+As versões estão fixadas no [`requirements.txt`](requirements.txt), incluindo as dependências transitivas. Elas foram consultadas no PyPI em 03/10/2026 e conferidas de novo em 07/10/2026, na revisão da `v0.5.0`: sem vulnerabilidade publicada e sem conflito no `pip check`; as versões mais novas do FastAPI (0.142.3) e do SQLAlchemy (2.1.4), publicadas no mesmo dia, não foram adotadas, porque não corrigem defeito que afete o projeto. O Python 3.11 é o mínimo porque o SQLAlchemy 2.1 o exige.
 
 ## Arquitetura
 
@@ -130,7 +130,7 @@ Campos desconhecidos ou somente leitura no corpo (`id`, `created_at`, `updated_a
 
 ### Exemplos de uso
 
-Os exemplos foram executados contra a API em execução em 06/10/2026, com o banco vazio e `LOCAL_UTC_OFFSET` no padrão (`-03:00`), na ordem da seção, exceto os exemplos de prioridade 4, de `422` por coerência e de filtro por prioridade, executados no fim, com a tarefa 1 concluída e a tarefa de `id` 2 excluída (a que eles criam recebe o `id` 2). Os JSON mostrados são as respostas reais; o `id`, os instantes (`created_at`, `updated_at`) e a `suggested_priority` do seu teste serão outros, pois dependem do momento da execução. Em Bash, `curl -i` mostra a linha de *status*. Em PowerShell, `Invoke-RestMethod` converte o JSON da resposta em objeto; o texto JSON abaixo é o corpo enviado pela API.
+Os exemplos foram executados contra a API em execução em 06/10/2026 e de novo em 07/10/2026, no Windows PowerShell 5.1, com os mesmos códigos e corpos, com o banco vazio e `LOCAL_UTC_OFFSET` no padrão (`-03:00`), na ordem da seção, exceto os exemplos de prioridade 4, de `422` por coerência e de filtro por prioridade, executados no fim, com a tarefa 1 concluída e a tarefa de `id` 2 excluída (a que eles criam recebe o `id` 2). Os JSON mostrados são as respostas reais; o `id`, os instantes (`created_at`, `updated_at`) e a `suggested_priority` do seu teste serão outros, pois dependem do momento da execução. Em Bash, `curl -i` mostra a linha de *status*. Em PowerShell, `Invoke-RestMethod` converte o JSON da resposta em objeto; o texto JSON abaixo é o corpo enviado pela API.
 
 Em PowerShell, `Invoke-RestMethod` lança exceção nas respostas de erro (`404`, `422`). Para ver o código e o corpo, use `try`/`catch`, como nos exemplos de erro abaixo (verificado no Windows PowerShell 5.1).
 

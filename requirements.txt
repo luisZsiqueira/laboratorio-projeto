@@ -2,6 +2,7 @@
 # Python: >= 3.11 (mínimo exigido pelo SQLAlchemy 2.1.3); testado em 3.14.6.
 # Versões consultadas no PyPI em 03/10/2026 (última versão estável de cada
 # pacote direto) e validadas com pip check em ambiente virtual limpo.
+# Conferidas de novo no PyPI em 07/10/2026 (revisão da v0.5.0), sem mudança.
 # Instalação: python -m pip install -r requirements.txt
 
 # ---------------------------------------------------------------------
