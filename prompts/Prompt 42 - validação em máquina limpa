@@ -1,0 +1,36 @@
+Contexto: docs/blueprint-v100.md aprovado. Item RT-15; RNF-01 e RNF-02; README (Como rodar) como única interface de operação.
+Objetivo: Em um diretório temporário fora do repositório, clonar o repositório, criar o .venv, instalar, subir a API e rodar a definição de pronto usando só os comandos do README, em PowerShell; repetir em Git Bash ou registrar como não verificado; chamar /health e os exemplos de Endpoints; aplicar a Solução de problemas do README se o Smart App Control bloquear o SQLAlchemy; conferir que nenhum arquivo além de tasks.db e dos caches ignorados é criado.
+Estilo: Roteiro passo a passo com o resultado de cada comando; falha reportada com a saída, nunca omitida.
+Resposta: Relatório da validação, correções no README se algum comando falhar e remoção do clone de validação ao final.
+
+---
+
+**Modelo:** Claude Sonnet 5.5 · **Execução:** 07/10/2026
+
+## Relatório da validação (RT-15, RNF-01, RNF-02)
+
+Clone de `https://github.com/luisZsiqueira/laboratorio-projeto.git` (`main`, `6ae17f4`, igual ao `origin/main`), Python 3.14.6, Windows 11.
+
+**Desvio (decidido com o autor):** a porta 8000 já estava ocupada por outro processo do autor (PID 17712, `/health` respondia `ok`). A API do clone subiu com `--port 8001` e os exemplos do README foram executados trocando só a porta. Não é falha do README.
+
+| # | Passo | PowerShell | Git Bash |
+| --- | --- | --- | --- |
+| 1 | diretório vazio em `%TEMP%` | conforme | conforme |
+| 2 | `git clone` | conforme (`6ae17f4`) | conforme (`6ae17f4`) |
+| 3 | `.venv` e ativação | conforme (`Activate.ps1`) | conforme (`source .venv/Scripts/activate`; ver nota 1) |
+| 4 | `pip install -r requirements.txt` | conforme; `pip check`: *No broken requirements found.* | conforme; idem |
+| 5 | `import sqlalchemy` | conforme (2.1.3); o Smart App Control **não bloqueou**, Solução de problemas não foi necessária | conforme (2.1.3) |
+| 6 | `uvicorn app.main:app --reload` | `Application startup complete.`; `tasks.db` criado | idem |
+| 7 | `/health` | `200` `{"status":"ok","database":"ok"}` | `200` mesmo corpo |
+| 8 | exemplos de Endpoints | 16 exemplos, mesmos códigos e forma dos corpos (`201`, `422` x4, `404`, `200`, `204`) | `POST /tasks` `201` e `GET /tasks` `200`, conforme (ver nota 2) |
+| 9 | parar o servidor | porta livre | porta livre |
+| 10 | `python -m pytest -W error` | `143 passed`, sem avisos | `143 passed`, sem avisos |
+| 11 | `git status --porcelain` | vazio; ignorados só `.venv/`, `tasks.db`, `.pytest_cache/`, `__pycache__/` | idem |
+| 12 | remoção dos clones | conforme | conforme |
+
+**Notas**
+
+1. O README só trazia `source .venv/bin/activate` (Linux/macOS), inexistente no Windows. Corrigido (E-04): o README ganhou a ativação do Git Bash e a forma Bash da Solução de problemas.
+2. A ferramenta Bash da sessão é um ambiente reduzido (sem `curl`, `tail`, `sleep`, `grep`, `uname`). O `venv`, a instalação e o servidor rodaram nela; as chamadas `curl` rodaram no Git Bash real (`C:\Program Files\Git\bin\bash.exe`). Uma primeira tentativa de `POST` retornou `422` por erro de aspas entre PowerShell e bash, repetida em arquivo de script e conforme (`201`).
+3. Linux/macOS (passo 2 do Como rodar, `source .venv/bin/activate`): **não verificado** (E-03), sem máquina Linux nem WSL.
+4. `docs/arquitetura.md`, `app/` e `tests/` não foram alterados. Alteração desta execução: `README.md` (Como rodar, Solução de problemas). Nenhum `commit`.

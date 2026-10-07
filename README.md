@@ -533,6 +533,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
+Git Bash (Windows): a ativação fica em `Scripts`, não em `bin`:
+
+```bash
+python3 -m venv .venv
+source .venv/Scripts/activate
+```
+
 ### 3. Instalar as dependências
 
 ```bash
@@ -563,6 +570,12 @@ Se `import sqlalchemy` falhar com `DLL load failed while importing _immutabledic
 $env:DISABLE_SQLALCHEMY_CEXT="1"
 python -m pip install --force-reinstall --no-deps --no-binary SQLAlchemy SQLAlchemy==2.1.3
 Remove-Item Env:DISABLE_SQLALCHEMY_CEXT
+```
+
+No Git Bash:
+
+```bash
+DISABLE_SQLALCHEMY_CEXT=1 python -m pip install --force-reinstall --no-deps --no-binary SQLAlchemy SQLAlchemy==2.1.3
 ```
 
 A versão e o comportamento são os mesmos; só as otimizações em Cython ficam de fora.
