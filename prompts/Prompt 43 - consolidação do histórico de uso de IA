@@ -1,0 +1,40 @@
+Contexto: Item RT-16; RNF-15; requisito R3.4 do curso; docs/PRE-HISTORY-IA.md, docs/EXTRA-HISTORY-IA.md, docs/HISTORY-IA.md, prompts/ e README (Uso de IA generativa).
+Objetivo: Conferir que todo arquivo de prompts/ tem o registro da execução (modelo, data, resumo, interações seguintes); que docs/HISTORY-IA.md tem uma entrada por prompt, a consolidação de cada release e as observações transversais; escrever a análise final (ganho de produtividade acumulado, principais desafios, decisões que ficaram com o humano, lições); README listando todos os assistentes, modelos e etapas apoiadas por IA, com os links para os três históricos.
+Estilo: Só fatos registrados nos arquivos; estimativas marcadas como estimativas; sem reconstruir conversas não registradas.
+Resposta: Diffs de docs/HISTORY-IA.md e do README; lista das lacunas encontradas e de como foram tratadas.
+
+---
+
+Execução: Claude Opus 5.5 (claude-opus-5-5), via Claude Code
+Data de execução: 07/10/2026
+
+Resumo da execução (passo 2 do docs/blueprint-v100.md, RT-16, RNF-15):
+
+1. Lidos o docs/blueprint-v100.md, os Prompts 41, 42 e 44, docs/HISTORY-IA.md por inteiro, docs/PRE-HISTORY-IA.md, docs/EXTRA-HISTORY-IA.md, o README (Uso de IA generativa, Roadmap), docs/backlog.md (seção 3) e o git log. Conferido por busca, em cada arquivo de prompts/, o separador e as linhas de modelo e data.
+2. Git: main estava 3 commits à frente de origin/main, com a branch docs/entrega-v100 já mesclada e removida (ver lacuna 9). A branch docs/entrega-v100 foi recriada a partir de main (3e9d6cc) para esta execução.
+3. Pergunta ao autor (E-08, b): motivo da numeração. Resposta: salto por fase; a fase de desenvolvimento começa no Prompt 20, e os números 09 e 14 a 19 nunca foram usados.
+4. Definição de pronto: python -m pytest -W error: 143 passed (nenhum arquivo de app/ ou tests/ alterado).
+5. Sem commit.
+
+Lacunas encontradas e tratamento (E-08: a = consolidado do que está nos arquivos; b = perguntado ao autor; c = "não registrado"):
+
+| # | Arquivo | Lacuna | Tratamento |
+| --- | --- | --- | --- |
+| 1 | prompts/ (00 a 42) | nenhuma quanto a modelo, data e resumo: todos os registros têm o separador e as duas linhas | — |
+| 2 | prompts/ (00 a 40) | o campo "interações seguintes" aparece só em parte dos registros | (a) os registros 00 a 40 não podem mudar (blueprint, seção 5); a fonte é o campo Refinamentos de cada entrada do HISTORY-IA.md, que existe para todos os prompts |
+| 3 | Prompts 41 e 42 | sem interações seguintes; os commits 7b71df3 e 91251b8 e o merge 3e9d6cc, feitos na sessão do Prompt 42 depois do relatório ("nenhum commit"), não estavam registrados | (a) linha "Interações seguintes" acrescentada aos dois registros a partir do git log; (c) o pedido do autor para esses commits ficou como não registrado |
+| 4 | Prompts 43 e 44 | sem registro | 43: este registro; 44: registrado no passo 3 |
+| 5 | HISTORY-IA.md | sem entradas e linhas do Resumo para os Prompts 41 a 43 | (a) entradas e linhas acrescentadas; ganho percebido marcado como estimativa |
+| 6 | HISTORY-IA.md | os Prompts 10 a 13 e 20 estavam fora de qualquer consolidação, e a consolidação da v0.1.0 estava depois deles | (a) consolidação da v0.1.0 movida para depois do Prompt 08; nova seção "Entre a v0.1.0 e a v0.2.0: consolidação"; horas reais do intervalo como não registradas (c) |
+| 7 | HISTORY-IA.md | consolidação da v0.1.0 sem a linha de horas reais | (a) "não medidas", conforme docs/backlog.md, seção 3 |
+| 8 | HISTORY-IA.md | numeração: só o 09 era explicado | (b) motivo registrado em "Como ler este arquivo" |
+| 9 | HISTORY-IA.md | tabela Ambiente com os modelos só até o Prompt 31; sem o Claude in Chrome e o modo chat | (a) modelos de todos os prompts até o 43 e nova linha "Outras ferramentas de IA" |
+| 10 | HISTORY-IA.md | sem análise final; "Como ler" sem o EXTRA-HISTORY-IA.md | (a) seção "Análise final" (uso por modelo, ganho e horas reais, desafios, decisões humanas, lições, cada item com o prompt de origem); referência ao EXTRA-HISTORY-IA.md |
+| 11 | README (Uso de IA generativa) | Claude in Chrome citado só nos Prompts 07 e 12 (usado também nos 31 e 35); sem as linhas da v1.0.0; sem o link do blueprint-v100 | (a) corrigido; links para os três históricos já presentes |
+| 12 | docs/EXTRA-HISTORY-IA.md | link do R-01 com caminho local (file:///C:/...) | E-09: trocado por HISTORY-IA.md; texto do autor intacto. O R-01 repete o texto do PRE-HISTORY-IA.md; não alterado, por ser registro do autor |
+| 13 | prompts/prompts-desenvolvimento.md | status "proposta para revisão do autor"; mypy na definição de pronto citada | E-10: só a linha de status, com a nota do ADR-21 |
+| 14 | git | merge de docs/entrega-v100 em main antes do fechamento (blueprint, passo 3, item 12, prevê o merge no Prompt 44); main sem push | registrado no HISTORY-IA.md (Prompt 42, Refinamentos); nada desfeito; o Prompt 44 mescla de novo a branch recriada |
+
+Arquivos alterados: docs/HISTORY-IA.md, README.md (Uso de IA generativa), docs/EXTRA-HISTORY-IA.md (só o link), prompts/prompts-desenvolvimento.md (só o status), prompts/Prompt 41 e Prompt 42 (interações seguintes) e este arquivo.
+
+Divergências do blueprint: nenhuma de arquivo (todos estão na lista "Pode" da seção 5). Além do previsto no passo 2: a reorganização das seções do HISTORY-IA.md (lacuna 6) e a consolidação do intervalo entre a v0.1.0 e a v0.2.0.

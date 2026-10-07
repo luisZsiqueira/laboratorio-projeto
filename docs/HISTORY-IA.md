@@ -5,7 +5,9 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 ## Como ler este arquivo
 
 - O uso de IA anterior ao repositório (concepção do `CLAUDE.md` no Claude em modo *chat*, em 01 e 02/10/2026) está em [`PRE-HISTORY-IA.md`](PRE-HISTORY-IA.md). Este arquivo começa no Prompt 00.
+- O uso de IA em modo *chat* fora do repositório (extração dos *prompts* de exemplo do tutor, em 04/10/2026) está em [`EXTRA-HISTORY-IA.md`](EXTRA-HISTORY-IA.md), registrado pelo autor.
 - Cada entrada corresponde a uma interação relevante e referencia o arquivo do *prompt* em [`prompts/`](../prompts/), onde estão o texto enviado e o registro da execução.
+- **Numeração.** Não existem os Prompts 09 e 14 a 19. Por escolha do autor, a fase de desenvolvimento começa no Prompt 20, e esses números nunca foram usados (declaração do autor, 07/10/2026, Prompt 43). Os Prompts 10 a 13 e 20 ficam entre a `v0.1.0` e a `v0.2.0`.
 - Campos de cada entrada: data, fase do ciclo de vida, modelo/assistente, como a IA foi usada, *prompt* aplicado, refinamentos, ganho percebido e desafios.
 - O **ganho percebido** é uma estimativa das horas que a mesma tarefa levaria sem IA, menos o tempo efetivamente gasto. É uma percepção, não uma medição, e deve ser lida como ordem de grandeza.
 - Toda saída da IA foi revisada pelo autor antes de entrar na *branch* `main`. As decisões de escopo ficaram com o humano.
@@ -15,7 +17,8 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | Item | Valor |
 | --- | --- |
 | Assistente | Claude Code (CLI), no VS Code, em Windows 11 com PowerShell |
-| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) por padrão, inclusive nos Prompts 21, 24, 25 e 31; outros modelos indicados na entrada (Fable 5.1 no Prompt 20, Sonnet 5.5 nos Prompts 22, 23 e 26 a 30) |
+| Modelo | Claude Opus 5.5 (`claude-opus-5-5`) nos Prompts 00 a 08, 10 a 13, 21, 24, 25, 31, 32, 35 a 41 e 43; Claude Sonnet 5.5 (`claude-sonnet-5-5`) nos Prompts 22, 23, 26 a 30, 33, 34 e 42; Claude Fable 5.1 (`claude-fable-5-1`) no Prompt 20 |
+| Outras ferramentas de IA | Claude in Chrome (extensão do navegador) para conferir a renderização dos diagramas no GitHub (Prompts 07, 12, 31 e 35); Claude em modo *chat*: Opus 5.5 na concepção do `CLAUDE.md` ([`PRE-HISTORY-IA.md`](PRE-HISTORY-IA.md)) e Sonnet 5.5 na extração dos *prompts* do tutor ([`EXTRA-HISTORY-IA.md`](EXTRA-HISTORY-IA.md)) |
 | Regras de trabalho com a IA | [`CLAUDE.md`](../CLAUDE.md) |
 | Formato dos *prompts* | Contexto, Objetivo, Estilo, Resposta (e Observações, a partir do Prompt 04) |
 
@@ -57,8 +60,11 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 | 38 | 07/10/2026 | Revisão de segurança | checklist de 17 verificações, `TaskId` (DT-16), `hide_parameters` (DT-17), 9 casos de teste, retirada do mypy (ADR-21) | ~1 h |
 | 39 | 07/10/2026 | Revisão de documentação e dependências | versões conferidas no PyPI e na OSV, sem mudança; exemplos do README executados de novo; checklist de 21 verificações | ~1 h |
 | 40 | 07/10/2026 | Documentação / fechamento de *release* | README, `CLAUDE.md`, escopo, backlog, `CHANGELOG.md`, este histórico | ~1,5 h |
+| 41 | 07/10/2026 | Planejamento / *blueprint* | `docs/blueprint-v100.md`, com levantamento prévio do repositório e do ambiente | ~1 h |
+| 42 | 07/10/2026 | Validação / execução | clone limpo em PowerShell e Git Bash, exemplos do README executados, ativação do Git Bash no README | ~1 h |
+| 43 | 07/10/2026 | Documentação do processo | consolidação deste histórico, análise final, README (Uso de IA generativa) | ~1 h |
 
-## Entradas
+## Entradas da release v0.1.0
 
 ### Prompt 00: estrutura e repositório
 
@@ -193,6 +199,26 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Release no GitHub.** O `gh` não está instalado, então a Release ficou como passo manual. A *tag* foi publicada.
   - **Definição de pronto.** Numa *release* sem código, ela não se aplica. Foi registrada como "não aplicável", e não como aprovada, para não mascarar o estado do projeto.
 
+## Release v0.1.0: consolidação
+
+- **Período:** 03/10/2026 a 04/10/2026 (Prompts 00 a 08)
+- **Entregas:**
+  - `.gitignore`, `CLAUDE.md`, README e `docs/requerimentos.md`;
+  - `requirements.txt` verificado;
+  - `docs/arquitetura.md` (4 diagramas Mermaid, mais 1 no README, e 11 ADRs);
+  - `LICENSE`, este histórico, `CHANGELOG.md` e `docs/release-review-010.md`;
+  - publicação no GitHub com *tag* `v0.1.0`.
+- **Uso da IA:** geração de documentação, verificação de versões no PyPI, desenho da arquitetura, revisão contra requisitos, testes de APIs deprecadas e diagnóstico de ambiente. Nenhum código da aplicação foi gerado nesta *release*.
+- **Ganho percebido acumulado:** ~10,7 h (soma das estimativas dos Prompts 00 a 08).
+- **Horas reais:** não medidas (`docs/backlog.md`, seção 3).
+- **Lição principal:** a verificação por execução encontrou dois defeitos que a leitura de documentação não revelaria:
+  - o `httpx2` (Prompt 03);
+  - o bloqueio do SQLAlchemy pelo Smart App Control e o comando do mypy (Prompt 08).
+
+  Na `v0.2.0`, o primeiro código já nasce sob o roteiro de checagem preenchido.
+
+## Entradas entre a v0.1.0 e a v0.2.0
+
 ### Prompt 10: escopo e não escopo do MVP
 
 - **Data:** 04/10/2026
@@ -296,22 +322,14 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
   - **Campo TOM.** Os *prompts* deste projeto usam cinco campos (com TOM); o exemplo do tutor, quatro. Seguiu-se o exemplo, como pedido.
   - **Estado do git.** A *branch* anterior (`docs/correcoes-revisao-humana`) tinha alterações no *stage* sem *commit*; a nova *branch* foi criada do mesmo ponto e carrega essas alterações. Separá-las em *commits* distintos fica para o autor.
 
-## Release v0.1.0: consolidação
+## Entre a v0.1.0 e a v0.2.0: consolidação
 
-- **Período:** 03/10/2026 a 04/10/2026 (Prompts 00 a 08)
-- **Entregas:**
-  - `.gitignore`, `CLAUDE.md`, README e `docs/requerimentos.md`;
-  - `requirements.txt` verificado;
-  - `docs/arquitetura.md` (4 diagramas Mermaid, mais 1 no README, e 11 ADRs);
-  - `LICENSE`, este histórico, `CHANGELOG.md` e `docs/release-review-010.md`;
-  - publicação no GitHub com *tag* `v0.1.0`.
-- **Uso da IA:** geração de documentação, verificação de versões no PyPI, desenho da arquitetura, revisão contra requisitos, testes de APIs deprecadas e diagnóstico de ambiente. Nenhum código da aplicação foi gerado nesta *release*.
-- **Ganho percebido acumulado:** ~10,7 h (soma das estimativas dos Prompts 00 a 08).
-- **Lição principal:** a verificação por execução encontrou dois defeitos que a leitura de documentação não revelaria:
-  - o `httpx2` (Prompt 03);
-  - o bloqueio do SQLAlchemy pelo Smart App Control e o comando do mypy (Prompt 08).
-
-  Na `v0.2.0`, o primeiro código já nasce sob o roteiro de checagem preenchido.
+- **Período:** 04 e 05/10/2026 (Prompts 10 a 13 e 20)
+- **Entregas:** `docs/escopo-mvp.md`, `docs/backlog.md`, revisão dos diagramas com o ADR-12 e `docs/mermaid.md`, `docs/PRE-HISTORY-IA.md`, regras de código e de *blueprint* executável no `CLAUDE.md` e `prompts/prompts-desenvolvimento.md`. Sem código. Essas mudanças foram publicadas com a *tag* `v0.2.0`, que inclui o que entrou em `main` depois da `v0.1.0` (Prompt 24).
+- **Uso da IA:** requisitos, planejamento, revisão do desenho antes do código e definição do processo das *releases* seguintes. Opus 5.5 nos Prompts 10 a 13; Fable 5.1 no Prompt 20, depois da extração dos *prompts* do tutor pelo Sonnet 5.5 em modo *chat* (`EXTRA-HISTORY-IA.md`, R-02).
+- **Ganho percebido acumulado:** ~7,2 h (soma das estimativas dos Prompts 10 a 13 e 20).
+- **Horas reais:** não registradas. O backlog registra horas a partir da `v0.2.0` e não diz se as 4 h dessa *release* incluem este intervalo.
+- **Lição principal:** o processo usado da `v0.2.0` em diante nasceu aqui: a regra de *blueprint* executável (Prompt 13) e a sequência planejada de *prompts*, com um *blueprint*, *prompts* de execução por item e um fechamento por *release* (Prompt 20).
 
 ## Entradas da release v0.2.0
 
@@ -690,12 +708,128 @@ Registro cronológico de como a IA generativa foi usada no desenvolvimento do pr
 - **Horas reais:** 4 h, informadas pelo autor, iguais à estimativa (2,5 h dos itens, mais *blueprint* e fechamento). Até a `v0.5.0`, 19 h contra 20,75 h estimadas; a projeção do projeto continua em cerca de 22 h.
 - **Lição principal:** revisar lendo o código não bastou. Os dois desvios de segurança não apareciam no código nem nos testes: um vinha do *driver* e o outro da mensagem padrão da exceção do SQLAlchemy. Só apareceram ao executar a API com entradas extremas e ler o log produzido. Do mesmo modo, a documentação defasada pelas próprias correções só apareceu ao comparar o texto com o código, item a item.
 
+## Entradas da release v1.0.0
+
+### Prompt 41: *blueprint* da `v1.0.0`
+
+- **Data:** 07/10/2026
+- **Fase:** planejamento da *release* `v1.0.0` (entrega do curso)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - leitura do backlog (RT-15 a RT-17), de `docs/requerimentos.md`, do escopo, do README, dos históricos de uso de IA e dos Prompts 42 a 44 planejados;
+  - levantamento prévio do repositório e da máquina, para que o *blueprint* não deixasse decisões em aberto: definição de pronto em `main`, *tags*, *commits* no padrão, registros de execução em `prompts/`, lacunas do histórico, GitHub CLI, `winget`, WSL e Git Bash;
+  - [`docs/blueprint-v100.md`](blueprint-v100.md): decisões E-01 a E-15, roteiro de validação em PowerShell e Git Bash, lista de verificação do histórico, checklist dos requisitos do curso, condição de parada e estimativa (3 h).
+- **Prompt:** [`prompts/Prompt 41 - blueprint da v1.0.0`](../prompts/Prompt%2041%20-%20blueprint%20da%20v1.0.0)
+- **Refinamentos:** nenhum registrado no arquivo do *prompt*. O Prompt 42 cita o *blueprint* como aprovado. O *commit* `7b71df3` (*blueprint* e registro) foi feito na sessão do Prompt 42 (ver a entrada seguinte).
+- **Ganho percebido:** ~1 h (estimativa)
+- **Desafios:**
+  - **Lacunas achadas antes da consolidação.** O levantamento mostrou o que o Prompt 43 teria de tratar: a numeração sem explicação, a tabela Ambiente parada no Prompt 31, o *link* local no `EXTRA-HISTORY-IA.md` e a menção ao mypy em `prompts-desenvolvimento.md`.
+  - **Bash sem Linux.** Sem máquina Linux nem distribuição WSL, o *blueprint* definiu o Git Bash do Windows como verificação do caminho Bash e o Linux/macOS como "não verificado" (E-03), sem instalar nada para a entrega.
+
+### Prompt 42: validação em máquina limpa
+
+- **Data:** 07/10/2026
+- **Fase:** validação (passo 1 do `docs/blueprint-v100.md`, RT-15)
+- **Modelo:** Claude Sonnet 5.5 (`claude-sonnet-5-5`), via Claude Code, como modelo de execução do roteiro
+- **Uso da IA:**
+  - clone de `main` (`6ae17f4`) em diretórios temporários, `.venv` novo e instalação só com os comandos do README, em PowerShell e em Git Bash;
+  - API no ar, `/health` e os 16 exemplos da seção Endpoints em PowerShell; `/health`, `POST /tasks` e `GET /tasks` em Git Bash; definição de pronto (`143 passed`) e `git status` limpo nos dois clones, removidos ao final;
+  - README (Como rodar) com a ativação do `.venv` no Git Bash e a forma Bash da Solução de problemas (E-04).
+- **Prompt:** [`prompts/Prompt 42 - validação em máquina limpa`](../prompts/Prompt%2042%20-%20valida%C3%A7%C3%A3o%20em%20m%C3%A1quina%20limpa)
+- **Refinamentos:** com a porta 8000 ocupada por outro processo do autor, a API do clone subiu na porta 8001, por decisão tomada com o autor. Depois do relatório, que diz "nenhum *commit*", a sessão fez os *commits* `7b71df3` e `91251b8` e o *merge* `3e9d6cc` em `main`, sem *push*; isso não está no arquivo do *prompt* e foi conferido no `git log` no Prompt 43.
+- **Ganho percebido:** ~1 h (estimativa)
+- **Desafios:**
+  - **README incompleto para o Git Bash do Windows.** Só havia `source .venv/bin/activate`, que não existe no Windows. A falha apareceu ao seguir o README à risca, como faria o avaliador.
+  - **Ferramenta Bash reduzida.** O *shell* da sessão não tinha `curl`, `sleep` nem `grep`; as chamadas HTTP rodaram no Git Bash real. Um `POST` com `422` por erro de aspas entre PowerShell e Bash foi repetido por arquivo de *script* e respondeu `201`.
+  - **Smart App Control.** Não bloqueou o SQLAlchemy no `.venv` novo; a Solução de problemas não foi necessária.
+  - **Linux/macOS:** não verificado (E-03).
+
+### Prompt 43: consolidação do histórico de uso de IA
+
+- **Data:** 07/10/2026
+- **Fase:** documentação do processo (passo 2 do `docs/blueprint-v100.md`, RT-16)
+- **Modelo:** Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code
+- **Uso da IA:**
+  - conferência, por busca nos arquivos, do registro da execução em cada arquivo de `prompts/` e das entradas deste histórico;
+  - entradas dos Prompts 41 a 43; consolidação do intervalo entre a `v0.1.0` e a `v0.2.0`, que não tinha uma; tabela Ambiente com os modelos de todos os *prompts*; motivo da numeração, perguntado ao autor; análise final;
+  - README (Uso de IA generativa), *link* do `EXTRA-HISTORY-IA.md` e status de `prompts/prompts-desenvolvimento.md`.
+- **Prompt:** [`prompts/Prompt 43 - consolidação do histórico de uso de IA`](../prompts/Prompt%2043%20-%20consolida%C3%A7%C3%A3o%20do%20hist%C3%B3rico%20de%20uso%20de%20IA)
+- **Refinamentos:** uma pergunta ao autor, sobre a numeração dos *prompts* (E-08, b).
+- **Ganho percebido:** ~1 h (estimativa)
+- **Desafios:**
+  - **Registrar sem reconstruir.** Os registros dos Prompts 00 a 40 não podem mudar (`docs/blueprint-v100.md`, seção 5). Onde falta o campo "interações seguintes", a fonte passa a ser o campo Refinamentos deste histórico. Os *commits* da sessão do Prompt 42 foram registrados a partir do `git log`, sem supor a conversa que os pediu.
+  - **Intervalo sem consolidação.** Os Prompts 10 a 13 e 20 ficavam fora de qualquer consolidação, e a consolidação da `v0.1.0` estava depois deles. A seção foi movida para logo após o Prompt 08, e o intervalo ganhou a sua.
+  - **README incompleto.** O Claude in Chrome aparecia só nos Prompts 07 e 12, e foi usado também nos Prompts 31 e 35.
+
 ## Observações transversais
 
-Padrões que se repetiram nas interações até aqui, a aprofundar na análise final:
+Padrões que se repetiram nas interações. A análise final, a seguir, os retoma com os números do projeto.
 
 - **O `CLAUDE.md` funcionou como contrato.** Vários *prompts* pediam algo em conflito com regras já acordadas (Node.js, priorização por IA, arquivos fora da estrutura). A IA não escolheu sozinha: aplicou a regra, apontou a divergência e devolveu a decisão ao autor.
 - **Verificação por execução supera o conhecimento do modelo.** O caso `httpx2` mostra que versões e APIs mudam depois do corte de treinamento; consultar o PyPI e rodar código no ambiente real evitou um erro que só apareceria nos testes.
 - **Premissas erradas nos *prompts* foram detectadas, não completadas.** Arquivos inexistentes, roadmap inexistente e códigos HTTP impossíveis no fluxo pedido foram apontados antes de a IA produzir conteúdo sobre eles.
 - **A IA também erra.** O `.gitignore` do Prompt 00 tinha um padrão que ignorava o `.env.example`; a revisão seguinte corrigiu. Por isso toda saída passa por revisão antes de entrar em `main`.
 - **Ambiente Windows gera atritos próprios:** bloqueio de arquivo aberto em outro programa e conversão de fim de linha (LF/CRLF), tratados sem perda de dados. O Smart App Control bloqueou extensões compiladas não assinadas: as do SQLAlchemy, contornadas com a instalação em Python puro, e as do mypy, que saiu do projeto (ADR-21).
+
+## Análise final
+
+Escrita no Prompt 43 (07/10/2026), com o projeto validado em máquina limpa e antes da publicação da `v1.0.0`. Cada afirmação cita o *prompt* ou o arquivo de origem; números de ganho são estimativas. O Prompt 44 acrescenta a sua entrada, a consolidação da `v1.0.0` e as horas reais da *release*.
+
+### Uso por modelo e por etapa
+
+| Modelo | *Prompts* | Etapas |
+| --- | --- | --- |
+| Claude Opus 5.5 (Claude Code) | 26: 00 a 08, 10 a 13, 21, 24, 25, 31, 32, 35 a 41 e 43 | inicialização, requisitos, arquitetura, *blueprints*, revisões, fechamentos de *release* e consolidação do histórico |
+| Claude Sonnet 5.5 (Claude Code) | 10: 22, 23, 26 a 30, 33, 34 e 42 | execução dos *blueprints* (código, testes, exemplos do README) e validação em máquina limpa |
+| Claude Fable 5.1 (Claude Code) | 1: 20 | planejamento dos *prompts* de desenvolvimento |
+| Claude in Chrome | 07, 12, 31 e 35 | conferência da renderização dos diagramas no GitHub |
+| Claude Opus 5.5 (*chat*) | antes do repositório | concepção do `CLAUDE.md` ([`PRE-HISTORY-IA.md`](PRE-HISTORY-IA.md)) |
+| Claude Sonnet 5.5 (*chat*) | fora do repositório | extração dos *prompts* do tutor ([`EXTRA-HISTORY-IA.md`](EXTRA-HISTORY-IA.md), R-02) |
+
+São 37 *prompts* executados no Claude Code até o Prompt 43.
+
+### Ganho percebido e horas reais
+
+| Período | *Prompts* | Ganho percebido (estimativa) | Horas reais |
+| --- | --- | --- | --- |
+| `v0.1.0` | 00 a 08 | ~10,7 h | não medidas |
+| entre a `v0.1.0` e a `v0.2.0` | 10 a 13 e 20 | ~7,2 h | não registradas |
+| `v0.2.0` | 21 a 24 | ~6 h | 4 h |
+| `v0.3.0` | 25 a 31 | ~9,5 h | 8 h |
+| `v0.4.0` | 32 a 35 | ~9 h | 3 h |
+| `v0.5.0` | 36 a 40 | ~5,5 h | 4 h |
+| `v1.0.0` | 41 a 43 (o 44 entra no fechamento) | ~3 h | a informar no Prompt 44 |
+| **Total** | 37 *prompts* | **~50,9 h** | **19 h** (`v0.2.0` a `v0.5.0`) |
+
+Leitura dos números:
+
+- **As estimativas são da IA.** O ganho de cada *prompt* foi estimado pelo assistente no registro (Prompt 06, Desafios), e não há registro de revisão dessas estimativas pelo autor. Valem como ordem de grandeza.
+- **Comparação só onde há as duas medidas.** Da `v0.2.0` à `v0.5.0`, o ganho estimado soma ~30 h, e as horas reais, 19 h. Pela definição de ganho deste arquivo, a mesma entrega sem IA levaria cerca de 49 h, ou cerca de 2,6 vezes o tempo gasto. É uma conta sobre estimativas, não uma medição.
+- **Horas reais contra o orçamento.** Até a `v0.5.0`, 19 h contra 20,75 h estimadas no backlog; a projeção do projeto é de cerca de 22 h, dentro das cerca de 30 horas (`docs/backlog.md`, seção 3). O tempo da `v0.1.0` não foi medido.
+- **Tempo perdido fora da IA.** Na `v0.3.0`, segundo o autor, cerca de metade das 8 h se perdeu com falhas de conexão com a API do Claude numa internet por *hotspot* do celular, e o trabalho caberia em 3 a 4 h (Prompt 31).
+
+### Principais desafios
+
+1. **Conhecimento do modelo defasado em relação às versões instaladas.** O `TestClient` do Starlette 1.7.0 exige `httpx2` (Prompt 03); `HTTP_422_UNPROCESSABLE_ENTITY` passou a emitir aviso (Prompt 25); `Literal` na *query string*, `tzdata` no Windows e conversões implícitas do Pydantic só apareceram no protótipo (Prompt 32). Nenhum deles seria evitado por um assistente que escrevesse de memória.
+2. **Ambiente Windows.** O Smart App Control bloqueou as extensões compiladas do SQLAlchemy (Prompt 08) e do mypy (Prompt 38). Também houve arquivo aberto em outro programa impedindo o *merge* (Prompt 03), a página de código do Git Bash quebrando acentos no `curl` (Prompt 30), o `Invoke-RestMethod` lançando exceção em `404` e `422` (Prompts 30 e 39) e a porta 8000 ocupada (Prompts 23 e 42).
+3. **Interrupções da API e da conexão.** Houve execuções interrompidas nos Prompts 23, 24, 30 e 31. A retomada partiu sempre do estado em disco e do `origin`, não do relato da sessão interrompida.
+4. ***Prompts* com premissas erradas ou em conflito com regras acordadas.** Foram o *frontend* Node.js (Prompt 01), a priorização por IA no MVP (Prompt 02), o roadmap inexistente e o `404` impossível (Prompt 04) e as funções do Prompt 27 contra a classe do *blueprint*. Os arquivos dos Prompts 02 e 35 estavam vazios no disco.
+5. **Validação dos diagramas sem Node.js.** A conferência passou pelo navegador (Prompts 07 e 12) e pelo mermaid.ink (Prompt 24). O modo automático do Claude Code bloqueou o mermaid.ink no Prompt 31, e a conferência voltou ao GitHub pelo Claude in Chrome (Prompts 31 e 35).
+6. **Documentação defasada pelas próprias mudanças.** As correções do Prompt 38 não tinham chegado à arquitetura (Prompt 39); pendências de fechamentos anteriores apareceram ao reler arquivos inteiros (Prompt 40); o README não cobria o Git Bash do Windows (Prompt 42).
+7. **Erros do próprio assistente.** O padrão do `.gitignore` ignorava o `.env.example` (Prompt 00). Também houve um comando que travou por `python -` sem entrada (Prompt 22), `heredocs` longos recusados pelo *shell* (Prompts 29, 34 e 43), uma edição por *script* que falhou na DT-13 (Prompt 37) e três *commits* em vez de um (Prompt 03). Todos foram detectados e corrigidos na mesma sessão ou na seguinte.
+
+### Decisões que ficaram com o humano
+
+- **Escopo:** priorização por IA fora do MVP (Prompt 02); roadmap em seis *releases* (Prompt 04); esquema do `/health` adiado para o *blueprint* (Prompt 12); aprovação das decisões D-08 (Prompt 21), D-01 a D-04 (Prompt 25) e D-05 a D-07 e D-09 (Prompt 32). A D-09, datas no horário local e "só o dia", nasceu de uma observação do autor sobre usabilidade.
+- **Processo:** aprovação de cada *blueprint* antes do código; autorização de cada *commit*, *merge*, *tag* e *push*; o catálogo `docs/mermaid.md` com o antes e o depois (Prompt 12); as regras de código e de *blueprint* executável a partir da revisão humana (Prompt 13).
+- **Ferramentas e histórico:** não reescrever o histórico publicado (Prompt 08); retirar o mypy do projeto em vez de desligar o Smart App Control ou instalar o WSL, e aceitar as execuções bem-sucedidas do mypy 1.18.2 como evidência (Prompt 38, ADR-21); manter o nome do validador no `422` de formato (R-05, Prompts 36 e 40); usar a porta 8001 na validação (Prompt 42).
+- **Fatos que só o autor tem:** horas reais de cada *release* (Prompts 24, 31, 35 e 40), as sessões em modo *chat* (`PRE-HISTORY-IA.md`, `EXTRA-HISTORY-IA.md`) e o motivo da numeração dos *prompts* (Prompt 43).
+
+### Lições
+
+1. **Um contrato escrito orienta mais do que o *prompt*.** Com o `CLAUDE.md` e as fontes de verdade, o assistente aplicou a regra e devolveu a decisão ao autor quando o pedido conflitava com ela (Prompts 01, 02, 04 e 27), em vez de escolher sozinho.
+2. **Verificar executando, não lendo.** Os meios foram o protótipo antes do *blueprint* (Prompts 21, 25 e 32), a sondagem da API com entradas extremas (Prompt 38), os exemplos do README executados (Prompts 30, 34, 39 e 42) e a comparação por *script* (Prompt 37). Os defeitos mais caros do projeto só apareceram assim: o `httpx2`, o Smart App Control, o `OverflowError` do *driver* e os dados no log.
+3. **O *blueprint* executável permite dividir o trabalho entre modelos.** O Opus 5.5 desenhou e fechou; o Sonnet 5.5 executou da `v0.2.0` à `v0.4.0` sem divergência de código, com a contagem de testes prevista em cada passo. Persistido em disco, o *blueprint* também permitiu retomar depois das interrupções (Prompts 23 e 31).
+4. **Registrar na hora custa menos do que reconstruir.** O modelo do Prompt 21 só foi identificado pelo transcrito da sessão (Prompt 24), e os *commits* da sessão do Prompt 42 só pelo `git log` (Prompt 43). Onde o registro foi feito ao fim de cada *prompt*, a consolidação não precisou de memória da conversa.
+5. **Estimativa da IA não é medição.** O ganho percebido serve como ordem de grandeza, mas as horas reais vieram sempre do autor, e o assistente não as inventou quando faltaram (Prompts 24 e 40).
+6. **Uma *release* só de revisão se pagou.** A `v0.5.0` não achou desvio de arquitetura (Prompt 37), mas achou dois desvios de segurança e documentação defasada (Prompts 38 e 39), com checklist e evidência em cada verificação.

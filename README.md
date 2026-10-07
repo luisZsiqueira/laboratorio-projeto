@@ -601,7 +601,7 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 | --- | --- | --- |
 | Claude (*chat*) | Claude Opus 5.5 | concepção do `CLAUDE.md` inicial a partir dos requisitos do curso, em 01 e 02/10/2026, antes do repositório |
 | Claude Code | Claude Opus 5.5 | estrutura do projeto, `.gitignore`, README, verificação de versões e `requirements.txt`, desenho da arquitetura, licença, histórico de uso de IA, revisão de segredos e publicação no GitHub, revisão de publicação da `v0.1.0` (APIs deprecadas, ambiente virtual, *commits*, `CHANGELOG.md`), documento de escopo e requisitos do MVP, backlog por *release*, revisão dos diagramas Mermaid, regras de código e de *blueprint* executável |
-| Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub (Prompts 07 e 12) |
+| Claude in Chrome | Claude Opus 5.5 | conferência visual da renderização dos diagramas Mermaid no GitHub (Prompts 07, 12, 31 e 35) |
 | Claude (*chat*) | Claude Sonnet 5.5 | extração, a partir de capturas de tela do curso, dos *prompts* de exemplo do tutor ([`docs/release-prompts-solon-020.md`](docs/release-prompts-solon-020.md)), em 04/10/2026 |
 | Claude Code | Claude Fable 5.1 | planejamento dos *prompts* da fase de desenvolvimento ([`prompts/prompts-desenvolvimento.md`](prompts/prompts-desenvolvimento.md), Prompt 20) |
 | Claude Code | Claude Sonnet 5.5 | execução do *blueprint* da `v0.2.0` ([`docs/blueprint-v020.md`](docs/blueprint-v020.md)): código da aplicação, testes de integração e execução manual da API (Prompts 22 e 23) |
@@ -611,11 +611,13 @@ O projeto é desenvolvido com apoio de IA generativa em todas as etapas do ciclo
 | Claude Code | Claude Opus 5.5 | *blueprint* da `v0.4.0` ([`docs/blueprint-v040.md`](docs/blueprint-v040.md)), com protótipo verificado e a revisão das datas no horário local pedida pelo autor (Prompt 32), e fechamento da *release* (Prompt 35) |
 | Claude Code | Claude Sonnet 5.5 | execução do *blueprint* da `v0.4.0`: `priority_advisor` e seus testes (Prompt 33); integração ao *service* e às rotas, filtro por prioridade, datas no horário local, 43 testes novos e exemplos do README executados na API (Prompt 34) |
 | Claude Code | Claude Opus 5.5 | *blueprint* da `v0.5.0` ([`docs/blueprint-v050.md`](docs/blueprint-v050.md), Prompt 36); revisões de arquitetura (Prompt 37), de segurança, com duas correções, três testes novos e a retirada do mypy (Prompt 38), e da documentação e das dependências, com os exemplos do README executados de novo na API (Prompt 39); fechamento da *release* (Prompt 40) |
+| Claude Code | Claude Opus 5.5 | *blueprint* da `v1.0.0` ([`docs/blueprint-v100.md`](docs/blueprint-v100.md), Prompt 41) e consolidação do histórico de uso de IA, com a análise final (Prompt 43) |
+| Claude Code | Claude Sonnet 5.5 | validação em máquina limpa: clone, instalação, API, exemplos e testes só com os comandos do README, em PowerShell e em Git Bash (Prompt 42) |
 
 - As regras de trabalho com o assistente estão em [`CLAUDE.md`](CLAUDE.md).
 - Cada *prompt* usado fica registrado em [`prompts/`](prompts/), um arquivo por *prompt*; os *prompts* planejados para as *releases* `v0.2.0` a `v1.0.0` estão em [`prompts/prompts-desenvolvimento.md`](prompts/prompts-desenvolvimento.md).
-- O histórico de uso da IA (etapas, ganhos, desafios) está em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md); o uso anterior ao repositório, em [`docs/PRE-HISTORY-IA.md`](docs/PRE-HISTORY-IA.md); o uso em modo *chat* fora do repositório, em [`docs/EXTRA-HISTORY-IA.md`](docs/EXTRA-HISTORY-IA.md).
-- Os *blueprints* aprovados ([`docs/blueprint-v020.md`](docs/blueprint-v020.md), [`docs/blueprint-v030.md`](docs/blueprint-v030.md), [`docs/blueprint-v040.md`](docs/blueprint-v040.md) e [`docs/blueprint-v050.md`](docs/blueprint-v050.md)) são escritos para que um modelo de execução, como o Claude Sonnet 5.5, os siga sem depender do contexto da conversa (regra em [`CLAUDE.md`](CLAUDE.md), Blueprint executável).
+- O histórico de uso da IA (etapas, ganhos, desafios, consolidação por *release* e análise final) está em [`docs/HISTORY-IA.md`](docs/HISTORY-IA.md); o uso anterior ao repositório, em [`docs/PRE-HISTORY-IA.md`](docs/PRE-HISTORY-IA.md); o uso em modo *chat* fora do repositório, em [`docs/EXTRA-HISTORY-IA.md`](docs/EXTRA-HISTORY-IA.md).
+- Os *blueprints* aprovados ([`docs/blueprint-v020.md`](docs/blueprint-v020.md), [`docs/blueprint-v030.md`](docs/blueprint-v030.md), [`docs/blueprint-v040.md`](docs/blueprint-v040.md), [`docs/blueprint-v050.md`](docs/blueprint-v050.md) e [`docs/blueprint-v100.md`](docs/blueprint-v100.md)) são escritos para que um modelo de execução, como o Claude Sonnet 5.5, os siga sem depender do contexto da conversa (regra em [`CLAUDE.md`](CLAUDE.md), Blueprint executável).
 
 Todo código gerado por IA é revisado e testado antes de ser incorporado.
 
