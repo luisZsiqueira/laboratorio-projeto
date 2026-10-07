@@ -1,6 +1,6 @@
 # Blueprint da `v1.0.0`: entrega do curso
 
-> **Status:** proposto em 07/10/2026 (Prompt 41), aguardando aprovação do autor. Executado pelos Prompts 42 (passo 1), 43 (passo 2) e 44 (passo 3, publicação e fechamento). Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
+> **Status:** executado. Proposto em 07/10/2026 (Prompt 41) e aprovado pelo autor; executado pelos Prompts 42 (passo 1), 43 (passo 2) e 44 (passo 3, publicação e fechamento), em 07/10/2026. A *release* `v1.0.0` foi publicada com *tag* e *Release* no GitHub. Quem executa lê este arquivo e o `CLAUDE.md`; nada depende do histórico do *chat*.
 
 ## 1. Escopo da *release*
 

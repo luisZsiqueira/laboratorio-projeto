@@ -17,3 +17,5 @@ Resumo da execução:
 4. Decisões do assistente a confirmar na aprovação: E-03 (Linux/macOS registrado como não verificado), E-04 (README ganha a ativação e a Solução de problemas para o Git Bash do Windows), E-09 e E-10 (correções pontuais no EXTRA-HISTORY-IA.md e em prompts-desenvolvimento.md) e E-12 (instalação e autenticação da GitHub CLI pelo autor antes do Prompt 44).
 5. Definição de pronto: 143 passed, sem avisos (nenhum arquivo de app/ ou tests/ alterado).
 6. Git: branch docs/entrega-v100 criada a partir de main; blueprint e este arquivo adicionados ao stage; sem commit.
+
+Interações seguintes (registradas no Prompt 43, a partir do git log e do Prompt 42): o Prompt 42 cita o blueprint como aprovado; o commit 7b71df3 (blueprint e este registro) foi feito na sessão do Prompt 42, com Claude Sonnet 5.5 como coautor.

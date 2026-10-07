@@ -34,3 +34,5 @@ Clone de `https://github.com/luisZsiqueira/laboratorio-projeto.git` (`main`, `6a
 2. A ferramenta Bash da sessão é um ambiente reduzido (sem `curl`, `tail`, `sleep`, `grep`, `uname`). O `venv`, a instalação e o servidor rodaram nela; as chamadas `curl` rodaram no Git Bash real (`C:\Program Files\Git\bin\bash.exe`). Uma primeira tentativa de `POST` retornou `422` por erro de aspas entre PowerShell e bash, repetida em arquivo de script e conforme (`201`).
 3. Linux/macOS (passo 2 do Como rodar, `source .venv/bin/activate`): **não verificado** (E-03), sem máquina Linux nem WSL.
 4. `docs/arquitetura.md`, `app/` e `tests/` não foram alterados. Alteração desta execução: `README.md` (Como rodar, Solução de problemas). Nenhum `commit`.
+
+**Interações seguintes** (registradas no Prompt 43, a partir do `git log`): depois deste relatório, a mesma sessão fez os commits `7b71df3` (`docs: adiciona o blueprint da v1.0.0`) e `91251b8` (`docs: registra a validação em máquina limpa`) na branch `docs/entrega-v100` e o merge `3e9d6cc` em `main`, sem push. O pedido do autor para esses commits não está registrado.

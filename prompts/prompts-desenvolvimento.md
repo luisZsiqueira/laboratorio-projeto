@@ -1,6 +1,6 @@
 # Prompts de desenvolvimento: `v0.2.0` a `v1.0.0`
 
-> **Status:** proposta para revisão do autor (Prompt 20, 05/10/2026). Adaptação dos *prompts* de exemplo do tutor ([`docs/release-prompts-solon-020.md`](../docs/release-prompts-solon-020.md)) ao processo deste projeto. Depois de aprovado, cada *prompt* abaixo vira um arquivo `prompts/Prompt NN - <título>` no momento do uso, e este arquivo passa a ser o índice da fase de desenvolvimento.
+> **Status:** executado (Prompts 21 a 43 de 05 a 07/10/2026; o Prompt 44 publica a `v1.0.0`). Proposto no Prompt 20 (05/10/2026). O mypy citado nos *prompts* foi retirado do projeto pelo ADR-21 (07/10/2026); a definição de pronto passou a ser só `python -m pytest -W error`. Os textos dos *prompts* abaixo não mudaram. Adaptação dos *prompts* de exemplo do tutor ([`docs/release-prompts-solon-020.md`](../docs/release-prompts-solon-020.md)) ao processo deste projeto. Depois de aprovado, cada *prompt* abaixo vira um arquivo `prompts/Prompt NN - <título>` no momento do uso, e este arquivo passa a ser o índice da fase de desenvolvimento.
 
 ## Como usar
 
